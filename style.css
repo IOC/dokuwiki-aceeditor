@@ -1,0 +1,120 @@
+/* Editor */
+
+.ace-doku.ace_editor {
+    font-size: 1.2em;
+}
+
+.ace-doku .ace_scroller {
+    background-color: #222;
+}
+
+/* Gutter */
+
+.ace-doku .ace_gutter {
+  width: 40px;
+  background-color: #444;
+  color: #ff8;
+  overflow : hidden;
+}
+
+.ace-doku .ace_gutter-layer {
+  width: 100%;
+  text-align: right;
+}
+
+.ace-doku .ace_gutter-layer .ace_gutter-cell {
+  padding-right: 5px;
+}
+
+/* Margin */
+
+.ace-doku .ace_print_margin {
+    background-color: #333;
+    width: 100%;
+    margin-left: 1px solid #666;
+}
+
+/* Cursor */
+
+.ace-doku .ace_cursor {
+    border-left: 1px solid #ff8;
+}
+
+.ace-doku .ace_cursor.ace_overwrite {
+    border-left: 0px;
+    border-bottom: 1px solid #ff8;
+}
+
+/* Marker */
+
+.ace-doku .ace_marker-layer .ace_active_line {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.ace-doku .ace_marker-layer .ace_selection {
+    background-color: rgba(0, 128, 255, 0.2);
+}
+
+.ace-doku .ace_marker-layer .ace_bracket {
+    margin-top: -1px;
+    border: 1px solid #f80;
+}
+
+/* Text */
+
+.ace-doku .ace_text-layer {
+    cursor: text;
+    color: #fff;
+}
+
+.ace-doku .ace_line .ace_invisible {
+    color: #888;
+}
+
+/* Syntax highlighting */
+
+.ace-doku .ace_header {
+    color: #ff8;
+    font-weight: bold;
+}
+
+.ace-doku .ace_strong,
+.ace-doku .ace_emphasis,
+.ace-doku .ace_underline,
+.ace-doku .ace_monospace,
+.ace-doku .ace_subscript,
+.ace-doku .ace_superscript,
+.ace-doku .ace_deleted,
+.ace-doku .ace_footnote {
+    font-weight: bold;
+}
+
+.ace-doku .ace_hr,
+.ace-doku .ace_listblock,
+.ace-doku .ace_table,
+.ace-doku .ace_quote {
+    color: #ff8;
+    font-weight: bold;
+}
+
+.ace-doku .ace_php,
+.ace-doku .ace_html,
+.ace-doku .ace_code,
+.ace-doku .ace_preformatted {
+    color: #8f8;
+}
+
+.ace-doku .ace_notoc,
+.ace-doku .ace_nocache,
+.ace-doku .ace_unformatted,
+.ace-doku .ace_unformattedalt,
+.ace-doku .ace_linebreak {
+    color: #f88;
+}
+
+.ace-doku .ace_internallink,
+.ace-doku .ace_media,
+.ace-doku .ace_email,
+.ace-doku .ace_externallink {
+    color: #8ff;
+}
