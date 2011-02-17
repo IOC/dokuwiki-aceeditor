@@ -31,11 +31,11 @@ addInitEvent(function() {
         textarea.parentNode.insertBefore(container, textarea);
         element = document.createElement("div");
         container.appendChild(element);
-        element.style.width = container.style.width = (window.innerWidth - 50) + "px";
+        element.style.width = container.offsetWidth + 'px';
         element.style.height = container.style.height = (DokuCookie.getValue('sizeCtl') || "300px");
         textarea.style.display = "none";
         window.addEventListener("resize", function(event) {
-            element.style.width = container.style.width = (window.innerWidth - 50) + 'px';
+            element.style.width = container.offsetWidth + 'px';
         }, false);
 
         // Initialize Ace
