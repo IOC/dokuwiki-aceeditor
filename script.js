@@ -54,8 +54,7 @@ addInitEvent(function() {
         // Setup wrap mode
         session.setUseWrapMode(false);
         editor.setShowPrintMargin(false);
-        session.setWrapLimitRange(JSINFO.plugin_aceeditor.wraplimit,
-                                  JSINFO.plugin_aceeditor.wraplimit);
+        session.setWrapLimitRange(null, JSINFO.plugin_aceeditor.wraplimit);
         editor.setPrintMarginColumn(JSINFO.plugin_aceeditor.wraplimit);
 
         // Patch Dokuwiki functions

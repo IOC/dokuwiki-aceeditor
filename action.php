@@ -32,10 +32,10 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
 
     public function handle_dokuwiki_started(Doku_Event &$event, $param) {
         global $JSINFO;
-        $wraplimit = (int) trim($this->getConf('wraplimit'));
+        $wraplimit = trim($this->getConf('wraplimit'));
         $JSINFO['plugin_aceeditor'] = array(
             'highlight' => $this->getConf('highlight'),
-            'wraplimit' => $wraplimit ? $wraplimit : 80,
+            'wraplimit' => $wraplimit ? (int) $wraplimit : null,
         );
     }
 
