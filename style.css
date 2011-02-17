@@ -118,3 +118,17 @@
 .ace-doku .ace_externallink {
     color: #8ff;
 }
+
+/* IOC */
+
+.ace-doku .ace_iocstl,
+.ace-doku .ace_quiz,
+.ace-doku .ace_latex,
+.ace-doku .ace_latexalt,
+.ace-doku .ace_noprint,
+.ace-doku .ace_noweb,
+.ace-doku .ace_directive-open,
+.ace-doku .ace_directive-param,
+.ace-doku .ace_directive-close {
+    color: #8f8;
+}

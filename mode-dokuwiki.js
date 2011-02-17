@@ -59,7 +59,11 @@ var DokuwikiHighlightRules = function() {
         };
     };
 
+    rule("start", "quiz", "<quiz>|</quiz>"); // sort 5
     rule("start", "listblock", "^(?: {2,}|\t{1,})[\-\\*]"); // sort 10
+    rule("start", "iocstl", "<iocstl.*?>|</iocstl>"); // sort 15
+    rule("start", "noprint", "<noprint>|</noprint>"); // sort 16
+    rule("start", "noweb", "<noweb>|</noweb>"); // sort 17
     rule("start", "preformatted", "^(?:  |\t).+$"); // sort 20
     rule("start", "notoc", "~~NOTOC~~"); // sort 30
     rule("start", "nocache", "~~NOCACHE~~"); // sort 40
@@ -68,28 +72,32 @@ var DokuwikiHighlightRules = function() {
     rule("table", "table", "[\\|\\^][ \t]*$", "start");
     rule("table", "table", "[\\|\\^]");
     rule("table", "table", ":::(?=[ \t]*[\\|\\^])");
-    format(["start", "table"], "strong", "\\*\\*", "\\*\\*"); // sort 70
-    format(["start", "table"], "emphasis", "//", "//"); // sort 80
-    format(["start", "table"], "underline", "__", "__"); // sort 90
-    format(["start", "table"], "monospace", "''", "''"); // sort 100
-    format(["start", "table"], "subscript", "<sub>", "</sub>"); // sort 110
-    format(["start", "table"], "superscript", "<sup>", "</sup>"); // sort 120
-    format(["start", "table"], "deleted", "<del>", "</del>"); // sort 130
-    inline(["start", "table"], "linebreak", "\\\\"); // sort 140
-    format(["start", "table"], "footnote", "\\(\\(", "\\)\\)"); // sort 150
+    format(["start", "table", "directive"], "strong", "\\*\\*", "\\*\\*"); // sort 70
+    format(["start", "table", "directive"], "emphasis", "//", "//"); // sort 80
+    format(["start", "table", "directive"], "underline", "__", "__"); // sort 90
+    format(["start", "table", "directive"], "monospace", "''", "''"); // sort 100
+    format(["start", "table", "directive"], "latex", "<latex>", "</latex>"); // sort 100
+    format(["start", "table", "directive"], "latexalt", "\\$\\$", "\\$\\$"); // sort 100
+    format(["start", "table", "directive"], "subscript", "<sub>", "</sub>"); // sort 110
+    format(["start", "table", "directive"], "superscript", "<sup>", "</sup>"); // sort 120
+    format(["start", "table", "directive"], "deleted", "<del>", "</del>"); // sort 130
+    inline(["start", "table", "directive"], "linebreak", "\\\\"); // sort 140
+    format(["start", "table", "directive"], "footnote", "\\(\\(", "\\)\\)"); // sort 150
     rule("start", "hr", "^[ \t]*-{4,}[ \t]*$") // sort 160
-    format(["start", "table"], "unformatted", "<nowikI>", "</nowikI>"); // sort 170
-    format(["start", "table"], "unformattedalt", "%%", "%%"); // sort 170
-    format(["start", "table"], "php", "<php>", "</php>"); // sort 180
-    format(["start", "table"], "html", "<html>", "</html>"); // sort 190
-    format(["start", "table"], "code", "<code.*?>", "</code>"); // sort 200
-    format(["start", "table"], "file", "<file.*?>", "</file>"); // sort 210
+    format(["start", "table", "directive"], "unformatted", "<nowikI>", "</nowikI>"); // sort 170
+    format(["start", "table", "directive"], "unformattedalt", "%%", "%%"); // sort 170
+    format(["start", "table", "directive"], "php", "<php>", "</php>"); // sort 180
+    format(["start", "table", "directive"], "html", "<html>", "</html>"); // sort 190
+    format(["start", "table", "directive"], "code", "<code.*?>", "</code>"); // sort 200
+    format(["start", "table", "directive"], "file", "<file.*?>", "</file>"); // sort 210
     rule("start", "quote", "^>{1,}"); // sort 220
-    inline(["start", "table"], "internallink", "\\[\\[.+?\\]\\]"); // sort 300
-    inline(["start", "table"], "media", "\\{\\{.+?\\}\\}"); // sort 320
-    inline(["start", "table"], "externallink", "(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$)|(?:www|ftp)\\.[\\w.:?\\-;,]+?\\.[\\w.:?\\-;,]+?[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$))"); // sort 33
-    inline(["start", "table"], "email", "<[0-9a-zA-Z!#$%&'*+\/=?^_`{|}~-]+(?:\\.[0-9a-zA-Z!#$%&'*+\\/=?^_`{|}~-]+)*@(?:[0-9a-zA-Z][0-9a-zA-Z-]*\\.)+(?:[a-zA-Z]{2,4}|museum|travel)>"); // sort 340
-
+    inline(["start", "table", "directive"], "internallink", "\\[\\[.+?\\]\\]"); // sort 300
+    inline(["start", "table", "directive"], "media", "\\{\\{.+?\\}\\}"); // sort 320
+    inline(["start", "table", "directive"], "externallink", "(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$)|(?:www|ftp)\\.[\\w.:?\\-;,]+?\\.[\\w.:?\\-;,]+?[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$))"); // sort 33
+    inline(["start", "table", "directive"], "email", "<[0-9a-zA-Z!#$%&'*+\/=?^_`{|}~-]+(?:\\.[0-9a-zA-Z!#$%&'*+\\/=?^_`{|}~-]+)*@(?:[0-9a-zA-Z][0-9a-zA-Z-]*\\.)+(?:[a-zA-Z]{2,4}|museum|travel)>"); // sort 340
+    rule("start", "directive-open", "^::[a-zA-Z0-9_-]+:.*$", "directive");
+    rule("directive", "directive-param", "^  [a-zA-Z0-9_-]+:.*$");
+    rule("directive", "directive-close", "^:::$", "start");
 };
 
 oop.inherits(DokuwikiHighlightRules, TextHighlightRules);
