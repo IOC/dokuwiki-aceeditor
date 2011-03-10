@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-addInitEvent(function() {
+var init = function() {
     var Range = require("ace/range").Range;
     var DokuwikiMode = require("mode-dokuwiki").Mode;
 
@@ -24,7 +24,7 @@ addInitEvent(function() {
 
     textarea = document.getElementById("wiki__text");
 
-    if (textarea && JSINFO && JSINFO.plugin_aceeditor) {
+    if (textarea && window.JSINFO) {
 
         // Setup elements
         container = document.createElement("div");
@@ -43,9 +43,6 @@ addInitEvent(function() {
         session = editor.getSession();
         editor.setReadOnly(textarea.getAttribute("readonly") === "readonly");
         session.setValue(textarea.value);
-        addEvent(textarea.form, "submit", function(event) {
-            textarea.value = session.getValue();
-        });
 
         // Setup Dokuwiki mode and theme
         session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor.highlight));
@@ -76,6 +73,16 @@ addInitEvent(function() {
             pos.column = offset;
             return pos;
         };
+
+        var doku_submit_handler = textarea.form.onsubmit;
+        addEvent(textarea.form, "submit", function(event) {
+            textarea.value = session.getValue();
+            if (doku_submit_handler && doku_submit_handler !== handleEvent) {
+                // submit handler is not set with addEvent
+                // in older versions of Dokuwiki
+                return doku_submit_handler(event);
+            }
+        });
 
         var doku_selection_class = selection_class;
         selection_class = function() {
@@ -175,4 +182,9 @@ addInitEvent(function() {
             }
         };
     }
+};
+
+addInitEvent(function() {
+    // initialize editor after Dokuwiki
+    setTimeout(init, 0);
 });
