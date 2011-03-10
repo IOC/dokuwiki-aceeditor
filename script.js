@@ -54,6 +54,12 @@ var init = function() {
         session.setWrapLimitRange(null, JSINFO.plugin_aceeditor.wraplimit);
         editor.setPrintMarginColumn(JSINFO.plugin_aceeditor.wraplimit);
 
+        // Notify Dokuwiki of text changes
+        session.getDocument().on("change", function() {
+            textChanged = true;
+            summaryCheck();
+        });
+
         // Patch Dokuwiki functions
 
         var pos_to_offset = function(pos) {
