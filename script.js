@@ -32,7 +32,9 @@ var init = function() {
         element = document.createElement("div");
         container.appendChild(element);
         element.style.width = container.offsetWidth + 'px';
-        element.style.height = container.style.height = (DokuCookie.getValue('sizeCtl') || "300px");
+        var editor_height = DokuCookie.getValue('sizeCtl') || "300px";
+        element.style.height = editor_height;
+        container.style.height = editor_height;
         textarea.style.display = "none";
         window.addEventListener("resize", function(event) {
             element.style.width = container.offsetWidth + 'px';
@@ -43,14 +45,17 @@ var init = function() {
         session = editor.getSession();
         editor.setReadOnly(textarea.getAttribute("readonly") === "readonly");
         session.setValue(textarea.value);
+        editor.navigateTo(0);
+        editor.focus();
 
         // Setup Dokuwiki mode and theme
         session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor.highlight));
         editor.setTheme({cssClass: 'ace-doku'});
 
         // Setup wrap mode
-        session.setUseWrapMode(false);
-        editor.setShowPrintMargin(false);
+        var wrap_mode = DokuCookie.getValue('wrapCtl') !== "off";
+        session.setUseWrapMode(wrap_mode);
+        editor.setShowPrintMargin(wrap_mode);
         session.setWrapLimitRange(null, JSINFO.plugin_aceeditor.wraplimit);
         editor.setPrintMarginColumn(JSINFO.plugin_aceeditor.wraplimit);
 
