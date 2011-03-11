@@ -1,3 +1,9 @@
+/* Dokuwiki */
+
+.picker {
+    z-index: 99;
+}
+
 /* Editor */
 
 .ace-doku.ace_editor {
