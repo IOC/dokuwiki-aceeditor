@@ -20,9 +20,42 @@ var init = function() {
     var Range = require("ace/range").Range;
     var DokuwikiMode = require("mode-dokuwiki").Mode;
 
-    var textarea, container, editor, session;
+    var enabled = false;
+    var textarea, container, editor, session, toggle;
 
-    textarea = document.getElementById("wiki__text");
+    textarea = $("wiki__text");
+
+    var enable = function() {
+        var selection = getSelection(textarea);
+
+        element.style.height = container.style.height = textarea.offsetHeight + "px";
+        textarea.style.display = "none";
+        container.style.display = "block";
+        toggle.className = "enabled";
+
+        session.setValue(textarea.value);
+        editor.navigateTo(0);
+        editor.resize();
+        editor.focus();
+
+        enabled = true;
+        setSelection(selection);
+        DokuCookie.setValue("aceeditor", "on");
+    }
+
+    var disable = function() {
+        var selection = getSelection(textarea);
+
+        textarea.style.display = "block";
+        container.style.display = "none";
+        toggle.className = "";
+
+        textarea.value = session.getValue();
+
+        enabled = false;
+        setSelection(selection);
+        DokuCookie.setValue("aceeditor", "off");
+    };
 
     if (textarea && window.JSINFO) {
 
@@ -32,19 +65,30 @@ var init = function() {
         element = document.createElement("div");
         container.appendChild(element);
         element.style.width = container.offsetWidth + 'px';
-        element.style.height = container.style.height = textarea.offsetHeight + "px";
-        textarea.style.display = "none";
-        window.addEventListener("resize", function(event) {
-            element.style.width = container.offsetWidth + 'px';
-        }, false);
+        container.style.display = "none";
+        addEvent(window, "resize", function(event) {
+            if (enabled) {
+                element.style.width = container.offsetWidth + 'px';
+            }
+        });
+
+        // Setup toggle
+        toggle = document.createElement("div");
+        toggle.id = "ace-toggle";
+        toggle.textContent = "Ace";
+        $('wiki__editbar').insertBefore(toggle, $("size__ctl").nextSibling);
+        addEvent($("ace-toggle"), "click", function() {
+            if (enabled) {
+                disable();
+            } else {
+                enable();
+            }
+        });
 
         // Initialize Ace
         editor = ace.edit(element);
         session = editor.getSession();
         editor.setReadOnly(textarea.getAttribute("readonly") === "readonly");
-        session.setValue(textarea.value);
-        editor.navigateTo(0);
-        editor.focus();
 
         // Setup Dokuwiki mode and theme
         session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor.highlight));
@@ -84,11 +128,13 @@ var init = function() {
 
         var doku_submit_handler = textarea.form.onsubmit;
         addEvent(textarea.form, "submit", function(event) {
-            textarea.value = session.getValue();
-            if (doku_submit_handler && doku_submit_handler !== handleEvent) {
-                // submit handler is not set with addEvent
-                // in older versions of Dokuwiki
-                return doku_submit_handler(event);
+            if (enabled) {
+                textarea.value = session.getValue();
+                if (doku_submit_handler && doku_submit_handler !== handleEvent) {
+                    // submit handler is not set with addEvent
+                    // in older versions of Dokuwiki
+                    return doku_submit_handler(event);
+                }
             }
         });
 
@@ -98,7 +144,7 @@ var init = function() {
             var doku_get_text = selection.getText;
             selection.getText = function() {
                 var value;
-                if (selection.obj === textarea) {
+                if (enabled && selection.obj === textarea) {
                     value = session.getValue();
                     return value.substring(selection.start, selection.end);
                 } else {
@@ -111,7 +157,7 @@ var init = function() {
         var doku_get_selection = getSelection;
         getSelection = function(obj) {
             var selection, range;
-            if (obj === textarea) {
+            if (enabled && obj === textarea) {
                 range = editor.getSelection().getRange();
                 selection = new selection_class();
                 selection.obj = textarea;
@@ -126,7 +172,7 @@ var init = function() {
         var doku_set_selection = setSelection;
         setSelection = function(selection) {
             var range;
-            if (selection.obj === textarea) {
+            if (enabled && selection.obj === textarea) {
                 range = Range.fromPoints(offset_to_pos(selection.start),
                                          offset_to_pos(selection.end));
                 editor.getSelection().setSelectionRange(range);
@@ -139,7 +185,7 @@ var init = function() {
         var doku_paste_text = pasteText;
         pasteText = function(selection, text, opts) {
             var value;
-            if (selection.obj === textarea) {
+            if (enabled && selection.obj === textarea) {
                 opts = opts || {};
                 value = session.getValue();
                 session.setValue(value.substring(0, selection.start) + text +
@@ -156,7 +202,7 @@ var init = function() {
         var doku_size_ctl = sizeCtl;
         sizeCtl = function(edid, val) {
             doku_size_ctl(edid, val);
-            if (textarea === document.getElementById(edid)) {
+            if (enabled && textarea === $(edid)) {
                 element.style.height = container.style.height = (element.clientHeight + val) + "px";
                 editor.resize();
                 editor.focus();
@@ -172,6 +218,10 @@ var init = function() {
                 editor.focus();
             }
         };
+
+        if (DokuCookie.getValue("aceeditor") !== "off") {
+            enable();
+        }
     }
 };
 

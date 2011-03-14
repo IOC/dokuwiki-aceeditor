@@ -14,6 +14,19 @@
     background-color: #222;
 }
 
+#ace-toggle {
+    float: right;
+    cursor: pointer;
+    margin-right: 5px;
+    color: #a0a0a0;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+#ace-toggle.enabled {
+    color: #404040;
+}
+
 /* Gutter */
 
 .ace-doku .ace_gutter {
