@@ -32,9 +32,7 @@ var init = function() {
         element = document.createElement("div");
         container.appendChild(element);
         element.style.width = container.offsetWidth + 'px';
-        var editor_height = DokuCookie.getValue('sizeCtl') || "300px";
-        element.style.height = editor_height;
-        container.style.height = editor_height;
+        element.style.height = container.style.height = textarea.offsetHeight + "px";
         textarea.style.display = "none";
         window.addEventListener("resize", function(event) {
             element.style.width = container.offsetWidth + 'px';
@@ -53,9 +51,8 @@ var init = function() {
         editor.setTheme({cssClass: 'ace-doku'});
 
         // Setup wrap mode
-        var wrap_mode = DokuCookie.getValue('wrapCtl') !== "off";
-        session.setUseWrapMode(wrap_mode);
-        editor.setShowPrintMargin(wrap_mode);
+        session.setUseWrapMode(textarea.getAttribute('wrap') !== "off");
+        editor.setShowPrintMargin(textarea.getAttribute('wrap') !== "off");
         session.setWrapLimitRange(null, JSINFO.plugin_aceeditor.wraplimit);
         editor.setPrintMarginColumn(JSINFO.plugin_aceeditor.wraplimit);
 
@@ -158,38 +155,21 @@ var init = function() {
 
         var doku_size_ctl = sizeCtl;
         sizeCtl = function(edid, val) {
-            var height;
-            if (textarea === $(edid)) {
-                height = element.clientHeight + val;
-                element.style.height = container.style.height = height + "px";
+            doku_size_ctl(edid, val);
+            if (textarea === document.getElementById(edid)) {
+                element.style.height = container.style.height = (element.clientHeight + val) + "px";
                 editor.resize();
-                DokuCookie.setValue('sizeCtl', height + "px");
                 editor.focus();
-            } else {
-                doku_size_ctl(edid, val);
             }
         };
 
         var doku_set_wrap = setWrap;
         setWrap = function(obj, value) {
+            doku_set_wrap(obj, value);
             if (obj === textarea) {
                 editor.setShowPrintMargin(value !== "off");
                 session.setUseWrapMode(value !== "off");
                 editor.focus();
-            } else {
-                return doku_set_wrap(obj, value);
-            }
-        };
-
-        var doku_toggle_wrap = toggleWrap;
-        toggleWrap = function(edid) {
-            var value;
-            if (textarea === $(edid)) {
-                value = (session.getUseWrapMode() ? "off" : "soft");
-                setWrap(textarea, value);
-                DokuCookie.setValue('wrapCtl', value);
-            } else {
-                doku_toggle_wrap(edid);
             }
         };
     }
