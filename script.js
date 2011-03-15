@@ -21,7 +21,7 @@ var init = function() {
     var DokuwikiMode = require("mode-dokuwiki").Mode;
 
     var enabled = false;
-    var textarea, container, editor, session, toggle;
+    var textarea, container, editor, session, toggle_on, toggle_off;
 
     textarea = $("wiki__text");
 
@@ -31,7 +31,8 @@ var init = function() {
         element.style.height = container.style.height = textarea.offsetHeight + "px";
         textarea.style.display = "none";
         container.style.display = "block";
-        toggle.className = "enabled";
+        toggle_on.style.display = "block";
+        toggle_off.style.display = "none";
 
         session.setValue(textarea.value);
         editor.navigateTo(0);
@@ -48,7 +49,8 @@ var init = function() {
 
         textarea.style.display = "block";
         container.style.display = "none";
-        toggle.className = "";
+        toggle_on.style.display = "none";
+        toggle_off.style.display = "block";
 
         textarea.value = session.getValue();
 
@@ -73,17 +75,16 @@ var init = function() {
         });
 
         // Setup toggle
-        toggle = document.createElement("div");
-        toggle.id = "ace-toggle";
-        toggle.textContent = "Ace";
-        $('wiki__editbar').insertBefore(toggle, $("size__ctl").nextSibling);
-        addEvent($("ace-toggle"), "click", function() {
-            if (enabled) {
-                disable();
-            } else {
-                enable();
-            }
-        });
+        toggle_on = document.createElement("img");
+        toggle_off = document.createElement("img");
+        toggle_on.src = DOKU_BASE + "lib/plugins/aceeditor/toggle_on.png";
+        toggle_off.src = DOKU_BASE + "lib/plugins/aceeditor/toggle_off.png";
+        toggle_on.className = toggle_off.className = "ace-toggle";
+        toggle_on.style.display = "none";
+        $('wiki__editbar').insertBefore(toggle_on, $("size__ctl").nextSibling);
+        $('wiki__editbar').insertBefore(toggle_off, $("size__ctl").nextSibling);
+        addEvent(toggle_on, "click", disable);
+        addEvent(toggle_off, "click", enable);
 
         // Initialize Ace
         editor = ace.edit(element);
