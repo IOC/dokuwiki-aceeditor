@@ -103,8 +103,10 @@ var init = function() {
 
         // Notify Dokuwiki of text changes
         session.getDocument().on("change", function() {
-            textChanged = true;
-            summaryCheck();
+            if (!editor.getReadOnly()) {
+                textChanged = true;
+                summaryCheck();
+            }
         });
 
         // Patch Dokuwiki functions
