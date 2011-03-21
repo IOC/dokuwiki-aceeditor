@@ -16,47 +16,98 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-addInitEvent(function() {
+var init = function() {
     var Range = require("ace/range").Range;
     var DokuwikiMode = require("mode-dokuwiki").Mode;
+    var enabled = false;
+    var textarea, container, editor, session, toggle_on, toggle_off;
 
-    var textarea, container, editor, session;
+    textarea = $("wiki__text");
 
-    textarea = document.getElementById("wiki__text");
+    var enable = function() {
+        var selection = getSelection(textarea);
 
-    if (textarea && JSINFO && JSINFO.plugin_aceeditor) {
+        element.style.height = container.style.height = textarea.offsetHeight + "px";
+        textarea.style.display = "none";
+        container.style.display = "block";
+        toggle_on.style.display = "block";
+        toggle_off.style.display = "none";
+
+        session.setValue(textarea.value);
+        editor.navigateTo(0);
+        editor.resize();
+        editor.focus();
+
+        enabled = true;
+        setSelection(selection);
+        DokuCookie.setValue("aceeditor", "on");
+    }
+
+    var disable = function() {
+        var selection = getSelection(textarea);
+
+        textarea.style.display = "block";
+        container.style.display = "none";
+        toggle_on.style.display = "none";
+        toggle_off.style.display = "block";
+
+        textarea.value = session.getValue();
+
+        enabled = false;
+        setSelection(selection);
+        DokuCookie.setValue("aceeditor", "off");
+    };
+
+    if (textarea && window.JSINFO) {
 
         // Setup elements
         container = document.createElement("div");
         textarea.parentNode.insertBefore(container, textarea);
         element = document.createElement("div");
+        element.className = "ace-doku";
         container.appendChild(element);
-        element.style.width = container.style.width = (window.innerWidth - 50) + "px";
-        element.style.height = container.style.height = (DokuCookie.getValue('sizeCtl') || "300px");
-        textarea.style.display = "none";
-        window.addEventListener("resize", function(event) {
-            element.style.width = container.style.width = (window.innerWidth - 50) + 'px';
-        }, false);
+        element.style.width = container.offsetWidth + 'px';
+        container.style.display = "none";
+        addEvent(window, "resize", function(event) {
+            if (enabled) {
+                element.style.width = container.offsetWidth + 'px';
+            }
+        });
+
+        // Setup toggle
+        toggle_on = document.createElement("img");
+        toggle_off = document.createElement("img");
+        toggle_on.src = DOKU_BASE + "lib/plugins/aceeditor/toggle_on.png";
+        toggle_off.src = DOKU_BASE + "lib/plugins/aceeditor/toggle_off.png";
+        toggle_on.className = toggle_off.className = "ace-toggle";
+        toggle_on.style.display = "none";
+        $('wiki__editbar').insertBefore(toggle_on, $("size__ctl").nextSibling);
+        $('wiki__editbar').insertBefore(toggle_off, $("size__ctl").nextSibling);
+        addEvent(toggle_on, "click", disable);
+        addEvent(toggle_off, "click", enable);
 
         // Initialize Ace
         editor = ace.edit(element);
         session = editor.getSession();
         editor.setReadOnly(textarea.getAttribute("readonly") === "readonly");
-        session.setValue(textarea.value);
-        addEvent(textarea.form, "submit", function(event) {
-            textarea.value = session.getValue();
-        });
 
         // Setup Dokuwiki mode and theme
         session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor.highlight));
-        editor.setTheme({cssClass: 'ace-doku'});
+        editor.setTheme({cssClass: 'ace-doku-' + JSINFO.plugin_aceeditor.colortheme});
 
         // Setup wrap mode
-        session.setUseWrapMode(false);
-        editor.setShowPrintMargin(false);
-        session.setWrapLimitRange(JSINFO.plugin_aceeditor.wraplimit,
-                                  JSINFO.plugin_aceeditor.wraplimit);
+        session.setUseWrapMode(textarea.getAttribute('wrap') !== "off");
+        editor.setShowPrintMargin(textarea.getAttribute('wrap') !== "off");
+        session.setWrapLimitRange(null, JSINFO.plugin_aceeditor.wraplimit);
         editor.setPrintMarginColumn(JSINFO.plugin_aceeditor.wraplimit);
+
+        // Notify Dokuwiki of text changes
+        session.getDocument().on("change", function() {
+            if (!editor.getReadOnly()) {
+                textChanged = true;
+                summaryCheck();
+            }
+        });
 
         // Patch Dokuwiki functions
 
@@ -78,13 +129,25 @@ addInitEvent(function() {
             return pos;
         };
 
+        var doku_submit_handler = textarea.form.onsubmit;
+        addEvent(textarea.form, "submit", function(event) {
+            if (enabled) {
+                textarea.value = session.getValue();
+                if (doku_submit_handler && doku_submit_handler !== handleEvent) {
+                    // submit handler is not set with addEvent
+                    // in older versions of Dokuwiki
+                    return doku_submit_handler(event);
+                }
+            }
+        });
+
         var doku_selection_class = selection_class;
         selection_class = function() {
             var selection = new doku_selection_class();
             var doku_get_text = selection.getText;
             selection.getText = function() {
                 var value;
-                if (selection.obj === textarea) {
+                if (enabled && selection.obj === textarea) {
                     value = session.getValue();
                     return value.substring(selection.start, selection.end);
                 } else {
@@ -97,7 +160,7 @@ addInitEvent(function() {
         var doku_get_selection = getSelection;
         getSelection = function(obj) {
             var selection, range;
-            if (obj === textarea) {
+            if (enabled && obj === textarea) {
                 range = editor.getSelection().getRange();
                 selection = new selection_class();
                 selection.obj = textarea;
@@ -112,7 +175,7 @@ addInitEvent(function() {
         var doku_set_selection = setSelection;
         setSelection = function(selection) {
             var range;
-            if (selection.obj === textarea) {
+            if (enabled && selection.obj === textarea) {
                 range = Range.fromPoints(offset_to_pos(selection.start),
                                          offset_to_pos(selection.end));
                 editor.getSelection().setSelectionRange(range);
@@ -125,7 +188,7 @@ addInitEvent(function() {
         var doku_paste_text = pasteText;
         pasteText = function(selection, text, opts) {
             var value;
-            if (selection.obj === textarea) {
+            if (enabled && selection.obj === textarea) {
                 opts = opts || {};
                 value = session.getValue();
                 session.setValue(value.substring(0, selection.start) + text +
@@ -141,39 +204,31 @@ addInitEvent(function() {
 
         var doku_size_ctl = sizeCtl;
         sizeCtl = function(edid, val) {
-            var height;
-            if (textarea === $(edid)) {
-                height = element.clientHeight + val;
-                element.style.height = container.style.height = height + "px";
+            doku_size_ctl(edid, val);
+            if (enabled && textarea === $(edid)) {
+                element.style.height = container.style.height = (element.clientHeight + val) + "px";
                 editor.resize();
-                DokuCookie.setValue('sizeCtl', height + "px");
                 editor.focus();
-            } else {
-                doku_size_ctl(edid, val);
             }
         };
 
         var doku_set_wrap = setWrap;
         setWrap = function(obj, value) {
+            doku_set_wrap(obj, value);
             if (obj === textarea) {
                 editor.setShowPrintMargin(value !== "off");
                 session.setUseWrapMode(value !== "off");
                 editor.focus();
-            } else {
-                return doku_set_wrap(obj, value);
             }
         };
 
-        var doku_toggle_wrap = toggleWrap;
-        toggleWrap = function(edid) {
-            var value;
-            if (textarea === $(edid)) {
-                value = (session.getUseWrapMode() ? "off" : "soft");
-                setWrap(textarea, value);
-                DokuCookie.setValue('wrapCtl', value);
-            } else {
-                doku_toggle_wrap(edid);
-            }
-        };
+        if (DokuCookie.getValue("aceeditor") !== "off") {
+            enable();
+        }
     }
+};
+
+addInitEvent(function() {
+    // initialize editor after Dokuwiki
+    setTimeout(init, 0);
 });

@@ -19,7 +19,7 @@
 
 if (!defined('DOKU_INC')) die();
 
-require_once DOKU_INC.'lib/plugins/aceeditor/action.php';
+require_once DOKU_INC.'lib/plugins/action.php';
 
 class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
 
@@ -32,10 +32,11 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
 
     public function handle_dokuwiki_started(Doku_Event &$event, $param) {
         global $JSINFO;
-        $wraplimit = (int) trim($this->getConf('wraplimit'));
+        $wraplimit = trim($this->getConf('wraplimit'));
         $JSINFO['plugin_aceeditor'] = array(
             'highlight' => $this->getConf('highlight'),
-            'wraplimit' => $wraplimit ? $wraplimit : 80,
+            'wraplimit' => $wraplimit ? (int) $wraplimit : null,
+            'colortheme' => $this->getConf('colortheme'),
         );
     }
 
