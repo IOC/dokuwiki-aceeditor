@@ -19,7 +19,6 @@
 var init = function() {
     var Range = require("ace/range").Range;
     var DokuwikiMode = require("mode-dokuwiki").Mode;
-
     var enabled = false;
     var textarea, container, editor, session, toggle_on, toggle_off;
 
@@ -65,6 +64,7 @@ var init = function() {
         container = document.createElement("div");
         textarea.parentNode.insertBefore(container, textarea);
         element = document.createElement("div");
+        element.className = "ace-doku";
         container.appendChild(element);
         element.style.width = container.offsetWidth + 'px';
         container.style.display = "none";
@@ -93,7 +93,7 @@ var init = function() {
 
         // Setup Dokuwiki mode and theme
         session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor.highlight));
-        editor.setTheme({cssClass: 'ace-doku'});
+        editor.setTheme({cssClass: 'ace-doku-' + JSINFO.plugin_aceeditor.colortheme});
 
         // Setup wrap mode
         session.setUseWrapMode(textarea.getAttribute('wrap') !== "off");
