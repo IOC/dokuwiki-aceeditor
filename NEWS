@@ -1,3 +1,10 @@
+2011-03-21
+ * Toggle between Ace and textarea
+ * New light color theme
+ * Fixed: toolbar popups not clickable
+ * Fixed: editor in locked pages
+ * Updated Ace build
+
 2011-03-11
  * Works on Lemming
  * Fixed some integration bugs
