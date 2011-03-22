@@ -215,14 +215,26 @@
 
 /* IOC */
 
-.ace-doku .ace_iocstl,
-.ace-doku .ace_quiz,
-.ace-doku .ace_latex,
-.ace-doku .ace_latexalt,
-.ace-doku .ace_noprint,
-.ace-doku .ace_noweb,
-.ace-doku .ace_directive-open,
-.ace-doku .ace_directive-param,
-.ace-doku .ace_directive-close {
+.ace-doku-light .ace_iocstl,
+.ace-doku-light .ace_quiz,
+.ace-doku-light .ace_latex,
+.ace-doku-light .ace_latexalt,
+.ace-doku-light .ace_noprint,
+.ace-doku-light .ace_noweb,
+.ace-doku-light .ace_directive-open,
+.ace-doku-light .ace_directive-param,
+.ace-doku-light .ace_directive-close {
+    color: #080;
+}
+
+.ace-doku-dark .ace_iocstl,
+.ace-doku-dark .ace_quiz,
+.ace-doku-dark .ace_latex,
+.ace-doku-dark .ace_latexalt,
+.ace-doku-dark .ace_noprint,
+.ace-doku-dark .ace_noweb,
+.ace-doku-dark .ace_directive-open,
+.ace-doku-dark .ace_directive-param,
+.ace-doku-dark .ace_directive-close {
     color: #8f8;
 }
