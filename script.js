@@ -38,8 +38,8 @@ addInitEvent(function() {
     var enable = function() {
         var selection = getSelection($textarea.get(0));
 
-        $editor.css("height", $textarea.outerHeight() + "px");
-        $container.css("height", $textarea.outerHeight() + "px");
+        $container.css("height", $textarea.innerHeight() + "px");
+        $editor.css("height", $container.height() + "px");
         $textarea.hide();
         $container.show();
         $toggle_on.show();
@@ -62,15 +62,16 @@ addInitEvent(function() {
 
         // Setup elements
         $textarea = $("#wiki__text");
-        $container = $("<div>").insertBefore($textarea);
-        $editor = $("<div>")
+        $container = $("<div>")
             .addClass("ace-doku")
-            .css("width", $container.width())
+            .insertBefore($textarea);
+        $editor = $("<div>")
+            .css("width", $container.width() + "px")
             .appendTo($container);
         $container.hide();
         addEvent(window, "resize", function(event) {
             if (enabled) {
-                $editor.css("width", $container.width());
+                $editor.css("width", $container.width() + "px");
             }
         });
 
@@ -189,8 +190,8 @@ addInitEvent(function() {
         sizeCtl = function(edid, val) {
             doku_size_ctl(edid, val);
             if (enabled && $textarea.attr("id") === edid) {
-                $editor.css("height", ($editor.height() + val) + "px");
-                $container.css("height", $editor.height() + "px");
+                $container.css("height", ($container.height() + val) + "px");
+                $editor.css("height", $container.height() + "px");
                 editor.resize();
                 editor.focus();
             }
