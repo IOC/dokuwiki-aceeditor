@@ -53,7 +53,7 @@ addInitEvent(function() {
         enabled = true;
         setSelection(selection);
         DokuCookie.setValue("aceeditor", "on");
-    }
+    };
 
     var init = function() {
         var $ = jQuery;
