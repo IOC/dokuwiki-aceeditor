@@ -169,12 +169,12 @@ addInitEvent(function() {
 
         var doku_paste_text = pasteText;
         pasteText = function(selection, text, opts) {
-            var value;
+            var range;
             if (enabled && selection.obj === $textarea.get(0)) {
                 opts = opts || {};
-                value = session.getValue();
-                session.setValue(value.substring(0, selection.start) + text +
-                                 value.substring(selection.end, value.length));
+                range = Range.fromPoints(offset_to_pos(selection.start),
+                                         offset_to_pos(selection.end));
+                session.replace(range, text);
                 selection.end = selection.start + text.length - (opts.endofs || 0);
                 selection.start = (opts.nosel ? selection.end :
                                    selection.start + (opts.startofs || 0));
