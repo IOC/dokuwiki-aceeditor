@@ -79,13 +79,13 @@ addInitEvent(function() {
             .addClass("ace-toggle")
             .attr("src", DOKU_BASE + "lib/plugins/aceeditor/toggle_on.png")
             .insertAfter($("#size__ctl"))
-            .click(disable);
+            .click(disable)
+            .hide();
         $toggle_off = $("<img>")
             .addClass("ace-toggle")
             .attr("src", DOKU_BASE + "lib/plugins/aceeditor/toggle_off.png")
             .insertAfter($("#size__ctl"))
-            .click(enable)
-            .hide();
+            .click(enable);
 
         // Initialize Ace
         editor = ace.edit($editor.get(0));
