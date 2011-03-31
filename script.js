@@ -37,7 +37,6 @@ addInitEvent(function() {
 
     var enable = function() {
         var selection = getSelection($textarea.get(0));
-
         $container.css("height", $textarea.innerHeight() + "px");
         $editor.css("height", $container.height() + "px");
         $textarea.hide();
@@ -127,18 +126,17 @@ addInitEvent(function() {
 
         var doku_selection_class = selection_class;
         selection_class = function() {
-            var selection = new doku_selection_class();
-            var doku_get_text = selection.getText;
-            selection.getText = function() {
+            doku_selection_class.apply(this);
+            this.doku_get_text = this.getText;
+            this.getText = function() {
                 var value;
-                if (enabled && selection.obj === $textarea.get(0)) {
+                if (enabled && this.obj === $textarea.get(0)) {
                     value = session.getValue();
-                    return value.substring(selection.start, selection.end);
+                    return value.substring(this.start, this.end);
                 } else {
-                    return doku_get_text();
+                    return this.doku_get_text();
                 }
             };
-            return selection;
         };
 
         var doku_get_selection = getSelection;
