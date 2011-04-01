@@ -16,24 +16,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-var init = function() {
-    var Range = require("ace/range").Range;
-    var DokuwikiMode = require("mode-dokuwiki").Mode;
-    var enabled = false;
-    var textarea, container, editor, session, toggle_on, toggle_off;
+addInitEvent(function() {
+    var editor, session, enabled = false;
+    var $textarea, $container, $editor, $toggle_on, $toggle_off;
 
-    textarea = $("wiki__text");
+    var disable = function() {
+        var selection = getSelection($textarea.get(0));
+
+        $textarea.show();
+        $container.hide();
+        $toggle_on.hide();
+        $toggle_off.show();
+
+        $textarea.val(session.getValue());
+
+        enabled = false;
+        setSelection(selection);
+        DokuCookie.setValue("aceeditor", "off");
+    };
 
     var enable = function() {
-        var selection = getSelection(textarea);
+        var selection = getSelection($textarea.get(0));
+        $container.css("height", $textarea.innerHeight() + "px");
+        $editor.css("height", $container.height() + "px");
+        $textarea.hide();
+        $container.show();
+        $toggle_on.show();
+        $toggle_off.hide();
 
-        element.style.height = container.style.height = textarea.offsetHeight + "px";
-        textarea.style.display = "none";
-        container.style.display = "block";
-        toggle_on.style.display = "block";
-        toggle_off.style.display = "none";
-
-        session.setValue(textarea.value);
+        session.setValue($textarea.val());
         editor.navigateTo(0);
         editor.resize();
         editor.focus();
@@ -41,63 +52,53 @@ var init = function() {
         enabled = true;
         setSelection(selection);
         DokuCookie.setValue("aceeditor", "on");
-    }
-
-    var disable = function() {
-        var selection = getSelection(textarea);
-
-        textarea.style.display = "block";
-        container.style.display = "none";
-        toggle_on.style.display = "none";
-        toggle_off.style.display = "block";
-
-        textarea.value = session.getValue();
-
-        enabled = false;
-        setSelection(selection);
-        DokuCookie.setValue("aceeditor", "off");
     };
 
-    if (textarea && window.JSINFO) {
+    var init = function() {
+        var $ = jQuery;
+        var Range = require("ace/range").Range;
+        var DokuwikiMode = require("mode-dokuwiki").Mode;
 
         // Setup elements
-        container = document.createElement("div");
-        textarea.parentNode.insertBefore(container, textarea);
-        element = document.createElement("div");
-        element.className = "ace-doku";
-        container.appendChild(element);
-        element.style.width = container.offsetWidth + 'px';
-        container.style.display = "none";
+        $textarea = $("#wiki__text");
+        $container = $("<div>")
+            .addClass("ace-doku")
+            .insertBefore($textarea);
+        $editor = $("<div>")
+            .css("width", $container.width() + "px")
+            .appendTo($container);
+        $container.hide();
         addEvent(window, "resize", function(event) {
             if (enabled) {
-                element.style.width = container.offsetWidth + 'px';
+                $editor.css("width", $container.width() + "px");
             }
         });
 
         // Setup toggle
-        toggle_on = document.createElement("img");
-        toggle_off = document.createElement("img");
-        toggle_on.src = DOKU_BASE + "lib/plugins/aceeditor/toggle_on.png";
-        toggle_off.src = DOKU_BASE + "lib/plugins/aceeditor/toggle_off.png";
-        toggle_on.className = toggle_off.className = "ace-toggle";
-        toggle_on.style.display = "none";
-        $('wiki__editbar').insertBefore(toggle_on, $("size__ctl").nextSibling);
-        $('wiki__editbar').insertBefore(toggle_off, $("size__ctl").nextSibling);
-        addEvent(toggle_on, "click", disable);
-        addEvent(toggle_off, "click", enable);
+        $toggle_on = $("<img>")
+            .addClass("ace-toggle")
+            .attr("src", DOKU_BASE + "lib/plugins/aceeditor/toggle_on.png")
+            .insertAfter($("#size__ctl"))
+            .click(disable)
+            .hide();
+        $toggle_off = $("<img>")
+            .addClass("ace-toggle")
+            .attr("src", DOKU_BASE + "lib/plugins/aceeditor/toggle_off.png")
+            .insertAfter($("#size__ctl"))
+            .click(enable);
 
         // Initialize Ace
-        editor = ace.edit(element);
+        editor = ace.edit($editor.get(0));
         session = editor.getSession();
-        editor.setReadOnly(textarea.getAttribute("readonly") === "readonly");
+        editor.setReadOnly($textarea.attr("readonly") === "readonly");
 
         // Setup Dokuwiki mode and theme
         session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor.highlight));
         editor.setTheme({cssClass: 'ace-doku-' + JSINFO.plugin_aceeditor.colortheme});
 
         // Setup wrap mode
-        session.setUseWrapMode(textarea.getAttribute('wrap') !== "off");
-        editor.setShowPrintMargin(textarea.getAttribute('wrap') !== "off");
+        session.setUseWrapMode($textarea.attr('wrap') !== "off");
+        editor.setShowPrintMargin($textarea.attr('wrap') !== "off");
         session.setWrapLimitRange(null, JSINFO.plugin_aceeditor.wraplimit);
         editor.setPrintMarginColumn(JSINFO.plugin_aceeditor.wraplimit);
 
@@ -111,28 +112,10 @@ var init = function() {
 
         // Patch Dokuwiki functions
 
-        var pos_to_offset = function(pos) {
-            var i, offset = pos.column;
-            for (i = 0; i < pos.row; i++) {
-                offset += session.getLine(i).length + 1;
-            }
-            return offset;
-        };
-
-        var offset_to_pos = function(offset) {
-            var pos = {row: 0, column: 0};
-            while (offset > session.getLine(pos.row).length) {
-                offset -= session.getLine(pos.row).length + 1;
-                pos.row += 1;
-            }
-            pos.column = offset;
-            return pos;
-        };
-
-        var doku_submit_handler = textarea.form.onsubmit;
-        addEvent(textarea.form, "submit", function(event) {
+        var doku_submit_handler = $textarea.get(0).form.onsubmit;
+        addEvent($textarea.get(0).form, "submit", function(event) {
             if (enabled) {
-                textarea.value = session.getValue();
+                $textarea.val(session.getValue());
                 if (doku_submit_handler && doku_submit_handler !== handleEvent) {
                     // submit handler is not set with addEvent
                     // in older versions of Dokuwiki
@@ -143,27 +126,26 @@ var init = function() {
 
         var doku_selection_class = selection_class;
         selection_class = function() {
-            var selection = new doku_selection_class();
-            var doku_get_text = selection.getText;
-            selection.getText = function() {
+            doku_selection_class.apply(this);
+            this.doku_get_text = this.getText;
+            this.getText = function() {
                 var value;
-                if (enabled && selection.obj === textarea) {
+                if (enabled && this.obj === $textarea.get(0)) {
                     value = session.getValue();
-                    return value.substring(selection.start, selection.end);
+                    return value.substring(this.start, this.end);
                 } else {
-                    return doku_get_text();
+                    return this.doku_get_text();
                 }
             };
-            return selection;
         };
 
         var doku_get_selection = getSelection;
         getSelection = function(obj) {
             var selection, range;
-            if (enabled && obj === textarea) {
+            if (enabled && obj === $textarea.get(0)) {
                 range = editor.getSelection().getRange();
                 selection = new selection_class();
-                selection.obj = textarea;
+                selection.obj = $textarea.get(0);
                 selection.start = pos_to_offset(range.start);
                 selection.end = pos_to_offset(range.end);
                 return selection;
@@ -175,7 +157,7 @@ var init = function() {
         var doku_set_selection = setSelection;
         setSelection = function(selection) {
             var range;
-            if (enabled && selection.obj === textarea) {
+            if (enabled && selection.obj === $textarea.get(0)) {
                 range = Range.fromPoints(offset_to_pos(selection.start),
                                          offset_to_pos(selection.end));
                 editor.getSelection().setSelectionRange(range);
@@ -187,12 +169,12 @@ var init = function() {
 
         var doku_paste_text = pasteText;
         pasteText = function(selection, text, opts) {
-            var value;
-            if (enabled && selection.obj === textarea) {
+            var range;
+            if (enabled && selection.obj === $textarea.get(0)) {
                 opts = opts || {};
-                value = session.getValue();
-                session.setValue(value.substring(0, selection.start) + text +
-                                 value.substring(selection.end, value.length));
+                range = Range.fromPoints(offset_to_pos(selection.start),
+                                         offset_to_pos(selection.end));
+                session.replace(range, text);
                 selection.end = selection.start + text.length - (opts.endofs || 0);
                 selection.start = (opts.nosel ? selection.end :
                                    selection.start + (opts.startofs || 0));
@@ -205,8 +187,9 @@ var init = function() {
         var doku_size_ctl = sizeCtl;
         sizeCtl = function(edid, val) {
             doku_size_ctl(edid, val);
-            if (enabled && textarea === $(edid)) {
-                element.style.height = container.style.height = (element.clientHeight + val) + "px";
+            if (enabled && $textarea.attr("id") === edid) {
+                $container.css("height", ($container.height() + val) + "px");
+                $editor.css("height", $container.height() + "px");
                 editor.resize();
                 editor.focus();
             }
@@ -215,7 +198,7 @@ var init = function() {
         var doku_set_wrap = setWrap;
         setWrap = function(obj, value) {
             doku_set_wrap(obj, value);
-            if (obj === textarea) {
+            if (obj === $textarea.get(0)) {
                 editor.setShowPrintMargin(value !== "off");
                 session.setUseWrapMode(value !== "off");
                 editor.focus();
@@ -225,10 +208,30 @@ var init = function() {
         if (DokuCookie.getValue("aceeditor") !== "off") {
             enable();
         }
-    }
-};
+    };
 
-addInitEvent(function() {
+    var offset_to_pos = function(offset) {
+        var pos = {row: 0, column: 0};
+        while (offset > session.getLine(pos.row).length) {
+            offset -= session.getLine(pos.row).length + 1;
+            pos.row += 1;
+        }
+        pos.column = offset;
+        return pos;
+    };
+
+    var pos_to_offset = function(pos) {
+        var i, offset = pos.column;
+            for (i = 0; i < pos.row; i++) {
+                offset += session.getLine(i).length + 1;
+            }
+        return offset;
+    };
+
     // initialize editor after Dokuwiki
-    setTimeout(init, 0);
+    setTimeout(function() {
+        if ($("wiki__text") && window.jQuery && window.JSINFO) {
+            init();
+        }
+    }), 0;
 });

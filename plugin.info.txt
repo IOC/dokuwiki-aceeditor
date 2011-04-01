@@ -1,7 +1,7 @@
 base   aceeditor
 author Albert Gasset, Marc Català
 email  albert.gasset@gmail.com
-date   2011-03-21
+date   2011-03-25
 name   Ace Editor plugin
 desc   Replace textarea with Ace editor
 url    https://github.com/IOC/dokuwiki-aceeditor

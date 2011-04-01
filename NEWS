@@ -1,3 +1,12 @@
+2011-04-01
+ * Fixed some integration bugs
+ * Updated Ace build (fixes multi-byte languages)
+
+2011-03-25
+ * Fixed syntax error with compact JavaScript
+ * Use of jQuery for compatibility and future enhancements
+ * Updated Ace build
+
 2011-03-21
  * Toggle between Ace and textarea
  * New light color theme
