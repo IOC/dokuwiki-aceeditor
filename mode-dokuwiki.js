@@ -23,7 +23,7 @@ var TextMode = require("ace/mode/text").Mode;
 var Tokenizer = require("ace/tokenizer").Tokenizer;
 var TextHighlightRules = require("ace/mode/text_highlight_rules").TextHighlightRules;
 
-var DokuwikiHighlightRules = function() {
+var DokuwikiHighlightRules = function(config) {
 
     var that = this;
     this.$rules = {};
@@ -72,7 +72,9 @@ var DokuwikiHighlightRules = function() {
     format(["start", "table"], "emphasis", "//", "//"); // sort 80
     format(["start", "table"], "underline", "__", "__"); // sort 90
     format(["start", "table"], "monospace", "''", "''"); // sort 100
-    format(["start", "table"], "latex-latex", "<latex>", "</latex>"); // sort 100
+    if (config.latex) {
+        format(["start", "table"], "latex-latex", "<latex>", "</latex>"); // sort 100
+    }
     format(["start", "table"], "subscript", "<sub>", "</sub>"); // sort 110
     format(["start", "table"], "superscript", "<sup>", "</sup>"); // sort 120
     format(["start", "table"], "deleted", "<del>", "</del>"); // sort 130
@@ -87,23 +89,27 @@ var DokuwikiHighlightRules = function() {
     format(["start", "table"], "file", "<file.*?>", "</file>"); // sort 210
     rule("start", "quote", "^>{1,}"); // sort 220
     inline(["start", "table"], "internallink", "\\[\\[.+?\\]\\]"); // sort 300
-    format(["start", "table"], "latex-ddollar", "\\$\\$", "\\$\\$"); // sort 300
+    if (config.latex) {
+        format(["start", "table"], "latex-ddollar", "\\$\\$", "\\$\\$"); // sort 300
+    }
     inline(["start", "table"], "media", "\\{\\{.+?\\}\\}"); // sort 320
     inline(["start", "table"], "externallink", "(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$)|(?:www|ftp)\\.[\\w.:?\\-;,]+?\\.[\\w.:?\\-;,]+?[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$))"); // sort 330
     inline(["start", "table"], "email", "<[0-9a-zA-Z!#$%&'*+\/=?^_`{|}~-]+(?:\\.[0-9a-zA-Z!#$%&'*+\\/=?^_`{|}~-]+)*@(?:[0-9a-zA-Z][0-9a-zA-Z-]*\\.)+(?:[a-zA-Z]{2,4}|museum|travel)>"); // sort 340
-    format(["start", "table"], "latex-dollar", "\\$", "\\$"); // sort 405
-    format(["start", "table"], "latex-displaymath", "\\\\begin\\{displaymath\\}", "\\\\end\\{displaymath\\}"); // sort 405
-    format(["start", "table"], "latex-equation", "\\\\begin\\{equation\\}", "\\\\end\\{equation\\}"); // sort 405
-    format(["start", "table"], "latex-equationstar", "\\\\begin\\{equation\\*\\}", "\\\\end\\{equation\\*\\}"); // sort 405
-    format(["start", "table"], "latex-eqnarray", "\\\\begin\\{eqnarray\\}", "\\\\end\\{eqnarray\\}"); // sort 405
-    format(["start", "table"], "latex-eqnarraystar", "\\\\begin\\{eqnarray\\*\\}", "\\\\end\\{eqnarray\\*\\}"); // sort 405
+    if (config.latex) {
+        format(["start", "table"], "latex-dollar", "\\$", "\\$"); // sort 405
+        format(["start", "table"], "latex-displaymath", "\\\\begin\\{displaymath\\}", "\\\\end\\{displaymath\\}"); // sort 405
+        format(["start", "table"], "latex-equation", "\\\\begin\\{equation\\}", "\\\\end\\{equation\\}"); // sort 405
+        format(["start", "table"], "latex-equationstar", "\\\\begin\\{equation\\*\\}", "\\\\end\\{equation\\*\\}"); // sort 405
+        format(["start", "table"], "latex-eqnarray", "\\\\begin\\{eqnarray\\}", "\\\\end\\{eqnarray\\}"); // sort 405
+        format(["start", "table"], "latex-eqnarraystar", "\\\\begin\\{eqnarray\\*\\}", "\\\\end\\{eqnarray\\*\\}"); // sort 405
+    }
 };
 
 oop.inherits(DokuwikiHighlightRules, TextHighlightRules);
 
-var Mode = function(highlight) {
-    this.$tokenizer = new Tokenizer(highlight ?
-                                    new DokuwikiHighlightRules().getRules():
+var Mode = function(config) {
+    this.$tokenizer = new Tokenizer(config.highlight ?
+                                    new DokuwikiHighlightRules(config).getRules():
                                     new TextHighlightRules().getRules());
 
     this.$nextLineIndentRules = new RegExp("^(?:" + ([

@@ -93,7 +93,7 @@ addInitEvent(function() {
         editor.setReadOnly($textarea.attr("readonly") === "readonly");
 
         // Setup Dokuwiki mode and theme
-        session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor.highlight));
+        session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor));
         editor.setTheme({cssClass: 'ace-doku-' + JSINFO.plugin_aceeditor.colortheme});
 
         // Setup wrap mode
