@@ -38,6 +38,13 @@
     width: 100%;
 }
 
+.ace-doku .ace_marker-layer .ace_preview {
+    position: absolute;
+    padding: 5px;
+    background-color: white;
+    border: 1px solid #ccc;
+}
+
 /* Light color theme */
 
 .ace-doku-light .ace_scroller {
