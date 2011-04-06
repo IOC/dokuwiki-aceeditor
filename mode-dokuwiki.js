@@ -76,7 +76,7 @@ var DokuwikiHighlightRules = function() {
     format(["start", "table"], "subscript", "<sub>", "</sub>"); // sort 110
     format(["start", "table"], "superscript", "<sup>", "</sup>"); // sort 120
     format(["start", "table"], "deleted", "<del>", "</del>"); // sort 130
-    inline(["start", "table"], "linebreak", "\\\\"); // sort 140
+    inline(["start", "table"], "linebreak", "\\\\\\\\"); // sort 140
     format(["start", "table"], "footnote", "\\(\\(", "\\)\\)"); // sort 150
     rule("start", "hr", "^[ \t]*-{4,}[ \t]*$") // sort 160
     format(["start", "table"], "unformatted", "<nowikI>", "</nowikI>"); // sort 170
@@ -89,7 +89,7 @@ var DokuwikiHighlightRules = function() {
     inline(["start", "table"], "internallink", "\\[\\[.+?\\]\\]"); // sort 300
     format(["start", "table"], "latex-ddollar", "\\$\\$", "\\$\\$"); // sort 300
     inline(["start", "table"], "media", "\\{\\{.+?\\}\\}"); // sort 320
-    inline(["start", "table"], "externallink", "(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$)|(?:www|ftp)\\.[\\w.:?\\-;,]+?\\.[\\w.:?\\-;,]+?[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$))"); // sort 33
+    inline(["start", "table"], "externallink", "(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$)|(?:www|ftp)\\.[\\w.:?\\-;,]+?\\.[\\w.:?\\-;,]+?[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$))"); // sort 330
     inline(["start", "table"], "email", "<[0-9a-zA-Z!#$%&'*+\/=?^_`{|}~-]+(?:\\.[0-9a-zA-Z!#$%&'*+\\/=?^_`{|}~-]+)*@(?:[0-9a-zA-Z][0-9a-zA-Z-]*\\.)+(?:[a-zA-Z]{2,4}|museum|travel)>"); // sort 340
     format(["start", "table"], "latex-dollar", "\\$", "\\$"); // sort 405
     format(["start", "table"], "latex-displaymath", "\\\\begin\\{displaymath\\}", "\\\\end\\{displaymath\\}"); // sort 405
@@ -97,7 +97,6 @@ var DokuwikiHighlightRules = function() {
     format(["start", "table"], "latex-equationstar", "\\\\begin\\{equation\\*\\}", "\\\\end\\{equation\\*\\}"); // sort 405
     format(["start", "table"], "latex-eqnarray", "\\\\begin\\{eqnarray\\}", "\\\\end\\{eqnarray\\}"); // sort 405
     format(["start", "table"], "latex-eqnarraystar", "\\\\begin\\{eqnarray\\*\\}", "\\\\end\\{eqnarray\\*\\}"); // sort 405
-
 };
 
 oop.inherits(DokuwikiHighlightRules, TextHighlightRules);
