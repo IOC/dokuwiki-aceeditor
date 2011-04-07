@@ -130,18 +130,21 @@ addInitEvent(function() {
             var url = DOKU_BASE + "lib/plugins/aceeditor/preview.php";
             $.getJSON(url, { text: token.value }, function (data) {
                 var renderer = function(html, range, left, top, config) {
-                    var left, top;
+                    var left, top, top_range, bottom_range;
                     range = token.range.clipRows(config.firstRow, config.lastRow);
                     range = range.toScreenRange(session);
-                    top = (range.end.row - config.firstRowScreen + 1) * config.lineHeight;
+                    range_top = (range.start.row - config.firstRowScreen) * config.lineHeight;
+                    range_bottom = (range.end.row - config.firstRowScreen + 1) * config.lineHeight;
+                    top = (range_top > config.height - range_bottom ?
+                           range_top - data.height - 12 : range_bottom);
                     left = (range.start.row < range.end.row ? 0 :
                             Math.round(range.start.column * config.characterWidth));
-                    html.push('<div class="ace_preview" style="'
-                              + 'left:' + left + 'px; top:' + top  + 'px; '
+                    html.push('<div class="ace_preview" style="padding:5px; '
+                              + 'position:absolute; left:' + left + 'px; top:' + top  + 'px; '
                               + 'width:' + data.width  + 'px; height:' + data.height + 'px;">'
                               + '<img src="' + encodeURI(data.url) + '"/></div>');
                 };
-                if (data.url && !preview_timer) {
+                if (data && !preview_timer) {
                     preview_marker = session.addMarker(token.range, "preview", renderer, true);
                 }
             });
