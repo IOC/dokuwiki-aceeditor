@@ -59,6 +59,8 @@ var DokuwikiHighlightRules = function(config) {
         };
     };
 
+    var containers = ["start", "table"];
+
     rule("start", "listblock", "^(?: {2,}|\t{1,})[\-\\*]"); // sort 10
     rule("start", "preformatted", "^(?:  |\t).+$"); // sort 20
     rule("start", "notoc", "~~NOTOC~~"); // sort 30
@@ -68,40 +70,40 @@ var DokuwikiHighlightRules = function(config) {
     rule("table", "table", "[\\|\\^][ \t]*$", "start");
     rule("table", "table", "[\\|\\^]");
     rule("table", "table", ":::(?=[ \t]*[\\|\\^])");
-    format(["start", "table"], "strong", "\\*\\*", "\\*\\*"); // sort 70
-    format(["start", "table"], "emphasis", "//", "//"); // sort 80
-    format(["start", "table"], "underline", "__", "__"); // sort 90
-    format(["start", "table"], "monospace", "''", "''"); // sort 100
+    format(containers, "strong", "\\*\\*", "\\*\\*"); // sort 70
+    format(containers, "emphasis", "//", "//"); // sort 80
+    format(containers, "underline", "__", "__"); // sort 90
+    format(containers, "monospace", "''", "''"); // sort 100
     if (config.latex) {
-        format(["start", "table"], "latex-latex", "<latex>", "</latex>"); // sort 100
+        format(containers, "latex-latex", "<latex>", "</latex>"); // sort 100
     }
-    format(["start", "table"], "subscript", "<sub>", "</sub>"); // sort 110
-    format(["start", "table"], "superscript", "<sup>", "</sup>"); // sort 120
-    format(["start", "table"], "deleted", "<del>", "</del>"); // sort 130
-    inline(["start", "table"], "linebreak", "\\\\\\\\"); // sort 140
-    format(["start", "table"], "footnote", "\\(\\(", "\\)\\)"); // sort 150
+    format(containers, "subscript", "<sub>", "</sub>"); // sort 110
+    format(containers, "superscript", "<sup>", "</sup>"); // sort 120
+    format(containers, "deleted", "<del>", "</del>"); // sort 130
+    inline(containers, "linebreak", "\\\\\\\\"); // sort 140
+    format(containers, "footnote", "\\(\\(", "\\)\\)"); // sort 150
     rule("start", "hr", "^[ \t]*-{4,}[ \t]*$") // sort 160
-    format(["start", "table"], "unformatted", "<nowikI>", "</nowikI>"); // sort 170
-    format(["start", "table"], "unformattedalt", "%%", "%%"); // sort 170
-    format(["start", "table"], "php", "<php>", "</php>"); // sort 180
-    format(["start", "table"], "html", "<html>", "</html>"); // sort 190
-    format(["start", "table"], "code", "<code.*?>", "</code>"); // sort 200
-    format(["start", "table"], "file", "<file.*?>", "</file>"); // sort 210
+    format(containers, "unformatted", "<nowikI>", "</nowikI>"); // sort 170
+    format(containers, "unformattedalt", "%%", "%%"); // sort 170
+    format(containers, "php", "<php>", "</php>"); // sort 180
+    format(containers, "html", "<html>", "</html>"); // sort 190
+    format(containers, "code", "<code.*?>", "</code>"); // sort 200
+    format(containers, "file", "<file.*?>", "</file>"); // sort 210
     rule("start", "quote", "^>{1,}"); // sort 220
-    inline(["start", "table"], "internallink", "\\[\\[.+?\\]\\]"); // sort 300
+    inline(containers, "internallink", "\\[\\[.+?\\]\\]"); // sort 300
     if (config.latex) {
-        format(["start", "table"], "latex-ddollar", "\\$\\$", "\\$\\$"); // sort 300
+        format(containers, "latex-ddollar", "\\$\\$", "\\$\\$"); // sort 300
     }
-    inline(["start", "table"], "media", "\\{\\{.+?\\}\\}"); // sort 320
-    inline(["start", "table"], "externallink", "(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$)|(?:www|ftp)\\.[\\w.:?\\-;,]+?\\.[\\w.:?\\-;,]+?[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$))"); // sort 330
-    inline(["start", "table"], "email", "<[0-9a-zA-Z!#$%&'*+\/=?^_`{|}~-]+(?:\\.[0-9a-zA-Z!#$%&'*+\\/=?^_`{|}~-]+)*@(?:[0-9a-zA-Z][0-9a-zA-Z-]*\\.)+(?:[a-zA-Z]{2,4}|museum|travel)>"); // sort 340
+    inline(containers, "media", "\\{\\{.+?\\}\\}"); // sort 320
+    inline(containers, "externallink", "(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$)|(?:www|ftp)\\.[\\w.:?\\-;,]+?\\.[\\w.:?\\-;,]+?[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$))"); // sort 330
+    inline(containers, "email", "<[0-9a-zA-Z!#$%&'*+\/=?^_`{|}~-]+(?:\\.[0-9a-zA-Z!#$%&'*+\\/=?^_`{|}~-]+)*@(?:[0-9a-zA-Z][0-9a-zA-Z-]*\\.)+(?:[a-zA-Z]{2,4}|museum|travel)>"); // sort 340
     if (config.latex) {
-        format(["start", "table"], "latex-dollar", "\\$", "\\$"); // sort 405
-        format(["start", "table"], "latex-displaymath", "\\\\begin\\{displaymath\\}", "\\\\end\\{displaymath\\}"); // sort 405
-        format(["start", "table"], "latex-equation", "\\\\begin\\{equation\\}", "\\\\end\\{equation\\}"); // sort 405
-        format(["start", "table"], "latex-equationstar", "\\\\begin\\{equation\\*\\}", "\\\\end\\{equation\\*\\}"); // sort 405
-        format(["start", "table"], "latex-eqnarray", "\\\\begin\\{eqnarray\\}", "\\\\end\\{eqnarray\\}"); // sort 405
-        format(["start", "table"], "latex-eqnarraystar", "\\\\begin\\{eqnarray\\*\\}", "\\\\end\\{eqnarray\\*\\}"); // sort 405
+        format(containers, "latex-dollar", "\\$", "\\$"); // sort 405
+        format(containers, "latex-displaymath", "\\\\begin\\{displaymath\\}", "\\\\end\\{displaymath\\}"); // sort 405
+        format(containers, "latex-equation", "\\\\begin\\{equation\\}", "\\\\end\\{equation\\}"); // sort 405
+        format(containers, "latex-equationstar", "\\\\begin\\{equation\\*\\}", "\\\\end\\{equation\\*\\}"); // sort 405
+        format(containers, "latex-eqnarray", "\\\\begin\\{eqnarray\\}", "\\\\end\\{eqnarray\\}"); // sort 405
+        format(containers, "latex-eqnarraystar", "\\\\begin\\{eqnarray\\*\\}", "\\\\end\\{eqnarray\\*\\}"); // sort 405
     }
 };
 
