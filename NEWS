@@ -1,3 +1,7 @@
+2011-04-07
+ * Syntax highlihgting for LaTeX plugin
+ * Preview of LaTeX formulas
+
 2011-04-01
  * Fixed some integration bugs
  * Updated Ace build (fixes multi-byte languages)

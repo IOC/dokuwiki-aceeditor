@@ -37,6 +37,7 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
             'highlight' => $this->getConf('highlight'),
             'wraplimit' => $wraplimit ? (int) $wraplimit : null,
             'colortheme' => $this->getConf('colortheme'),
+            'latex' => $this->getConf('latex'),
         );
     }
 

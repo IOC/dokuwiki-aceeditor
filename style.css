@@ -38,6 +38,11 @@
     width: 100%;
 }
 
+.ace-doku .ace_marker-layer .ace_preview {
+    background-color: white;
+    border: 1px solid #ccc;
+}
+
 /* Light color theme */
 
 .ace-doku-light .ace_scroller {
@@ -103,6 +108,14 @@
     font-weight: bold;
 }
 
+.ace-doku-light .ace_latex-latex,
+.ace-doku-light .ace_latex-dollar,
+.ace-doku-light .ace_latex-ddollar,
+.ace-doku-light .ace_latex-displaymath,
+.ace-doku-light .ace_latex-eqnarray,
+.ace-doku-light .ace_latex-eqnarraystar,
+.ace-doku-light .ace_latex-equation,
+.ace-doku-light .ace_latex-equationstar,
 .ace-doku-light .ace_php,
 .ace-doku-light .ace_html,
 .ace-doku-light .ace_code,
@@ -194,6 +207,14 @@
     font-weight: bold;
 }
 
+.ace-doku-dark .ace_latex-latex,
+.ace-doku-dark .ace_latex-dollar,
+.ace-doku-dark .ace_latex-ddollar,
+.ace-doku-dark .ace_latex-displaymath,
+.ace-doku-dark .ace_latex-eqnarray,
+.ace-doku-dark .ace_latex-eqnarraystar,
+.ace-doku-dark .ace_latex-equation,
+.ace-doku-dark .ace_latex-equationstar,
 .ace-doku-dark .ace_php,
 .ace-doku-dark .ace_html,
 .ace-doku-dark .ace_code,
@@ -232,8 +253,6 @@
 
 .ace-doku-dark .ace_iocstl,
 .ace-doku-dark .ace_quiz,
-.ace-doku-dark .ace_latex,
-.ace-doku-dark .ace_latexalt,
 .ace-doku-dark .ace_noprint,
 .ace-doku-dark .ace_noweb,
 .ace-doku-dark .ace_directive-open,

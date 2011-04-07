@@ -17,8 +17,12 @@
  */
 
 addInitEvent(function() {
+    var Range = require("ace/range").Range;
+    var DokuwikiMode = require("mode-dokuwiki").Mode;
+
     var editor, session, enabled = false;
     var $textarea, $container, $editor, $toggle_on, $toggle_off;
+    var preview_marker, preview_timer;
 
     var disable = function() {
         var selection = getSelection($textarea.get(0));
@@ -56,8 +60,6 @@ addInitEvent(function() {
 
     var init = function() {
         var $ = jQuery;
-        var Range = require("ace/range").Range;
-        var DokuwikiMode = require("mode-dokuwiki").Mode;
 
         // Setup elements
         $textarea = $("#wiki__text");
@@ -93,7 +95,7 @@ addInitEvent(function() {
         editor.setReadOnly($textarea.attr("readonly") === "readonly");
 
         // Setup Dokuwiki mode and theme
-        session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor.highlight));
+        session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor));
         editor.setTheme({cssClass: 'ace-doku-' + JSINFO.plugin_aceeditor.colortheme});
 
         // Setup wrap mode
@@ -109,6 +111,63 @@ addInitEvent(function() {
                 summaryCheck();
             }
         });
+
+
+        // LaTeX preview
+
+        var preview_show = function() {
+            var pos = editor.getCursorPosition();
+            var token = token_at_pos(pos);
+            preview_timer = null;
+            preview_hide();
+
+            if (token && /^latex-.*$/.test(token.type)) {
+                preview_latex(token);
+            }
+        };
+
+        var preview_latex = function(token) {
+            var url = DOKU_BASE + "lib/plugins/aceeditor/preview.php";
+            $.getJSON(url, { text: token.value }, function (data) {
+                var renderer = function(html, range, left, top, config) {
+                    var left, top, top_range, bottom_range;
+                    range = token.range.clipRows(config.firstRow, config.lastRow);
+                    range = range.toScreenRange(session);
+                    range_top = (range.start.row - config.firstRowScreen) * config.lineHeight;
+                    range_bottom = (range.end.row - config.firstRowScreen + 1) * config.lineHeight;
+                    top = (range_top > config.height - range_bottom ?
+                           range_top - data.height - 12 : range_bottom);
+                    left = (range.start.row < range.end.row ? 0 :
+                            Math.round(range.start.column * config.characterWidth));
+                    html.push('<div class="ace_preview" style="padding:5px; '
+                              + 'position:absolute; left:' + left + 'px; top:' + top  + 'px; '
+                              + 'width:' + data.width  + 'px; height:' + data.height + 'px;">'
+                              + '<img src="' + encodeURI(data.url) + '"/></div>');
+                };
+                if (data && !preview_timer) {
+                    preview_marker = session.addMarker(token.range, "preview", renderer, true);
+                }
+            });
+        };
+
+        var preview_hide = function() {
+             if (preview_marker) {
+                 session.removeMarker(preview_marker);
+             }
+        };
+
+        var preview_trigger = function() {
+            if (preview_timer) {
+                clearTimeout(preview_timer);
+                preview_timer = null;
+            }
+            preview_hide();
+            preview_timer = setTimeout(preview_show, 1000);
+        };
+
+        session.on("change", preview_trigger);
+        editor.getSelection().on("changeCursor", preview_trigger);
+
 
         // Patch Dokuwiki functions
 
@@ -226,6 +285,63 @@ addInitEvent(function() {
                 offset += session.getLine(i).length + 1;
             }
         return offset;
+    };
+
+    var token_at_pos = function(pos) {
+        var tokenizer = editor.bgTokenizer;
+        var i, tokens, regexp, next = true;
+        var regexp, type, range = new Range(pos.row, 0, pos.row, 0);
+        var get_tokens = function(row) {
+            tokens = tokenizer.getTokens(row, row)[0];
+        };
+
+        get_tokens(range.end.row);
+        while (tokens.tokens.length === 0) {
+            if (range.start.row === 0) {
+                return;
+            }
+            range.start.row -= 1;
+            get_tokens(range.start.row);
+        }
+
+        for (i = 0; i < tokens.tokens.length; i += 1) {
+            range.end.column += tokens.tokens[i].value.length;
+            if (pos.column < range.end.column || i === tokens.tokens.length - 1) {
+                type = tokens.tokens[i].type;
+                regexp = new RegExp("^(start|table)-" + type + "$");
+                break;
+            }
+            range.start.column = range.end.column;
+        }
+
+        while (i >= tokens.tokens.length - 1 &&
+               regexp.test(tokens.state) &&
+               range.end.row + 1 < session.getLength()) {
+            range.end.row += 1;
+            range.end.column = 0;
+            get_tokens(range.end.row);
+            for (i = 0; i < tokens.tokens.length; i += 1) {
+                range.end.column += tokens.tokens[i].value.length;
+                if (pos.column < range.end.column) {
+                    break;
+                }
+            }
+        }
+
+        while (range.start.row > 0 && range.start.column === 0) {
+            get_tokens(range.start.row - 1);
+            if (!regexp.test(tokens.state)) {
+                break;
+            }
+            range.start.row -= 1;
+            for (i = 0; i < tokens.tokens.length - 1; i += 1) {
+                range.start.column += tokens.tokens[i].value.length;
+            }
+        }
+
+       return {type: type,
+               value: session.getTextRange(range),
+               range: range};
     };
 
     // initialize editor after Dokuwiki

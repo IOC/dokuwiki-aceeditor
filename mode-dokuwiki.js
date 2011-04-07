@@ -23,7 +23,7 @@ var TextMode = require("ace/mode/text").Mode;
 var Tokenizer = require("ace/tokenizer").Tokenizer;
 var TextHighlightRules = require("ace/mode/text_highlight_rules").TextHighlightRules;
 
-var DokuwikiHighlightRules = function() {
+var DokuwikiHighlightRules = function(config) {
 
     var that = this;
     this.$rules = {};
@@ -59,6 +59,8 @@ var DokuwikiHighlightRules = function() {
         };
     };
 
+    var containers = ["start", "table", "directive"];
+
     rule("start", "quiz", "<quiz>|</quiz>"); // sort 5
     rule("start", "listblock", "^(?: {2,}|\t{1,})[\-\\*]"); // sort 10
     rule("start", "iocstl", "<iocstl.*?>|</iocstl>"); // sort 15
@@ -72,29 +74,41 @@ var DokuwikiHighlightRules = function() {
     rule("table", "table", "[\\|\\^][ \t]*$", "start");
     rule("table", "table", "[\\|\\^]");
     rule("table", "table", ":::(?=[ \t]*[\\|\\^])");
-    format(["start", "table", "directive"], "strong", "\\*\\*", "\\*\\*"); // sort 70
-    format(["start", "table", "directive"], "emphasis", "//", "//"); // sort 80
-    format(["start", "table", "directive"], "underline", "__", "__"); // sort 90
-    format(["start", "table", "directive"], "monospace", "''", "''"); // sort 100
-    format(["start", "table", "directive"], "latex", "<latex>", "</latex>"); // sort 100
-    format(["start", "table", "directive"], "latexalt", "\\$\\$", "\\$\\$"); // sort 100
-    format(["start", "table", "directive"], "subscript", "<sub>", "</sub>"); // sort 110
-    format(["start", "table", "directive"], "superscript", "<sup>", "</sup>"); // sort 120
-    format(["start", "table", "directive"], "deleted", "<del>", "</del>"); // sort 130
-    inline(["start", "table", "directive"], "linebreak", "\\\\"); // sort 140
-    format(["start", "table", "directive"], "footnote", "\\(\\(", "\\)\\)"); // sort 150
+    format(containers, "strong", "\\*\\*", "\\*\\*"); // sort 70
+    format(containers, "emphasis", "//", "//"); // sort 80
+    format(containers, "underline", "__", "__"); // sort 90
+    format(containers, "monospace", "''", "''"); // sort 100
+    if (config.latex) {
+        format(containers, "latex-latex", "<latex>", "</latex>"); // sort 100
+    }
+    format(containers, "subscript", "<sub>", "</sub>"); // sort 110
+    format(containers, "superscript", "<sup>", "</sup>"); // sort 120
+    format(containers, "deleted", "<del>", "</del>"); // sort 130
+    inline(containers, "linebreak", "\\\\\\\\"); // sort 140
+    format(containers, "footnote", "\\(\\(", "\\)\\)"); // sort 150
     rule("start", "hr", "^[ \t]*-{4,}[ \t]*$") // sort 160
-    format(["start", "table", "directive"], "unformatted", "<nowikI>", "</nowikI>"); // sort 170
-    format(["start", "table", "directive"], "unformattedalt", "%%", "%%"); // sort 170
-    format(["start", "table", "directive"], "php", "<php>", "</php>"); // sort 180
-    format(["start", "table", "directive"], "html", "<html>", "</html>"); // sort 190
-    format(["start", "table", "directive"], "code", "<code.*?>", "</code>"); // sort 200
-    format(["start", "table", "directive"], "file", "<file.*?>", "</file>"); // sort 210
+    format(containers, "unformatted", "<nowikI>", "</nowikI>"); // sort 170
+    format(containers, "unformattedalt", "%%", "%%"); // sort 170
+    format(containers, "php", "<php>", "</php>"); // sort 180
+    format(containers, "html", "<html>", "</html>"); // sort 190
+    format(containers, "code", "<code.*?>", "</code>"); // sort 200
+    format(containers, "file", "<file.*?>", "</file>"); // sort 210
     rule("start", "quote", "^>{1,}"); // sort 220
-    inline(["start", "table", "directive"], "internallink", "\\[\\[.+?\\]\\]"); // sort 300
-    inline(["start", "table", "directive"], "media", "\\{\\{.+?\\}\\}"); // sort 320
-    inline(["start", "table", "directive"], "externallink", "(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$)|(?:www|ftp)\\.[\\w.:?\\-;,]+?\\.[\\w.:?\\-;,]+?[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$))"); // sort 33
-    inline(["start", "table", "directive"], "email", "<[0-9a-zA-Z!#$%&'*+\/=?^_`{|}~-]+(?:\\.[0-9a-zA-Z!#$%&'*+\\/=?^_`{|}~-]+)*@(?:[0-9a-zA-Z][0-9a-zA-Z-]*\\.)+(?:[a-zA-Z]{2,4}|museum|travel)>"); // sort 340
+    inline(containers, "internallink", "\\[\\[.+?\\]\\]"); // sort 300
+    if (config.latex) {
+        format(containers, "latex-ddollar", "\\$\\$", "\\$\\$"); // sort 300
+    }
+    inline(containers, "media", "\\{\\{.+?\\}\\}"); // sort 320
+    inline(containers, "externallink", "(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$)|(?:www|ftp)\\.[\\w.:?\\-;,]+?\\.[\\w.:?\\-;,]+?[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$))"); // sort 330
+    inline(containers, "email", "<[0-9a-zA-Z!#$%&'*+\/=?^_`{|}~-]+(?:\\.[0-9a-zA-Z!#$%&'*+\\/=?^_`{|}~-]+)*@(?:[0-9a-zA-Z][0-9a-zA-Z-]*\\.)+(?:[a-zA-Z]{2,4}|museum|travel)>"); // sort 340
+    if (config.latex) {
+        format(containers, "latex-dollar", "\\$", "\\$"); // sort 405
+        format(containers, "latex-displaymath", "\\\\begin\\{displaymath\\}", "\\\\end\\{displaymath\\}"); // sort 405
+        format(containers, "latex-equation", "\\\\begin\\{equation\\}", "\\\\end\\{equation\\}"); // sort 405
+        format(containers, "latex-equationstar", "\\\\begin\\{equation\\*\\}", "\\\\end\\{equation\\*\\}"); // sort 405
+        format(containers, "latex-eqnarray", "\\\\begin\\{eqnarray\\}", "\\\\end\\{eqnarray\\}"); // sort 405
+        format(containers, "latex-eqnarraystar", "\\\\begin\\{eqnarray\\*\\}", "\\\\end\\{eqnarray\\*\\}"); // sort 405
+    }
     rule("start", "directive-open", "^::[a-zA-Z0-9_-]+:.*$", "directive");
     rule("directive", "directive-param", "^  [a-zA-Z0-9_-]+:.*$");
     rule("directive", "directive-close", "^:::$", "start");
@@ -102,9 +116,9 @@ var DokuwikiHighlightRules = function() {
 
 oop.inherits(DokuwikiHighlightRules, TextHighlightRules);
 
-var Mode = function(highlight) {
-    this.$tokenizer = new Tokenizer(highlight ?
-                                    new DokuwikiHighlightRules().getRules():
+var Mode = function(config) {
+    this.$tokenizer = new Tokenizer(config.highlight ?
+                                    new DokuwikiHighlightRules(config).getRules():
                                     new TextHighlightRules().getRules());
 
     this.$nextLineIndentRules = new RegExp("^(?:" + ([
