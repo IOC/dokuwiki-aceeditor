@@ -86,7 +86,9 @@ var DokuwikiHighlightRules = function(config) {
     format(containers, "unformatted", "<nowikI>", "</nowikI>"); // sort 170
     format(containers, "unformattedalt", "%%", "%%"); // sort 170
     format(containers, "php", "<php>", "</php>"); // sort 180
+    format(containers, "phpblock", "<PHP>", "</PHP>"); // sort 180
     format(containers, "html", "<html>", "</html>"); // sort 190
+    format(containers, "htmlblock", "<HTML>", "</HTML>"); // sort 190
     format(containers, "code", "<code.*?>", "</code>"); // sort 200
     format(containers, "file", "<file.*?>", "</file>"); // sort 210
     rule("start", "quote", "^>{1,}"); // sort 220

@@ -117,8 +117,11 @@
 .ace-doku-light .ace_latex-equation,
 .ace-doku-light .ace_latex-equationstar,
 .ace-doku-light .ace_php,
+.ace-doku-light .ace_phpblock,
 .ace-doku-light .ace_html,
+.ace-doku-light .ace_htmlblock,
 .ace-doku-light .ace_code,
+.ace-doku-light .ace_file,
 .ace_preformatted {
     color: #080;
 }
@@ -216,8 +219,11 @@
 .ace-doku-dark .ace_latex-equation,
 .ace-doku-dark .ace_latex-equationstar,
 .ace-doku-dark .ace_php,
+.ace-doku-dark .ace_phpblock,
 .ace-doku-dark .ace_html,
+.ace-doku-dark .ace_htmlblock,
 .ace-doku-dark .ace_code,
+.ace-doku-dark .ace_file,
 .ace-doku-dark .ace_preformatted {
     color: #8f8;
 }
