@@ -266,6 +266,9 @@ addInitEvent(function() {
 
         if (DokuCookie.getValue("aceeditor") !== "off") {
             enable();
+            setTimeout(function() {
+                editor.scrollToRow(0);
+            }, 0);
         }
     };
 
