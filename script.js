@@ -288,11 +288,10 @@ addInitEvent(function() {
     };
 
     var token_at_pos = function(pos) {
-        var tokenizer = editor.bgTokenizer;
         var i, tokens, regexp, next = true;
         var regexp, type, range = new Range(pos.row, 0, pos.row, 0);
         var get_tokens = function(row) {
-            tokens = tokenizer.getTokens(row, row)[0];
+            tokens = session.getTokens(row, row)[0];
         };
 
         get_tokens(range.end.row);
