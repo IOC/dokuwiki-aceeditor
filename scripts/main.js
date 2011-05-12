@@ -16,9 +16,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-addInitEvent(function() {
+define(function(require) {
     var Range = require("ace/range").Range;
-    var DokuwikiMode = require("mode-dokuwiki").Mode;
+    var DokuwikiMode = require("mode").Mode;
+    var Editor = require("ace/editor").Editor;
+    var Renderer = require("ace/virtual_renderer").VirtualRenderer;
 
     var editor, session, enabled = false;
     var $textarea, $container, $editor, $toggle_on, $toggle_off;
@@ -60,6 +62,7 @@ addInitEvent(function() {
 
     var init = function() {
         var $ = jQuery;
+        var theme;
 
         // Setup elements
         $textarea = $("#wiki__text");
@@ -90,13 +93,11 @@ addInitEvent(function() {
             .click(enable);
 
         // Initialize Ace
-        editor = ace.edit($editor.get(0));
-        session = editor.getSession();
+        theme = {cssClass: 'ace-doku-' + JSINFO.plugin_aceeditor.colortheme};
+        editor = new Editor(new Renderer($editor.get(0), theme));
         editor.setReadOnly($textarea.attr("readonly") === "readonly");
-
-        // Setup Dokuwiki mode and theme
+        session = editor.getSession();
         session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor));
-        editor.setTheme({cssClass: 'ace-doku-' + JSINFO.plugin_aceeditor.colortheme});
 
         // Setup wrap mode
         session.setUseWrapMode($textarea.attr('wrap') !== "off");
@@ -347,9 +348,11 @@ addInitEvent(function() {
     };
 
     // initialize editor after Dokuwiki
-    setTimeout(function() {
-        if ($("wiki__text") && window.jQuery && window.JSINFO) {
-            init();
-        }
-    }), 0;
+    require.ready(function() {
+        setTimeout(function() {
+            if ($("wiki__text") && window.jQuery && window.JSINFO) {
+                init();
+            }
+        }, 0);
+    });
 });

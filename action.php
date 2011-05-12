@@ -43,16 +43,22 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
 
     public function handle_tpl_metaheader_output(Doku_Event &$event, $param) {
         global $ACT;
-        $event->data['script'][] = array(
-            'type' => 'text/javascript',
-            'charset' => 'utf-8',
-            'src' => DOKU_BASE.'lib/plugins/aceeditor/ace/ace.js'
-        );
-        $event->data['script'][] = array(
-            'type' => 'text/javascript',
-            'charset' => 'utf-8',
-            'src' => DOKU_BASE.'lib/plugins/aceeditor/mode-dokuwiki.js'
-        );
+
+        if (file_exists(DOKU_INC.'lib/plugins/aceeditor/build.js')) {
+            $event->data['script'][] = array(
+                'type' => 'text/javascript',
+                'charset' => 'utf-8',
+                'src' => DOKU_BASE.'lib/plugins/aceeditor/build.js',
+            );
+        } else {
+            $event->data['script'][] = array(
+                'type' => 'text/javascript',
+                'charset' => 'utf-8',
+                'src' => DOKU_BASE.'lib/plugins/aceeditor/scripts/require.js',
+                'data-main' => DOKU_BASE.'lib/plugins/aceeditor/scripts/main.js',
+            );
+        }
+
         if ($this->getConf('loadjquery')) {
             $event->data['script'][] = array(
                 'type' => 'text/javascript',
