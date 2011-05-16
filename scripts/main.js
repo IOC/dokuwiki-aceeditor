@@ -23,7 +23,7 @@ define(function(require) {
     var Renderer = require("ace/virtual_renderer").VirtualRenderer;
 
     var editor, session, enabled = false;
-    var $textarea, $container, $editor, $toggle_on, $toggle_off;
+    var $textarea, $container, $editor, toggle;
     var preview_marker, preview_timer;
 
     var disable = function() {
@@ -31,8 +31,7 @@ define(function(require) {
 
         $textarea.show();
         $container.hide();
-        $toggle_on.hide();
-        $toggle_off.show();
+        toggle.off();
 
         $textarea.val(session.getValue());
 
@@ -47,8 +46,7 @@ define(function(require) {
         $editor.css("height", $container.height() + "px");
         $textarea.hide();
         $container.show();
-        $toggle_on.show();
-        $toggle_off.hide();
+        toggle.on();
 
         session.setValue($textarea.val());
         editor.navigateTo(0);
@@ -80,17 +78,10 @@ define(function(require) {
         });
 
         // Setup toggle
-        $toggle_on = $("<img>")
-            .addClass("ace-toggle")
-            .attr("src", DOKU_BASE + "lib/plugins/aceeditor/toggle_on.png")
-            .insertAfter($("#size__ctl"))
-            .click(disable)
-            .hide();
-        $toggle_off = $("<img>")
-            .addClass("ace-toggle")
-            .attr("src", DOKU_BASE + "lib/plugins/aceeditor/toggle_off.png")
-            .insertAfter($("#size__ctl"))
-            .click(enable);
+        toggle = require("toggle")({
+            on_enable: enable,
+            on_disable: disable
+        });
 
         // Initialize Ace
         theme = {cssClass: 'ace-doku-' + JSINFO.plugin_aceeditor.colortheme};
