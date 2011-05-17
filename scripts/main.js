@@ -22,40 +22,51 @@ define(function(require) {
     var Editor = require("ace/editor").Editor;
     var Renderer = require("ace/virtual_renderer").VirtualRenderer;
 
-    var editor, session, enabled = false;
-    var $textarea, $container, $editor, toggle;
+    var editor, session;
+    var $container, $editor, doku, toggle;
     var preview_marker, preview_timer;
 
-    var disable = function() {
-        var selection = getSelection($textarea.get(0));
+    var set_selection = function(start, end) {
+        var range = Range.fromPoints(offset_to_pos(start), offset_to_pos(end));
+        editor.getSelection().setSelectionRange(range);
+        editor.focus();
+    };
 
-        $textarea.show();
+    var get_selection = function() {
+        var range = editor.getSelection().getRange();
+        return {start: pos_to_offset(range.start), end: pos_to_offset(range.end)};
+    };
+
+    var disable = function() {
+        var selection = get_selection();
+
+        doku.enable();
         $container.hide();
         toggle.off();
 
-        $textarea.val(session.getValue());
+        doku.set_value(session.getValue());
 
-        enabled = false;
-        setSelection(selection);
-        DokuCookie.setValue("aceeditor", "off");
+        doku.set_selection(selection.start, selection.end);
+        doku.set_cookie("aceeditor", "off");
     };
 
     var enable = function() {
-        var selection = getSelection($textarea.get(0));
-        $container.css("height", $textarea.innerHeight() + "px");
-        $editor.css("height", $container.height() + "px");
-        $textarea.hide();
+        var selection = doku.get_selection();
+
+        doku.disable();
         $container.show();
+        $editor.css("width", $container.width() + "px");
+        $container.css("height", doku.inner_height() + "px");
+        $editor.css("height", $container.height() + "px");
         toggle.on();
 
-        session.setValue($textarea.val());
-        editor.navigateTo(0);
+        session.setValue(doku.get_value());
+        editor.navigateTo(0, 0);
         editor.resize();
         editor.focus();
 
-        enabled = true;
-        setSelection(selection);
-        DokuCookie.setValue("aceeditor", "on");
+        set_selection(selection.start, selection.end);
+        doku.set_cookie("aceeditor", "on");
     };
 
     var init = function() {
@@ -63,19 +74,45 @@ define(function(require) {
         var theme;
 
         // Setup elements
-        $textarea = $("#wiki__text");
+        doku = require("doku")({
+            get_selection: get_selection,
+            get_text: function(start, end) {
+                return session.getValue().substring(start, end);
+            },
+            get_value: function() {
+                return session.getValue();
+            },
+            paste_text: function(start, end, text) {
+                var range;
+                range = Range.fromPoints(offset_to_pos(start), offset_to_pos(end));
+                session.replace(range, text);
+                set_selection(start, end);
+
+            },
+            on_resize: function() {
+                $editor.css("width", $container.width() + "px");
+                editor.resize();
+            },
+            set_selection: set_selection,
+            set_wrap: function(value) {
+                editor.setShowPrintMargin(value);
+                session.setUseWrapMode(value);
+                editor.focus();
+            },
+            size_ctl: function(value) {
+                $container.css("height", ($container.height() + value) + "px");
+                $editor.css("height", $container.height() + "px");
+                editor.resize();
+                editor.focus();
+            }
+        });
         $container = $("<div>")
             .addClass("ace-doku")
-            .insertBefore($textarea);
+            .insertBefore(jQuery("#wiki__text"));
         $editor = $("<div>")
             .css("width", $container.width() + "px")
             .appendTo($container);
         $container.hide();
-        addEvent(window, "resize", function(event) {
-            if (enabled) {
-                $editor.css("width", $container.width() + "px");
-            }
-        });
 
         // Setup toggle
         toggle = require("toggle")({
@@ -86,21 +123,20 @@ define(function(require) {
         // Initialize Ace
         theme = {cssClass: 'ace-doku-' + JSINFO.plugin_aceeditor.colortheme};
         editor = new Editor(new Renderer($editor.get(0), theme));
-        editor.setReadOnly($textarea.attr("readonly") === "readonly");
+        editor.setReadOnly(doku.get_readonly());
         session = editor.getSession();
         session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor));
 
         // Setup wrap mode
-        session.setUseWrapMode($textarea.attr('wrap') !== "off");
-        editor.setShowPrintMargin($textarea.attr('wrap') !== "off");
+        session.setUseWrapMode(doku.get_wrap());
+        editor.setShowPrintMargin(doku.get_wrap());
         session.setWrapLimitRange(null, JSINFO.plugin_aceeditor.wraplimit);
         editor.setPrintMarginColumn(JSINFO.plugin_aceeditor.wraplimit);
 
         // Notify Dokuwiki of text changes
         session.getDocument().on("change", function() {
             if (!editor.getReadOnly()) {
-                textChanged = true;
-                summaryCheck();
+                doku.text_changed();
             }
         });
 
@@ -160,107 +196,9 @@ define(function(require) {
         session.on("change", preview_trigger);
         editor.getSelection().on("changeCursor", preview_trigger);
 
-
-        // Patch Dokuwiki functions
-
-        var doku_submit_handler = $textarea.get(0).form.onsubmit;
-        addEvent($textarea.get(0).form, "submit", function(event) {
-            if (enabled) {
-                $textarea.val(session.getValue());
-                if (doku_submit_handler && doku_submit_handler !== handleEvent) {
-                    // submit handler is not set with addEvent
-                    // in older versions of Dokuwiki
-                    return doku_submit_handler(event);
-                }
-            }
-        });
-
-        var doku_selection_class = selection_class;
-        selection_class = function() {
-            doku_selection_class.apply(this);
-            this.doku_get_text = this.getText;
-            this.getText = function() {
-                var value;
-                if (enabled && this.obj === $textarea.get(0)) {
-                    value = session.getValue();
-                    return value.substring(this.start, this.end);
-                } else {
-                    return this.doku_get_text();
-                }
-            };
-        };
-
-        var doku_get_selection = getSelection;
-        getSelection = function(obj) {
-            var selection, range;
-            if (enabled && obj === $textarea.get(0)) {
-                range = editor.getSelection().getRange();
-                selection = new selection_class();
-                selection.obj = $textarea.get(0);
-                selection.start = pos_to_offset(range.start);
-                selection.end = pos_to_offset(range.end);
-                return selection;
-            } else {
-                return doku_get_selection(obj);
-            }
-        };
-
-        var doku_set_selection = setSelection;
-        setSelection = function(selection) {
-            var range;
-            if (enabled && selection.obj === $textarea.get(0)) {
-                range = Range.fromPoints(offset_to_pos(selection.start),
-                                         offset_to_pos(selection.end));
-                editor.getSelection().setSelectionRange(range);
-                editor.focus();
-            } else {
-                return doku_set_selection(selection);
-            }
-        };
-
-        var doku_paste_text = pasteText;
-        pasteText = function(selection, text, opts) {
-            var range;
-            if (enabled && selection.obj === $textarea.get(0)) {
-                opts = opts || {};
-                range = Range.fromPoints(offset_to_pos(selection.start),
-                                         offset_to_pos(selection.end));
-                session.replace(range, text);
-                selection.end = selection.start + text.length - (opts.endofs || 0);
-                selection.start = (opts.nosel ? selection.end :
-                                   selection.start + (opts.startofs || 0));
-                setSelection(selection);
-            } else {
-                doku_paste_text(selection, text, opts);
-            }
-        };
-
-        var doku_size_ctl = sizeCtl;
-        sizeCtl = function(edid, val) {
-            doku_size_ctl(edid, val);
-            if (enabled && $textarea.attr("id") === edid) {
-                $container.css("height", ($container.height() + val) + "px");
-                $editor.css("height", $container.height() + "px");
-                editor.resize();
-                editor.focus();
-            }
-        };
-
-        var doku_set_wrap = setWrap;
-        setWrap = function(obj, value) {
-            doku_set_wrap(obj, value);
-            if (obj === $textarea.get(0)) {
-                editor.setShowPrintMargin(value !== "off");
-                session.setUseWrapMode(value !== "off");
-                editor.focus();
-            }
-        };
-
-        if (DokuCookie.getValue("aceeditor") !== "off") {
+        if (doku.get_cookie("aceeditor") !== "off") {
             enable();
-            setTimeout(function() {
-                editor.scrollToRow(0);
-            }, 0);
+            editor.navigateTo(0, 0);
         }
     };
 
