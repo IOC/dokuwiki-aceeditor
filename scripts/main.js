@@ -17,34 +17,17 @@
  */
 
 define(function(require) {
-    var Range = require("ace/range").Range;
-    var DokuwikiMode = require("mode").Mode;
-    var Editor = require("ace/editor").Editor;
-    var Renderer = require("ace/virtual_renderer").VirtualRenderer;
-
-    var editor, session;
-    var container, doku, toggle;
+    var ace, container, doku, toggle;
     var preview_marker, preview_timer;
 
-    var set_selection = function(start, end) {
-        var range = Range.fromPoints(offset_to_pos(start), offset_to_pos(end));
-        editor.getSelection().setSelectionRange(range);
-        editor.focus();
-    };
-
-    var get_selection = function() {
-        var range = editor.getSelection().getRange();
-        return {start: pos_to_offset(range.start), end: pos_to_offset(range.end)};
-    };
-
     var disable = function() {
-        var selection = get_selection();
+        var selection = ace.get_selection();
 
         doku.enable();
         container.hide();
         toggle.off();
 
-        doku.set_value(session.getValue());
+        doku.set_value(ace.get_value());
 
         doku.set_selection(selection.start, selection.end);
         doku.set_cookie("aceeditor", "off");
@@ -58,49 +41,47 @@ define(function(require) {
         container.show();
         toggle.on();
 
-        session.setValue(doku.get_value());
-        editor.navigateTo(0, 0);
-        editor.resize();
-        editor.focus();
+        ace.set_value(doku.get_value());
+        ace.resize();
+        ace.focus();
 
-        set_selection(selection.start, selection.end);
+        ace.set_selection(selection.start, selection.end);
         doku.set_cookie("aceeditor", "on");
     };
 
     var init = function() {
-        var $ = jQuery;
-        var theme;
-
         // Setup elements
         doku = require("doku")({
-            get_selection: get_selection,
+            get_selection: function() {
+                return ace.get_selection();
+            },
             get_text: function(start, end) {
-                return session.getValue().substring(start, end);
+                return ace.get_value().substring(start, end);
             },
             get_value: function() {
-                return session.getValue();
+                return ace.get_value();
             },
             paste_text: function(start, end, text) {
-                var range;
-                range = Range.fromPoints(offset_to_pos(start), offset_to_pos(end));
-                session.replace(range, text);
-                set_selection(start, end);
-
+                ace.replace(start, end, text);
+                ace.set_selection(start, end);
+                ace.focus();
             },
             on_resize: function() {
                 container.on_resize();
-                editor.resize();
+                ace.resize();
             },
-            set_selection: set_selection,
+            set_selection: function(start, end) {
+                ace.set_selection(start, end);
+                ace.focus();
+            },
             set_wrap: function(value) {
-                editor.setShowPrintMargin(value);
-                session.setUseWrapMode(value);
-                editor.focus();
+                ace.set_wrap_mode(value);
+                ace.focus();
             },
             size_ctl: function(value) {
                 container.incr_height(value);
-                editor.resize();
-                editor.focus();
+                ace.resize();
+                ace.focus();
             }
         });
 
@@ -113,30 +94,26 @@ define(function(require) {
         });
 
         // Initialize Ace
-        theme = {cssClass: 'ace-doku-' + JSINFO.plugin_aceeditor.colortheme};
-        editor = new Editor(new Renderer(container.element(), theme));
-        editor.setReadOnly(doku.get_readonly());
-        session = editor.getSession();
-        session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor));
-
-        // Setup wrap mode
-        session.setUseWrapMode(doku.get_wrap());
-        editor.setShowPrintMargin(doku.get_wrap());
-        session.setWrapLimitRange(null, JSINFO.plugin_aceeditor.wraplimit);
-        editor.setPrintMarginColumn(JSINFO.plugin_aceeditor.wraplimit);
-
-        // Notify Dokuwiki of text changes
-        session.getDocument().on("change", function() {
-            if (!editor.getReadOnly()) {
+        ace = require("ace")({
+            colortheme: JSINFO.plugin_aceeditor.colortheme,
+            element: container.element(),
+            on_cursor_change: function() {
+                preview_trigger();
+            },
+            on_document_change: function() {
                 doku.text_changed();
-            }
+                preview_trigger();
+            },
+            readonly: doku.get_readonly(),
+            wraplimit: JSINFO.plugin_aceeditor.wraplimit,
+            wrapmode: doku.get_wrap()
         });
 
 
         // LaTeX preview
 
         var preview_show = function() {
-            var pos = editor.getCursorPosition();
+            var pos = ace.get_cursor_position();
             var token = token_at_pos(pos);
             preview_timer = null;
             preview_hide();
@@ -148,31 +125,31 @@ define(function(require) {
 
         var preview_latex = function(token) {
             var url = DOKU_BASE + "lib/plugins/aceeditor/preview.php";
-            $.getJSON(url, { text: token.value }, function (data) {
-                var renderer = function(html, range, left, top, config) {
-                    var left, top, top_range, bottom_range;
-                    range = token.range.clipRows(config.firstRow, config.lastRow);
-                    range = range.toScreenRange(session);
-                    range_top = (range.start.row - config.firstRowScreen) * config.lineHeight;
-                    range_bottom = (range.end.row - config.firstRowScreen + 1) * config.lineHeight;
-                    top = (range_top > config.height - range_bottom ?
-                           range_top - data.height - 12 : range_bottom);
-                    left = (range.start.row < range.end.row ? 0 :
-                            Math.round(range.start.column * config.characterWidth));
-                    html.push('<div class="ace_preview" style="padding:5px; '
-                              + 'position:absolute; left:' + left + 'px; top:' + top  + 'px; '
-                              + 'width:' + data.width  + 'px; height:' + data.height + 'px;">'
-                              + '<img src="' + encodeURI(data.url) + '"/></div>');
+            jQuery.getJSON(url, { text: token.value }, function (data) {
+                var renderer = function(spec) {
+                    var top = (spec.top > spec.screen_height - spec.bottom ?
+                               spec.top - data.height - 12 : spec.bottom);
+                    return ('<div class="ace_preview" style="padding:5px; '
+                            + 'position:absolute; left:' + spec.left + 'px; top:' + top  + 'px; '
+                            + 'width:' + data.width  + 'px; height:' + data.height + 'px;">'
+                            + '<img src="' + encodeURI(data.url) + '"/></div>');
                 };
                 if (data && !preview_timer) {
-                    preview_marker = session.addMarker(token.range, "preview", renderer, true);
+                    preview_marker = ace.add_marker({
+                        start_row: token.start_row,
+                        start_column: token.start_column,
+                        end_row: token.end_row,
+                        end_column: token.end_column,
+                        klass: "preview",
+                        on_render: renderer
+                    });
                 }
             });
         };
 
         var preview_hide = function() {
              if (preview_marker) {
-                 session.removeMarker(preview_marker);
+                 ace.remove_marker(preview_marker);
              }
         };
 
@@ -185,87 +162,71 @@ define(function(require) {
             preview_timer = setTimeout(preview_show, 1000);
         };
 
-        session.on("change", preview_trigger);
-        editor.getSelection().on("changeCursor", preview_trigger);
-
         if (doku.get_cookie("aceeditor") !== "off") {
             enable();
-            editor.navigateTo(0, 0);
         }
-    };
-
-    var offset_to_pos = function(offset) {
-        var pos = {row: 0, column: 0};
-        while (offset > session.getLine(pos.row).length) {
-            offset -= session.getLine(pos.row).length + 1;
-            pos.row += 1;
-        }
-        pos.column = offset;
-        return pos;
-    };
-
-    var pos_to_offset = function(pos) {
-        var i, offset = pos.column;
-            for (i = 0; i < pos.row; i++) {
-                offset += session.getLine(i).length + 1;
-            }
-        return offset;
     };
 
     var token_at_pos = function(pos) {
-        var i, tokens, regexp, next = true;
-        var regexp, type, range = new Range(pos.row, 0, pos.row, 0);
-        var get_tokens = function(row) {
-            tokens = session.getTokens(row, row)[0];
+        var i, tokens, regexp;
+        var result = {
+            type: null,
+            value: "",
+            start_row: pos.row,
+            start_column: 0,
+            end_row: pos.row,
+            end_column: 0
         };
 
-        get_tokens(range.end.row);
-        while (tokens.tokens.length === 0) {
-            if (range.start.row === 0) {
+        tokens = ace.get_tokens(pos.row);
+        while (tokens.length === 0) {
+            if (result.start_row === 0) {
                 return;
             }
-            range.start.row -= 1;
-            get_tokens(range.start.row);
+            result.start_row -= 1;
+            tokens = ace.get_tokens(start_row);
         }
 
-        for (i = 0; i < tokens.tokens.length; i += 1) {
-            range.end.column += tokens.tokens[i].value.length;
-            if (pos.column < range.end.column || i === tokens.tokens.length - 1) {
-                type = tokens.tokens[i].type;
-                regexp = new RegExp("^(start|table)-" + type + "$");
+        for (i = 0; i < tokens.length; i += 1) {
+            result.end_column += tokens[i].value.length;
+            if (pos.column < result.end_column || i === tokens.length - 1) {
+                result.value = tokens[i].value;
+                result.type = tokens[i].type;
+                regexp = new RegExp("^(start|table)-" + result.type + "$");
                 break;
             }
-            range.start.column = range.end.column;
+            result.start_column = result.end_column;
         }
 
-        while (i >= tokens.tokens.length - 1 &&
+        while (i >= tokens.length - 1 &&
                regexp.test(tokens.state) &&
-               range.end.row + 1 < session.getLength()) {
-            range.end.row += 1;
-            range.end.column = 0;
-            get_tokens(range.end.row);
-            for (i = 0; i < tokens.tokens.length; i += 1) {
-                range.end.column += tokens.tokens[i].value.length;
-                if (pos.column < range.end.column) {
+               result.end_row + 1 < ace.get_length()) {
+            result.end_row += 1;
+            result.end_column = 0;
+            result.value += "\n";
+            tokens = ace.get_tokens(result.end_row);
+            for (i = 0; i < tokens.length; i += 1) {
+                result.end_column += tokens[i].value.length;
+                result.value += tokens[i].value;
+                if (pos.column < result.end_column) {
                     break;
                 }
             }
         }
 
-        while (range.start.row > 0 && range.start.column === 0) {
-            get_tokens(range.start.row - 1);
+        while (result.start_row > 0 && result.start_column === 0) {
+            tokens = ace.get_tokens(result.start_row - 1);
             if (!regexp.test(tokens.state)) {
                 break;
             }
-            range.start.row -= 1;
-            for (i = 0; i < tokens.tokens.length - 1; i += 1) {
-                range.start.column += tokens.tokens[i].value.length;
+            result.start_row -= 1;
+            for (i = 0; i < tokens.length - 1; i += 1) {
+                result.start_column += tokens[i].value.length;
             }
+            result.value = tokens[i].value + "\n" + result.value;
         }
 
-       return {type: type,
-               value: session.getTextRange(range),
-               range: range};
+        return result;
     };
 
     // initialize editor after Dokuwiki
