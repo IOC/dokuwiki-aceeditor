@@ -23,7 +23,7 @@ define(function(require) {
     var Renderer = require("ace/virtual_renderer").VirtualRenderer;
 
     var editor, session;
-    var $container, $editor, doku, toggle;
+    var container, doku, toggle;
     var preview_marker, preview_timer;
 
     var set_selection = function(start, end) {
@@ -41,7 +41,7 @@ define(function(require) {
         var selection = get_selection();
 
         doku.enable();
-        $container.hide();
+        container.hide();
         toggle.off();
 
         doku.set_value(session.getValue());
@@ -54,10 +54,8 @@ define(function(require) {
         var selection = doku.get_selection();
 
         doku.disable();
-        $container.show();
-        $editor.css("width", $container.width() + "px");
-        $container.css("height", doku.inner_height() + "px");
-        $editor.css("height", $container.height() + "px");
+        container.set_height(doku.inner_height());
+        container.show();
         toggle.on();
 
         session.setValue(doku.get_value());
@@ -90,7 +88,7 @@ define(function(require) {
 
             },
             on_resize: function() {
-                $editor.css("width", $container.width() + "px");
+                container.on_resize();
                 editor.resize();
             },
             set_selection: set_selection,
@@ -100,19 +98,13 @@ define(function(require) {
                 editor.focus();
             },
             size_ctl: function(value) {
-                $container.css("height", ($container.height() + value) + "px");
-                $editor.css("height", $container.height() + "px");
+                container.incr_height(value);
                 editor.resize();
                 editor.focus();
             }
         });
-        $container = $("<div>")
-            .addClass("ace-doku")
-            .insertBefore(jQuery("#wiki__text"));
-        $editor = $("<div>")
-            .css("width", $container.width() + "px")
-            .appendTo($container);
-        $container.hide();
+
+        container = require("container")();
 
         // Setup toggle
         toggle = require("toggle")({
@@ -122,7 +114,7 @@ define(function(require) {
 
         // Initialize Ace
         theme = {cssClass: 'ace-doku-' + JSINFO.plugin_aceeditor.colortheme};
-        editor = new Editor(new Renderer($editor.get(0), theme));
+        editor = new Editor(new Renderer(container.element(), theme));
         editor.setReadOnly(doku.get_readonly());
         session = editor.getSession();
         session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor));
