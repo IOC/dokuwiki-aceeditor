@@ -17,8 +17,7 @@
  */
 
 define(function() {
-    var ace, container, doku, mode, toggle;
-    var preview_marker, preview_timer;
+    var ace, container, doku, toggle;
 
     var disable = function() {
         var selection = ace.get_selection();
@@ -50,7 +49,8 @@ define(function() {
     };
 
     var init = function() {
-        // Setup elements
+        var mode, preivew;
+
         doku = require("doku")({
             get_selection: function() {
                 return ace.get_selection();
@@ -87,7 +87,6 @@ define(function() {
 
         container = require("container")();
 
-        // Setup toggle
         toggle = require("toggle")({
             on_enable: enable,
             on_disable: disable
@@ -97,17 +96,16 @@ define(function() {
             latex: JSINFO.plugin_aceeditor.latex
         });
 
-        // Initialize Ace
         ace = require("ace")({
             colortheme: JSINFO.plugin_aceeditor.colortheme,
             element: container.element(),
             next_line_indent: mode.next_line_indent,
             on_cursor_change: function() {
-                preview_trigger();
+                preview.trigger();
             },
             on_document_change: function() {
                 doku.text_changed();
-                preview_trigger();
+                preview.trigger();
             },
             readonly: doku.get_readonly(),
             tokenizer_rules: mode.tokenizer_rules(),
@@ -115,135 +113,34 @@ define(function() {
             wrapmode: doku.get_wrap()
         });
 
-
-        // LaTeX preview
-
-        var preview_show = function() {
-            var pos = ace.get_cursor_position();
-            var token = token_at_pos(pos);
-            preview_timer = null;
-            preview_hide();
-
-            if (token && /^latex-.*$/.test(token.type)) {
-                preview_latex(token);
-            }
-        };
-
-        var preview_latex = function(token) {
-            var url = DOKU_BASE + "lib/plugins/aceeditor/preview.php";
-            jQuery.getJSON(url, { text: token.value }, function (data) {
-                var renderer = function(spec) {
-                    var top = (spec.top > spec.screen_height - spec.bottom ?
-                               spec.top - data.height - 12 : spec.bottom);
-                    return ('<div class="ace_preview" style="padding:5px; '
-                            + 'position:absolute; left:' + spec.left + 'px; top:' + top  + 'px; '
-                            + 'width:' + data.width  + 'px; height:' + data.height + 'px;">'
-                            + '<img src="' + encodeURI(data.url) + '"/></div>');
-                };
-                if (data && !preview_timer) {
-                    preview_marker = ace.add_marker({
-                        start_row: token.start_row,
-                        start_column: token.start_column,
-                        end_row: token.end_row,
-                        end_column: token.end_column,
-                        klass: "preview",
-                        on_render: renderer
-                    });
-                }
-            });
-        };
-
-        var preview_hide = function() {
-             if (preview_marker) {
-                 ace.remove_marker(preview_marker);
-             }
-        };
-
-        var preview_trigger = function() {
-            if (preview_timer) {
-                clearTimeout(preview_timer);
-                preview_timer = null;
-            }
-            preview_hide();
-            preview_timer = setTimeout(preview_show, 1000);
-        };
+        preview = require("preview")({
+            ace: ace,
+        });
 
         if (doku.get_cookie("aceeditor") !== "off") {
             enable();
         }
     };
 
-    var token_at_pos = function(pos) {
-        var i, tokens, regexp;
-        var result = {
-            type: null,
-            value: "",
-            start_row: pos.row,
-            start_column: 0,
-            end_row: pos.row,
-            end_column: 0
-        };
+    var modules =  [
+        "ace",
+        "ace/editor",
+        "ace/mode/text",
+        "ace/range",
+        "ace/tokenizer",
+        "ace/virtual_renderer",
+        "container",
+        "doku",
+        "mode",
+        "preview",
+        "toggle"
+    ];
 
-        tokens = ace.get_tokens(pos.row);
-        while (tokens.length === 0) {
-            if (result.start_row === 0) {
-                return;
-            }
-            result.start_row -= 1;
-            tokens = ace.get_tokens(start_row);
-        }
-
-        for (i = 0; i < tokens.length; i += 1) {
-            result.end_column += tokens[i].value.length;
-            if (pos.column < result.end_column || i === tokens.length - 1) {
-                result.value = tokens[i].value;
-                result.type = tokens[i].type;
-                regexp = new RegExp("^(start|table)-" + result.type + "$");
-                break;
-            }
-            result.start_column = result.end_column;
-        }
-
-        while (i >= tokens.length - 1 &&
-               regexp.test(tokens.state) &&
-               result.end_row + 1 < ace.get_length()) {
-            result.end_row += 1;
-            result.end_column = 0;
-            result.value += "\n";
-            tokens = ace.get_tokens(result.end_row);
-            for (i = 0; i < tokens.length; i += 1) {
-                result.end_column += tokens[i].value.length;
-                result.value += tokens[i].value;
-                if (pos.column < result.end_column) {
-                    break;
-                }
-            }
-        }
-
-        while (result.start_row > 0 && result.start_column === 0) {
-            tokens = ace.get_tokens(result.start_row - 1);
-            if (!regexp.test(tokens.state)) {
-                break;
-            }
-            result.start_row -= 1;
-            for (i = 0; i < tokens.length - 1; i += 1) {
-                result.start_column += tokens[i].value.length;
-            }
-            result.value = tokens[i].value + "\n" + result.value;
-        }
-
-        return result;
-    };
-
-    // initialize editor after Dokuwiki
-    var modules =  ["ace", "ace/editor", "ace/mode/text", "ace/range", "ace/tokenizer",
-                    "ace/virtual_renderer", "container", "doku", "mode", "toggle"];
     require(modules, function() {
         require.ready(function() {
+            // initialize editor after Dokuwiki
             setTimeout(function() {
-                if ($("wiki__text") && window.jQuery && window.JSINFO) {
-                    init();
-                }
+                $("wiki__text") && window.jQuery && window.JSINFO && init();
             }, 0);
         });
     });
