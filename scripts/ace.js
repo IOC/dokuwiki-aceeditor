@@ -81,16 +81,10 @@ define(function(require) {
             var range = new Range(spec.start_row, spec.start_column,
                                   spec.end_row, spec.end_column);
             var renderer = function(html, range, left, top, config) {
-                var i, right = 0;
-                range = range.clipRows(config.firstRow, config.lastRow).toScreenRange(session);
-                for (i = range.start.row; i <= range.end.row; i += 1) {
-                    right = Math.max(right, Math.round(range.end.column * config.characterWidth));
-                }
                 html.push(spec.on_render({
                     left: (range.start.row < range.end.row ? 0 :
                            Math.round(range.start.column * config.characterWidth)),
                     top: (range.start.row - config.firstRowScreen) * config.lineHeight,
-                    right: right,
                     bottom: (range.end.row - config.firstRowScreen + 1) * config.lineHeight,
                     screen_height: config.height,
                     screen_width: config.width
