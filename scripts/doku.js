@@ -36,7 +36,7 @@ define(function() {
         };
 
         that.get_readonly = function() {
-            return jQuery(textarea).attr("readonly") === "readonly";
+            return jQuery(textarea).attr("readonly");
         };
 
         that.get_value = function() {

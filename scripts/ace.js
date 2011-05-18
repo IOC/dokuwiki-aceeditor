@@ -32,7 +32,7 @@ define(function() {
             editor.setPrintMarginColumn(spec.wraplimit);
 
             session.on("change", function() {
-                if (!editor.getReadOnly()) {
+                if (!spec.readonly) {
                     spec.on_document_change();
                 }
             });
