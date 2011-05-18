@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-define(function() {
+define(function(require) {
     var ace, container, doku, toggle;
 
     var disable = function() {
@@ -122,26 +122,10 @@ define(function() {
         }
     };
 
-    var modules =  [
-        "ace",
-        "ace/editor",
-        "ace/mode/text",
-        "ace/range",
-        "ace/tokenizer",
-        "ace/virtual_renderer",
-        "container",
-        "doku",
-        "mode",
-        "preview",
-        "toggle"
-    ];
-
-    require(modules, function() {
-        require.ready(function() {
-            // initialize editor after Dokuwiki
-            setTimeout(function() {
-                $("wiki__text") && window.jQuery && window.JSINFO && init();
-            }, 0);
-        });
+    require.ready(function() {
+        // initialize editor after Dokuwiki
+        setTimeout(function() {
+            $("wiki__text") && window.jQuery && window.JSINFO && init();
+        }, 0);
     });
 });
