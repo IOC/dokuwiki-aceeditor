@@ -1,13 +1,46 @@
-define(["ace/editor", "ace/range", "ace/virtual_renderer", "mode"], function() {
-    var Range = require("ace/range").Range;
-    var DokuwikiMode = require("mode").Mode;
-    var Editor = require("ace/editor").Editor;
-    var Renderer = require("ace/virtual_renderer").VirtualRenderer;
+
+define(function() {
 
     return function(spec) {
         var that = {};
 
-        var editor, session, theme;
+        var Range = require("ace/range").Range;
+        var editor, session;
+
+        var init = function() {
+            var Editor = require("ace/editor").Editor;
+            var Renderer = require("ace/virtual_renderer").VirtualRenderer;
+            var TextMode = require("ace/mode/text").Mode;
+            var Tokenizer = require("ace/tokenizer").Tokenizer;
+
+            var theme = {cssClass: 'ace-doku-' + spec.colortheme};
+            var renderer = new Renderer(spec.element, theme)
+            var mode = new TextMode();
+
+            editor = new Editor(renderer);
+            editor.setReadOnly(spec.readonly);
+            session = editor.getSession();
+            mode.$tokenizer = new Tokenizer(spec.tokenizer_rules);
+            mode.getNextLineIndent = function(state, line, tab) {
+                return spec.next_line_indent(line);
+            };
+            session.setMode(mode);
+
+            editor.setShowPrintMargin(spec.wrapmode);
+            session.setUseWrapMode(spec.wrapmode);
+            session.setWrapLimitRange(null, spec.wraplimit);
+            editor.setPrintMarginColumn(spec.wraplimit);
+
+            session.on("change", function() {
+                if (!editor.getReadOnly()) {
+                    spec.on_document_change();
+                }
+            });
+
+            editor.getSelection().on("changeCursor", function() {
+                spec.on_cursor_change();
+            });
+        };
 
         var offset_to_pos = function(offset) {
             var pos = {row: 0, column: 0};
@@ -104,25 +137,7 @@ define(["ace/editor", "ace/range", "ace/virtual_renderer", "mode"], function() {
             session.setUseWrapMode(value);
         };
 
-        theme = {cssClass: 'ace-doku-' + spec.colortheme};
-        editor = new Editor(new Renderer(spec.element, theme));
-        editor.setReadOnly(spec.readonly);
-        session = editor.getSession();
-        session.setMode(new DokuwikiMode(JSINFO.plugin_aceeditor));
-        editor.setShowPrintMargin(spec.wrapmode);
-        session.setUseWrapMode(spec.wrapmode);
-        session.setWrapLimitRange(null, spec.wraplimit);
-        editor.setPrintMarginColumn(spec.wraplimit);
-
-        session.on("change", function() {
-            if (!editor.getReadOnly()) {
-                spec.on_document_change();
-            }
-        });
-
-        editor.getSelection().on("changeCursor", function() {
-            spec.on_cursor_change();
-        });
+        init();
 
         return that;
     };

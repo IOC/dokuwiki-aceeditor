@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-define(function(require) {
-    var ace, container, doku, toggle;
+define(function() {
+    var ace, container, doku, mode, toggle;
     var preview_marker, preview_timer;
 
     var disable = function() {
@@ -93,10 +93,15 @@ define(function(require) {
             on_disable: disable
         });
 
+        mode = require("mode")({
+            latex: JSINFO.plugin_aceeditor.latex
+        });
+
         // Initialize Ace
         ace = require("ace")({
             colortheme: JSINFO.plugin_aceeditor.colortheme,
             element: container.element(),
+            next_line_indent: mode.next_line_indent,
             on_cursor_change: function() {
                 preview_trigger();
             },
@@ -105,6 +110,7 @@ define(function(require) {
                 preview_trigger();
             },
             readonly: doku.get_readonly(),
+            tokenizer_rules: mode.tokenizer_rules(),
             wraplimit: JSINFO.plugin_aceeditor.wraplimit,
             wrapmode: doku.get_wrap()
         });
@@ -230,11 +236,15 @@ define(function(require) {
     };
 
     // initialize editor after Dokuwiki
-    require.ready(function() {
-        setTimeout(function() {
-            if ($("wiki__text") && window.jQuery && window.JSINFO) {
-                init();
-            }
-        }, 0);
+    var modules =  ["ace", "ace/editor", "ace/mode/text", "ace/range", "ace/tokenizer",
+                    "ace/virtual_renderer", "container", "doku", "mode", "toggle"];
+    require(modules, function() {
+        require.ready(function() {
+            setTimeout(function() {
+                if ($("wiki__text") && window.jQuery && window.JSINFO) {
+                    init();
+                }
+            }, 0);
+        });
     });
 });
