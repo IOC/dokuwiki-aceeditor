@@ -46,7 +46,7 @@ define(function(require) {
                     return;
                 }
                 result.start_row -= 1;
-                tokens = spec.ace.get_tokens(start_row);
+                tokens = spec.ace.get_tokens(result.start_row);
             }
 
             for (i = 0; i < tokens.length; i += 1) {
