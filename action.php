@@ -63,7 +63,7 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
             $event->data['script'][] = array(
                 'type' => 'text/javascript',
                 'charset' => 'utf-8',
-                'src' => 'http://code.jquery.com/jquery-1.5.1.min.js',
+                'src' => 'http://code.jquery.com/jquery-1.6.1.min.js',
             );
             $event->data['script'][] = array(
                 'type' => 'text/javascript',
