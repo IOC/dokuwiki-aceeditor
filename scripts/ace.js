@@ -29,6 +29,7 @@ define(function(require) {
             var Renderer = require("ace/virtual_renderer").VirtualRenderer;
             var TextMode = require("ace/mode/text").Mode;
             var Tokenizer = require("ace/tokenizer").Tokenizer;
+            var UndoManager = require("ace/undomanager").UndoManager;
 
             var theme = {cssClass: 'ace-doku-' + spec.colortheme};
             var renderer = new Renderer(spec.element, theme)
@@ -37,6 +38,7 @@ define(function(require) {
             editor = new Editor(renderer);
             editor.setReadOnly(spec.readonly);
             session = editor.getSession();
+            session.setUndoManager(new UndoManager());
             mode.$tokenizer = new Tokenizer(spec.tokenizer_rules);
             mode.getNextLineIndent = function(state, line, tab) {
                 return spec.next_line_indent(line);
