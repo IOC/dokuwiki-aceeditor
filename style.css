@@ -136,7 +136,7 @@
 
 .ace-doku-light .ace_internallink,
 .ace-doku-light .ace_media,
-.ace-doku-light .ace_email,
+.ace-doku-light .ace_emaillink,
 .ace-doku-light .ace_externallink {
     color: #00c;
 }
@@ -238,7 +238,7 @@
 
 .ace-doku-dark .ace_internallink,
 .ace-doku-dark .ace_media,
-.ace-doku-dark .ace_email,
+.ace-doku-dark .ace_emaillink,
 .ace-doku-dark .ace_externallink {
     color: #8ff;
 }

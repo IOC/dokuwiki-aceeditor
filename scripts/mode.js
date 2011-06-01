@@ -29,29 +29,7 @@ define(function(require) {
             ">{1,}[ \t]*", // quote
         ]).join("|") + ")");
 
-        var block = function(token, open, close) {
-            rule("start", token, open, token);
-            rule(token, token, ".*?" + close, "start");
-            rule(token, token, ".+$");
-        };
-
-        var format = function(states, token, open, close) {
-            var i;
-            for (i = 0; i < states.length; i++) {
-                rule(states[i], token, open, states[i] + "-" + token);
-                rule(states[i] + "-" + token, token, ".*?" + close, states[i]);
-                rule(states[i] + "-" + token, token, ".+$");
-            };
-        };
-
-        var inline = function(states, token, regex) {
-            var i;
-            for (i = 0; i < states.length; i++) {
-                rule(states[i], token, regex);
-            };
-        }
-
-        var rule = function(state, token, regex, next) {
+        var add_rule = function(state, token, regex, next) {
             var rule = {token: token, regex: regex};
             if (next) {
                 rule.next = next;
@@ -59,6 +37,46 @@ define(function(require) {
             tokenizer_rules[state] = tokenizer_rules[state] || [];
             tokenizer_rules[state].push(rule);
         }
+
+        var create_rules = function(prefix, names) {
+            var i, mode, state;
+            names.sort(function (a, b) {
+                var sort_a = modes[a] ? modes[a].sort : 1000;
+                var sort_b = modes[b] ? modes[b].sort : 1000;
+                return sort_a - sort_b;
+            });
+            for (i = 0; i < names.length; i += 1) {
+                if (mode = modes[names[i]]) {
+                    state = prefix + "-" + names[i];
+                    if (mode.special) {
+                        add_rule(prefix, names[i], mode.special);
+                    }
+                    if (mode.entry && mode.exit) {
+                        add_rule(prefix, names[i], mode.entry, state);
+                        add_rule(state, names[i], mode.exit, prefix);
+                        if (mode.pattern) {
+                            add_rule(state, names[i], mode.pattern);
+                        }
+                        if (mode.modes) {
+                            create_rules(state, mode.modes);
+                        }
+                    }
+                }
+            }
+        };
+
+        var init = function() {
+            var name, names = [];
+            if (spec.latex) {
+                for (name in latex_modes) {
+                    modes[name] = latex_modes[name];
+                }
+            }
+            for (name in modes) {
+                names.push(name);
+            }
+            create_rules("start", names);
+        };
 
         that.next_line_indent = function(line) {
             var match = indent_regex.exec(line);
@@ -69,52 +87,237 @@ define(function(require) {
             return tokenizer_rules;
         };
 
-        rule("start", "listblock", "^(?: {2,}|\t{1,})[\-\\*]"); // sort 10
-        rule("start", "preformatted", "^(?:  |\t).+$"); // sort 20
-        rule("start", "notoc", "~~NOTOC~~"); // sort 30
-        rule("start", "nocache", "~~NOCACHE~~"); // sort 40
-        rule("start", "header", "[ \t]*={2,}.+={2,}[ \t]*$"); // sort 50
-        rule("start", "table", "^[\\||\\^](?=.*[\\||\\^][ \t]*$)", "table"); // sort 60
-        rule("table", "table", "[\\|\\^][ \t]*$", "start");
-        rule("table", "table", "[\\|\\^]");
-        rule("table", "table", ":::(?=[ \t]*[\\|\\^])");
-        format(containers, "strong", "\\*\\*", "\\*\\*"); // sort 70
-        format(containers, "emphasis", "//", "//"); // sort 80
-        format(containers, "underline", "__", "__"); // sort 90
-        format(containers, "monospace", "''", "''"); // sort 100
-        if (spec.latex) {
-            format(containers, "latex-latex", "<latex>", "</latex>"); // sort 100
-        }
-        format(containers, "subscript", "<sub>", "</sub>"); // sort 110
-        format(containers, "superscript", "<sup>", "</sup>"); // sort 120
-        format(containers, "deleted", "<del>", "</del>"); // sort 130
-        inline(containers, "linebreak", "\\\\\\\\"); // sort 140
-        format(containers, "footnote", "\\(\\(", "\\)\\)"); // sort 150
-        rule("start", "hr", "^[ \t]*-{4,}[ \t]*$") // sort 160
-        format(containers, "unformatted", "<nowikI>", "</nowikI>"); // sort 170
-        format(containers, "unformattedalt", "%%", "%%"); // sort 170
-        format(containers, "php", "<php>", "</php>"); // sort 180
-        format(containers, "phpblock", "<PHP>", "</PHP>"); // sort 180
-        format(containers, "html", "<html>", "</html>"); // sort 190
-        format(containers, "htmlblock", "<HTML>", "</HTML>"); // sort 190
-        format(containers, "code", "<code.*?>", "</code>"); // sort 200
-        format(containers, "file", "<file.*?>", "</file>"); // sort 210
-        rule("start", "quote", "^>{1,}"); // sort 220
-        inline(containers, "internallink", "\\[\\[.+?\\]\\]"); // sort 300
-        if (spec.latex) {
-            format(containers, "latex-ddollar", "\\$\\$", "\\$\\$"); // sort 300
-        }
-        inline(containers, "media", "\\{\\{.+?\\}\\}"); // sort 320
-        inline(containers, "externallink", "(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$)|(?:www|ftp)\\.[\\w.:?\\-;,]+?\\.[\\w.:?\\-;,]+?[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$))"); // sort 330
-        inline(containers, "email", "<[0-9a-zA-Z!#$%&'*+\/=?^_`{|}~-]+(?:\\.[0-9a-zA-Z!#$%&'*+\\/=?^_`{|}~-]+)*@(?:[0-9a-zA-Z][0-9a-zA-Z-]*\\.)+(?:[a-zA-Z]{2,4}|museum|travel)>"); // sort 340
-        if (spec.latex) {
-            format(containers, "latex-dollar", "\\$", "\\$"); // sort 405
-            format(containers, "latex-displaymath", "\\\\begin\\{displaymath\\}", "\\\\end\\{displaymath\\}"); // sort 405
-            format(containers, "latex-equation", "\\\\begin\\{equation\\}", "\\\\end\\{equation\\}"); // sort 405
-            format(containers, "latex-equationstar", "\\\\begin\\{equation\\*\\}", "\\\\end\\{equation\\*\\}"); // sort 405
-            format(containers, "latex-eqnarray", "\\\\begin\\{eqnarray\\}", "\\\\end\\{eqnarray\\}"); // sort 405
-            format(containers, "latex-eqnarraystar", "\\\\begin\\{eqnarray\\*\\}", "\\\\end\\{eqnarray\\*\\}"); // sort 405
-        }
+        var container_modes = ["listblock", "table", "quote", "hr"];
+        var formatting_modes = ["strong", "emphasis", "underline", "monospace",
+                                "subscript", "superscript", "deleted", "footnote",
+                                "internallink", "media", "externallink", "linebreak",
+                                "emaillink", "notoc", "nocache",
+                                "preformatted", "code", "file", "php", "html",
+                                "htmlblock", "phpblock", "unformatted",
+                                "latex-latex", "latex-ddollar", "latex-dollar",
+                                "latex-displaymath", "latex-equation",
+                                "latex-equationstar", "latex-eqnarray",
+                                "latex-eqnarraystar"];
+
+        var modes = {
+            "start": {
+                modes: ["listblock", "strong"]
+            },
+            "listblock": {
+                sort: 10,
+                special: "^(?: {2,}|\t{1,})[\-\\*]",
+                modes: formatting_modes
+            },
+            "preformatted": {
+                sort: 20,
+                special: "^(?:  |\t).+$"
+            },
+            "notoc" : {
+                sort: 30,
+                special: "~~NOTOC~~"
+            },
+            "nocache" : {
+                sort: 40,
+                special: "~~NOCACHE~~"
+            },
+            "header": {
+                sort: 50,
+                special: "[ \t]*={2,}.+={2,}[ \t]*$"
+            },
+            "table": {
+                sort: 60,
+                entry : "^[\\||\\^](?=.*[\\||\\^][ \t]*$)",
+                exit: "[\\|\\^][ \t]*$",
+                pattern: "[\\|\\^]|:::(?=[ \t]*[\\|\\^])",
+                modes: formatting_modes
+            },
+            "strong": {
+                sort: 70,
+                entry: "\\*\\*",
+                exit: "\\*\\*",
+                pattern: "."
+            },
+            "emphasis": {
+                sort: 80,
+                entry: "//",
+                exit: "//",
+                pattern: "."
+            },
+            "underline": {
+                sort: 90,
+                entry: "__",
+                exit: "__",
+                pattern: "."
+            },
+            "monospace": {
+                sort: 100,
+                entry: "''",
+                exit: "''",
+                pattern: "."
+            },
+            "subscript": {
+                sort: 110,
+                entry: "<sub>",
+                exit: "</sub>",
+                pattern: "."
+            },
+            "superscript": {
+                sort: 120,
+                entry: "<sup>",
+                exit: "</sup>",
+                pattern: "."
+            },
+            "deleted": {
+                sort: 130,
+                entry: "<del>",
+                exit: "</del>",
+                pattern: "."
+            },
+            "linebreak": {
+                sort: 140,
+                special: "\\\\\\\\"
+            },
+            "footnote": {
+                sort: 150,
+                entry: "\\(\\(",
+                exit: "\\)\\)",
+                pattern: "."
+            },
+            "hr": {
+                sort: 160,
+                special: "^[ \t]*-{4,}[ \t]*$",
+            },
+            "unformatted": {
+                sort: 170,
+                entry: "<nowiki>",
+                exit: "</nowiki>",
+                pattern: "."
+            },
+            "unformattedalt": {
+                sort: 170,
+                entry: "%%",
+                exit: "%%",
+                pattern: "."
+            },
+            "php": {
+                sort: 180,
+                entry: "<php>",
+                exit: "</php>",
+                pattern: "."
+            },
+            "phpblock": {
+                sort: 180,
+                entry: "<PHP>",
+                exit: "</PHP>",
+                pattern: "."
+            },
+            "html": {
+                sort: 190,
+                entry: "<html>",
+                exit: "</html>",
+                pattern: "."
+            },
+            "htmlblock": {
+                sort: 190,
+                entry: "<HTML>",
+                exit: "</HTML>",
+                pattern: "."
+            },
+            "code": {
+                sort: 200,
+                entry: "<code.*?>",
+                exit: "</code>",
+                pattern: "."
+            },
+            "file": {
+                sort: 210,
+                entry: "<file.*?>",
+                exit: "</file>",
+                pattern: "."
+            },
+            "quote": {
+                sort: 220,
+                special: "^>{1,2}",
+                modes: formatting_modes
+            },
+            "internallink": {
+                sort: 300,
+                special: "\\[\\[.+?\\]\\]"
+            },
+            "media": {
+                sort: 320,
+                special: "\\{\\{.+?\\}\\}",
+            },
+            "externallink": {
+                sort: 330,
+                special: ("(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://" +
+                          "[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*" +
+                          "[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$)|(?:www|ftp)\\." +
+                          "[\\w.:?\\-;,]+?\\.[\\w.:?\\-;,]+?" +
+                          "[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?" +
+                          "(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$))")
+            },
+            "emaillink": {
+                sort: 340,
+                special: ("<[0-9a-zA-Z!#$%&'*+\/=?^_`{|}~-]+" +
+                          "(?:\\.[0-9a-zA-Z!#$%&'*+\\/=?^_`{|}~-]+)*" +
+                          "@(?:[0-9a-zA-Z][0-9a-zA-Z-]*\\.)+" +
+                          "(?:[a-zA-Z]{2,4}|museum|travel)>")
+            },
+        };
+
+        var latex_modes = {
+            "latex-latex": {
+                sort: 100,
+                entry: "<latex>",
+                exit: "</latex>",
+                pattern: "."
+            },
+            "latex-ddollar": {
+                sort: 300,
+                entry: "\\$\\$",
+                exit: "\\$\\$",
+                pattern: "."
+            },
+            "latex-dollar": {
+                sort: 405,
+                entry: "\\$",
+                exit: "\\$",
+                pattern: "."
+            },
+            "latex-displaymath": {
+                sort: 405,
+                entry: "\\\\begin\\{displaymath\\}",
+                exit: "\\\\end\\{displaymath\\}",
+                pattern: "."
+            },
+            "latex-equation": {
+                sort: 405,
+                entry: "\\\\begin\\{equation\\}",
+                exit: "\\\\end\\{equation\\}",
+                pattern: "."
+            },
+            "latex-equationstar": {
+                sort: 405,
+                entry: "\\\\begin\\{equation\\*\\}",
+                exit: "\\\\end\\{equation\\*\\}",
+                pattern: "."
+            },
+            "latex-eqnarray": {
+                sort: 405,
+                entry: "\\\\begin\\{eqnarray\\}",
+                exit: "\\\\end\\{eqnarray\\}",
+                pattern: "."
+            },
+            "latex-eqnarraystar": {
+                sort: 405,
+                entry: "\\\\begin\\{eqnarray\\*\\}",
+                exit: "\\\\end\\{eqnarray\\*\\}",
+                pattern: "."
+            }
+        };
+
+        init();
 
         return that;
     };
