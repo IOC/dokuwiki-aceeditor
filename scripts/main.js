@@ -49,7 +49,7 @@ define(function(require) {
     };
 
     var init = function() {
-        var mode, preivew;
+        var mode, preivew, commands;
 
         doku = require("doku")({
             get_selection: function() {
@@ -114,6 +114,10 @@ define(function(require) {
         });
 
         preview = require("preview")({
+            ace: ace,
+        });
+
+        commands = require("commands")({
             ace: ace,
         });
 

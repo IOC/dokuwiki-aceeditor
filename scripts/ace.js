@@ -22,6 +22,7 @@ define(function(require) {
         var that = {};
 
         var Range = require("ace/range").Range;
+        var canon = require("pilot/canon");
         var editor, session;
 
         var init = function() {
@@ -79,6 +80,20 @@ define(function(require) {
             return offset;
         };
 
+        that.add_command = function(spec) {
+            canon.addCommand({
+                name: spec.name,
+                bindKey: {
+                    win: spec.key_win,
+                    mac: spec.key_mac,
+                    sender: "editor"
+                },
+                exec: function (env, args, request) {
+                    spec.exec();
+                }
+            });
+        };
+
         that.add_marker = function(spec) {
             var range = new Range(spec.start_row, spec.start_column,
                                   spec.end_row, spec.end_column);
@@ -93,6 +108,14 @@ define(function(require) {
                 }));
             };
             return session.addMarker(range, spec.klass, renderer, true);
+        };
+
+        that.indent = function() {
+            editor.indent();
+        };
+
+        that.insert = function(text) {
+            editor.insert(text);
         };
 
         that.focus = function() {
@@ -123,6 +146,18 @@ define(function(require) {
             return session.getValue();
         };
 
+        that.navigate_line_end = function() {
+            editor.navigateLineEnd();
+        };
+
+        that.navigate_line_start = function() {
+            editor.navigateLineStart();
+        };
+
+        that.outdent = function() {
+            editor.blockOutdent();
+        };
+
         that.remove_marker = function(marker_id) {
             session.removeMarker(marker_id);
         };
@@ -132,8 +167,17 @@ define(function(require) {
             session.replace(range, text);
         };
 
+        that.replace_lines = function(start, end, lines) {
+            session.getDocument().removeLines(start, end);
+            session.getDocument().insertLines(start, lines);
+        };
+
         that.resize = function() {
             editor.resize();
+        };
+
+        that.set_cursor_position = function(position) {
+            return editor.moveCursorToPosition(position);
         };
 
         that.set_selection = function(start, end) {

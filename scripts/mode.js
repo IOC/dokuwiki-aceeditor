@@ -100,9 +100,6 @@ define(function(require) {
                                 "latex-eqnarraystar"];
 
         var modes = {
-            "start": {
-                modes: ["listblock", "strong"]
-            },
             "listblock": {
                 sort: 10,
                 special: "^(?: {2,}|\t{1,})[\-\\*]",
