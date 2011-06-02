@@ -14,6 +14,11 @@
     font-size: 1.2em;
 }
 
+.ace-doku .ace_editor,
+.ace-doku .ace_text-layer {
+    font-family: "Courier New", monospace;
+}
+
 .ace-toggle {
     float: right;
     cursor: pointer;
