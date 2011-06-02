@@ -40,6 +40,7 @@ define(function(require) {
             editor.setReadOnly(spec.readonly);
             session = editor.getSession();
             session.setUndoManager(new UndoManager());
+            session.setTabSize(2);
             mode.$tokenizer = new Tokenizer(spec.tokenizer_rules);
             mode.getNextLineIndent = function(state, line, tab) {
                 return spec.next_line_indent(line);
