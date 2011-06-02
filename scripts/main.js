@@ -17,19 +17,19 @@
  */
 
 define(function(require) {
-    var ace, container, doku, toggle;
+    var ace, container, doku, toggle, user_editing;
 
     var disable = function() {
         var selection = ace.get_selection();
 
-        doku.enable();
+        user_editing = false;
+        doku.set_cookie("aceeditor", "off");
+
         container.hide();
         toggle.off();
-
+        doku.enable();
         doku.set_value(ace.get_value());
-
         doku.set_selection(selection.start, selection.end);
-        doku.set_cookie("aceeditor", "off");
     };
 
     var enable = function() {
@@ -39,12 +39,12 @@ define(function(require) {
         container.set_height(doku.inner_height());
         container.show();
         toggle.on();
-
         ace.set_value(doku.get_value());
         ace.resize();
         ace.focus();
-
         ace.set_selection(selection.start, selection.end);
+
+        user_editing = true;
         doku.set_cookie("aceeditor", "on");
     };
 
@@ -104,8 +104,10 @@ define(function(require) {
                 preview.trigger();
             },
             on_document_change: function() {
-                doku.text_changed();
-                preview.trigger();
+                if (user_editing) {
+                    doku.text_changed();
+                    preview.trigger();
+                };
             },
             readonly: doku.get_readonly(),
             tokenizer_rules: mode.tokenizer_rules(),
