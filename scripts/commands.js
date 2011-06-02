@@ -373,7 +373,7 @@ define(function(require) {
         spec.ace.add_command({
             name: "doku-alt-left",
             key_win: "Alt-Left",
-            key_mac: "Command-Left",
+            key_mac: "Option-Left",
             exec: function() {
                 var table = parse_table();
                 if (table) {
@@ -387,7 +387,7 @@ define(function(require) {
         spec.ace.add_command({
             name: "doku-alt-right",
             key_win: "Alt-Right",
-            key_mac: "Command-Right",
+            key_mac: "Option-Right",
             exec: function() {
                 var table = parse_table();
                 if (table) {
@@ -401,7 +401,7 @@ define(function(require) {
         spec.ace.add_command({
             name: "doku-alt-t",
             key_win: "Alt-T",
-            key_mac: "Command-T",
+            key_mac: "Option-T",
             exec: function() {
                 var table = parse_table();
                 if (table) {
@@ -413,7 +413,7 @@ define(function(require) {
         spec.ace.add_command({
             name: "doku-alt-l",
             key_win: "Alt-L",
-            key_mac: "Command-L",
+            key_mac: "Option-L",
             exec: function() {
                 var table = parse_table();
                 if (table) {
@@ -425,7 +425,7 @@ define(function(require) {
         spec.ace.add_command({
             name: "doku-alt-c",
             key_win: "Alt-C",
-            key_mac: "Command-C",
+            key_mac: "Option-C",
             exec: function() {
                 var table = parse_table();
                 if (table) {
