@@ -128,6 +128,15 @@ define(function(require) {
         }
     };
 
+    var supported_browser = function() {
+        return navigator.userAgent.indexOf("MSIE") === -1;
+    };
+
+    require("pilot/fixoldbrowsers");
+    if (!supported_browser()) {
+        return;
+    }
+
     require.ready(function() {
         // initialize editor after Dokuwiki
         setTimeout(function() {
