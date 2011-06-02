@@ -1,3 +1,11 @@
+2011-06-02
+ * Table editing commands
+ * Notify of errors in LaTeX preview
+ * Italian translation (thanks to vinnie)
+ * Fixed editor in locked pages
+ * Some minor bugs fixed
+ * Updated Ace version
+
 2011-04-07
  * Syntax highlihgting for LaTeX plugin
  * Preview of LaTeX formulas
