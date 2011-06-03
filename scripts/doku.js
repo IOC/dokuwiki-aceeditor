@@ -109,7 +109,7 @@ define(function(require) {
                                    selection.start + (opts.startofs || 0));
                 spec.set_selection(selection.start, selection.end);
             } else {
-                doku_paste_pext(selection, text, opts);
+                doku_paste_text(selection, text, opts);
             }
         };
 
@@ -129,7 +129,7 @@ define(function(require) {
             if (patching && selection.obj === textarea) {
                 spec.set_selection(selection.start, selection.end);
             } else {
-                return doku_set_election(selection);
+                return doku_set_selection(selection);
             }
         };
 
