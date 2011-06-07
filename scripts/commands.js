@@ -259,23 +259,39 @@ define(function(require) {
         };
 
         var parse_row = function(row, column) {
-            var is_header, align, value = "", cells = [];
+            var cells = [], i, is_header, value;
             var tokens = spec.ace.get_tokens(row);
 
             if (tokens.length === 0 || tokens[0].type !== "table") {
                 return;
             }
 
-            is_header = (tokens[0].value === "^");
-            for (i = 1; i < tokens.length; i += 1) {
-                if (tokens[i].type === "table" &&
-                    /[|^]/.test(tokens[i].value)) {
+            var push_cell = function() {
+                var align;
+                if (value !== undefined) {
                     align = (/^  +[^ ]/.test(value) ?
                              (/[^ ] + $/.test(value) ? "center" : "right") :
                              "left");
                     cells.push(new_cell(is_header, align, value));
-                    is_header = (tokens[i].value === "^");
-                    value = "";
+                }
+            }
+
+            var parse_table_token = function(token) {
+                var i, align;
+                for (i = 0; i < token.length; i += 1) {
+                    if (token[i] === "|" || token[i] === "^") {
+                        push_cell();
+                        is_header = (token[i] === "^");
+                        value = "";
+                    } else {
+                        value += token[i];
+                    }
+                }
+            };
+
+            for (i = 0; i < tokens.length; i += 1) {
+                if (tokens[i].type === "table") {
+                    parse_table_token(tokens[i].value);
                 } else {
                     value += tokens[i].value;
                 }
