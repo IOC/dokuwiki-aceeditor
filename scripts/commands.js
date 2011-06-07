@@ -132,6 +132,10 @@ define(function(require) {
                 return cells.length;
             };
 
+            that.remove_cell = function(index) {
+                cells.splice(index, 1);
+            };
+
             that.toggle_header = function(index) {
                 cells[index].toggle_header();
             };
@@ -247,6 +251,20 @@ define(function(require) {
                     cursor_row -= 1;
                 }
                 format();
+                update();
+            };
+
+            that.remove_column = function() {
+                var i;
+                format();
+                if (rows[0].length() > 1) {
+                    for (i = 0; i < rows.length; i += 1) {
+                        rows[i].remove_cell(cursor_cell);
+                    }
+                    if (cursor_cell === rows[0].length()) {
+                        cursor_cell -= 1;
+                    }
+                }
                 update();
             };
 
@@ -458,6 +476,18 @@ define(function(require) {
                 var table = parse_table();
                 if (table) {
                     table.align_cell("right");
+                }
+            }
+        });
+
+        spec.ace.add_command({
+            name: "doku-ctrl-shift-d",
+            key_win: "Ctrl-Shift-D",
+            key_mac: "Command-Shift-D",
+            exec: function() {
+                var table = parse_table();
+                if (table) {
+                    table.remove_column();
                 }
             }
         });
