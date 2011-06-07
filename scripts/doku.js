@@ -22,6 +22,7 @@ define(function(require) {
 
         var patching = false;
         var textarea = $("wiki__text");
+        var doku_current_headline_level = currentHeadlineLevel;
         var doku_get_selection = getSelection;
         var doku_paste_text = pasteText;
         var doku_selection_class = selection_class;
@@ -84,6 +85,13 @@ define(function(require) {
         that.text_changed = function() {
             textChanged = true;
             summaryCheck();
+        };
+
+        currentHeadlineLevel = function(id) {
+            if (id === textarea.id) {
+                jQuery(textarea).val(spec.get_value());
+            }
+            return doku_current_headline_level(id);
         };
 
         getSelection = function(obj) {
