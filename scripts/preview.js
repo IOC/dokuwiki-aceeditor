@@ -92,7 +92,7 @@ define(function(require) {
         };
 
         var update = function() {
-            var pos = spec.ace.get_cursor_position();
+            var pos = spec.ace.cursor_position();
             var token = token_at_pos(pos);
             timer = null;
             remove();

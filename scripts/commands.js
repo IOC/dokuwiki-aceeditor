@@ -180,7 +180,7 @@ define(function(require) {
                     lines.push(rows[i].value());
                 }
                 spec.ace.replace_lines(start_row, end_row, lines);
-                spec.ace.set_cursor_position(cursor_position());
+                spec.ace.navigate(cursor_position());
             };
 
             that.align_cell = function(align) {
@@ -319,7 +319,7 @@ define(function(require) {
         };
 
         var parse_table = function() {
-            var pos = spec.ace.get_cursor_position();
+            var pos = spec.ace.cursor_position();
             var start_row = pos.row, end_row = pos.row;
             var i, row, rows = [];
 

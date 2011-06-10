@@ -111,6 +111,10 @@ define(function(require) {
             return session.addMarker(range, spec.klass, renderer, true);
         };
 
+        that.cursor_position = function() {
+            return editor.getCursorPosition();
+        };
+
         that.indent = function() {
             editor.indent();
         };
@@ -121,10 +125,6 @@ define(function(require) {
 
         that.focus = function() {
             editor.focus();
-        };
-
-        that.get_cursor_position = function() {
-            return editor.getCursorPosition();
         };
 
         that.get_length = function() {
@@ -153,6 +153,10 @@ define(function(require) {
 
         that.navigate_line_start = function() {
             editor.navigateLineStart();
+        };
+
+        that.navigate = function(position) {
+            return editor.moveCursorToPosition(position);
         };
 
         that.outdent = function() {
@@ -189,10 +193,6 @@ define(function(require) {
 
         that.resize = function() {
             editor.resize();
-        };
-
-        that.set_cursor_position = function(position) {
-            return editor.moveCursorToPosition(position);
         };
 
         that.set_selection = function(start, end) {
