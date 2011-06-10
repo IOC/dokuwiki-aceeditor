@@ -115,14 +115,6 @@ define(function(require) {
             return editor.getCursorPosition();
         };
 
-        that.indent = function() {
-            editor.indent();
-        };
-
-        that.insert = function(text) {
-            editor.insert(text);
-        };
-
         that.focus = function() {
             editor.focus();
         };
@@ -145,6 +137,14 @@ define(function(require) {
 
         that.get_value = function() {
             return session.getValue();
+        };
+
+        that.indent = function() {
+            editor.indent();
+        };
+
+        that.insert = function(text) {
+            editor.insert(text);
         };
 
         that.navigate_line_end = function() {
