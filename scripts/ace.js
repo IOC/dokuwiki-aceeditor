@@ -169,8 +169,22 @@ define(function(require) {
         };
 
         that.replace_lines = function(start, end, lines) {
-            session.getDocument().removeLines(start, end);
-            session.getDocument().insertLines(start, lines);
+            var i, document = session.getDocument();
+            var doc_length = end - start + 1;
+            var min_length = Math.min(doc_length, lines.length);
+
+            for (i = 0; i < min_length; i+= 1) {
+                if (document.getLine(start + i) !== lines[i]) {
+                    document.removeInLine(start + i, 0, Infinity);
+                    document.insertInLine({row: start + i, column: 0}, lines[i]);
+                }
+            }
+
+            if (doc_length > lines.length) {
+                document.removeLines(start + lines.length, end);
+            } else if (doc_length < lines.length) {
+                document.insertLines(end + 1, lines.slice(doc_length));
+            }
         };
 
         that.resize = function() {
