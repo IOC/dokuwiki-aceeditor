@@ -156,7 +156,7 @@ define(function(require) {
         };
 
         that.navigate = function(position) {
-            return editor.moveCursorToPosition(position);
+            editor.navigateTo(position.row, position.column);
         };
 
         that.outdent = function() {
