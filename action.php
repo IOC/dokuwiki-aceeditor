@@ -50,6 +50,12 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
                 'charset' => 'utf-8',
                 'src' => DOKU_BASE.'lib/plugins/aceeditor/build.js',
             );
+            // Workaround for conflict with syntaxhighlighter3 plugin
+            $event->data['script'][] = array(
+                'type' => 'text/javascript',
+                'charset' => 'utf-8',
+                '_data' => 'window.require = undefined;',
+            );
         } else {
             $event->data['script'][] = array(
                 'type' => 'text/javascript',
