@@ -1,3 +1,11 @@
+2011-06-14
+ * Tab now inserts 2 spaces instead of 4
+ * New command to remove a column of a table
+ * Option key is used for shortcuts is MacOSX
+ * Fixed errors in toolbar buttons
+ * Workaround for conflict with syntaxhiglighter3 plugin
+ * Fixed some minor bugs in table commands
+
 2011-06-02
  * Table editing commands
  * Notify of errors in LaTeX preview
