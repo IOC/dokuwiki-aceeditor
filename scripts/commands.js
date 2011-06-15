@@ -433,9 +433,7 @@ define(function(require) {
         });
 
         spec.ace.add_command({
-            name: "doku-alt-t",
-            key_win: "Alt-T",
-            key_mac: "Option-T",
+            name: "doku-mode-t",
             exec: function() {
                 var table = parse_table();
                 if (table) {
@@ -445,9 +443,7 @@ define(function(require) {
         });
 
         spec.ace.add_command({
-            name: "doku-alt-l",
-            key_win: "Alt-L",
-            key_mac: "Option-L",
+            name: "doku-mode-l",
             exec: function() {
                 var table = parse_table();
                 if (table) {
@@ -457,9 +453,7 @@ define(function(require) {
         });
 
         spec.ace.add_command({
-            name: "doku-alt-c",
-            key_win: "Alt-C",
-            key_mac: "Option-C",
+            name: "doku-mode-c",
             exec: function() {
                 var table = parse_table();
                 if (table) {
@@ -469,9 +463,7 @@ define(function(require) {
         });
 
         spec.ace.add_command({
-            name: "doku-alt-r",
-            key_win: "Alt-R",
-            key_mac: "Command-R",
+            name: "doku-mode-r",
             exec: function() {
                 var table = parse_table();
                 if (table) {
@@ -490,6 +482,30 @@ define(function(require) {
                     table.remove_column();
                 }
             }
+        });
+
+        spec.ace.set_keyboard_states({
+            "start": [{
+                key: "ctrl-space",
+                then: "doku-mode",
+            }],
+            "doku-mode": [{
+                key: "t",
+                exec: "doku-mode-t",
+                then: "start",
+            }, {
+                key: "l",
+                exec: "doku-mode-l",
+                then: "start",
+            }, {
+                key: "c",
+                exec: "doku-mode-c",
+                then: "start",
+            }, {
+                key: "r",
+                exec: "doku-mode-r",
+                then: "start",
+            }]
         });
 
         return that;

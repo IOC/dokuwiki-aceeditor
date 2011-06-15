@@ -22,6 +22,7 @@ define(function(require) {
         var that = {};
 
         var Range = require("ace/range").Range;
+        var StateHandler = require("ace/keyboard/state_handler").StateHandler;
         var canon = require("pilot/canon");
         var editor, session;
 
@@ -82,17 +83,20 @@ define(function(require) {
         };
 
         that.add_command = function(spec) {
-            canon.addCommand({
+            var command = {
                 name: spec.name,
-                bindKey: {
-                    win: spec.key_win,
-                    mac: spec.key_mac,
-                    sender: "editor"
-                },
                 exec: function (env, args, request) {
                     spec.exec();
                 }
-            });
+            };
+            if (spec.key_win || spec.key_mac) {
+                command.bindKey = {
+                     win: spec.key_win || null,
+                     mac: spec.key_mac || null,
+                     sender: "editor"
+                };
+            }
+            canon.addCommand(command);
         };
 
         that.add_marker = function(spec) {
@@ -193,6 +197,10 @@ define(function(require) {
 
         that.resize = function() {
             editor.resize();
+        };
+
+        that.set_keyboard_states = function(states) {
+            editor.setKeyboardHandler(new StateHandler(states));
         };
 
         that.set_selection = function(start, end) {
