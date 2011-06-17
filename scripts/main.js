@@ -102,11 +102,13 @@ define(function(require) {
             next_line_indent: mode.next_line_indent,
             on_cursor_change: function() {
                 preview.trigger();
+                commands.hide_menu();
             },
             on_document_change: function() {
                 if (user_editing) {
                     doku.text_changed();
                     preview.trigger();
+                    commands.hide_menu();
                 };
             },
             readonly: doku.get_readonly(),

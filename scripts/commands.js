@@ -18,8 +18,52 @@
 
 define(function(require) {
 
+    var Menu = require("menu");
+
     return function(spec) {
         var that = {};
+
+        var menu;
+
+        var init = function() {
+            menu = Menu({
+                items: [{
+                    key: "t",
+                    label: "Toggle type",
+                    exec: function() {
+                        parse_table().toggle_header()
+                    }
+                }, {
+                    key: "l",
+                    label: "Align to left",
+                    exec: function() {
+                        parse_table().align_cell("left");
+                    }
+                }, {
+                    key: "c",
+                    label: "Align to center",
+                    exec: function() {
+                        parse_table().align_cell("center");
+                    }
+                }, {
+                    key: "r",
+                    label: "Align to right",
+                    exec: function() {
+                        parse_table().align_cell("right");
+                    }
+                }],
+                on_hide: function() {
+                    spec.ace.focus();
+                }
+            });
+
+            jQuery(".ace-doku").mouseup(function(event) {
+                if (event.which === 2) {
+                    show_menu();
+                    return false;
+                }
+            });
+        };
 
         var new_cell = function(is_header, align, content) {
             var that = {};
@@ -348,6 +392,18 @@ define(function(require) {
             }
         };
 
+        var show_menu = function() {
+            if (parse_table()) {
+                menu.show(spec.ace.cursor_coordinates());
+            }
+        };
+
+        that.hide_menu = function() {
+            if (menu) {
+                menu.hide();
+            }
+        };
+
         spec.ace.add_command({
             name: "doku-tab",
             key_win: "Tab",
@@ -484,12 +540,21 @@ define(function(require) {
             }
         });
 
+        spec.ace.add_command({
+            name: "doku-mode-menu",
+            exec: show_menu
+        });
+
         spec.ace.set_keyboard_states({
             "start": [{
                 key: "ctrl-space",
-                then: "doku-mode",
+                exec: "doku-mode-menu",
+                then: "doku-mode"
             }],
             "doku-mode": [{
+                key: "ctrl-space",
+                exec: "doku-mode-menu",
+            }, {
                 key: "t",
                 exec: "doku-mode-t",
                 then: "start",
@@ -505,8 +570,12 @@ define(function(require) {
                 key: "r",
                 exec: "doku-mode-r",
                 then: "start",
+            }, {
+                then: "start",
             }]
         });
+
+        init();
 
         return that;
     };

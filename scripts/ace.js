@@ -115,6 +115,15 @@ define(function(require) {
             return session.addMarker(range, spec.klass, renderer, true);
         };
 
+        that.cursor_coordinates = function() {
+            var pos = editor.getCursorPosition();
+            var screen = editor.renderer.textToScreenCoordinates(pos.row, pos.column);
+            return {
+                x: Math.round(screen.pageX),
+                y: Math.round(screen.pageY + editor.renderer.lineHeight / 2),
+            };
+        };
+
         that.cursor_position = function() {
             return editor.getCursorPosition();
         };
