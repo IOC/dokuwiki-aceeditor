@@ -21,33 +21,39 @@ define(function(require) {
     return function(spec) {
         var that = {};
 
-        var element;
-
-        var callback = function(index) {
-            return function() {
-                spec.items[index].exec();
-                that.hide();
-            };
-        };
+        var element, groups = {};
 
         var init = function() {
-            var i, item;
+            var i;
 
             element = jQuery("<div>")
                 .addClass("ace-menu")
                 .hide()
                 .appendTo("body");
 
+            spec.items = spec.items || [];
             for (i = 0; i < spec.items.length; i += 1) {
-                item = spec.items[i];
-                jQuery("<a>")
-                    .attr("href", "#")
-                    .addClass("ace-menu-item")
-                    .html("<strong>" + item.key + "</strong>"
-                          + "&nbsp;&nbsp;" + item.label)
-                    .click(callback(i))
-                    .appendTo(element);
+                that.append(spec.items[i]);
+            };
+        };
+
+        that.append = function(spec) {
+            spec.group = spec.group || "default";
+
+            if (!groups[spec.group]) {
+                groups[spec.group] = jQuery("<div>").appendTo(element);
             }
+
+            jQuery("<a>")
+                .attr("href", "#")
+                .addClass("ace-menu-item")
+                .html("<strong>" + spec.key + "</strong>"
+                      + "&nbsp;&nbsp;" + spec.label)
+                .click(function() {
+                    spec.exec();
+                    that.hide();
+                })
+                .appendTo(groups[spec.group]);
         };
 
         that.hide = function() {
@@ -55,7 +61,15 @@ define(function(require) {
             spec.on_hide();
         };
 
-        that.show = function(pos) {
+        that.show = function(pos, group) {
+            var name;
+
+            group = group || "default";
+            for (name in groups) {
+                groups[name].hide();
+            }
+            groups[group].show();
+
             element.css("left", pos.x + "px");
             if (pos.y + element.height() < jQuery(window).height()) {
                 element.css("top", pos.y + "px");
