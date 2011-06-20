@@ -28,6 +28,8 @@ define(function(require) {
 
             element = jQuery("<div>")
                 .addClass("ace-menu")
+                .css("position", "absolute")
+                .css("z-index", 100)
                 .hide()
                 .appendTo("body");
 
@@ -62,7 +64,7 @@ define(function(require) {
         };
 
         that.show = function(pos, group) {
-            var name;
+            var name, top, left;
 
             group = group || "default";
             for (name in groups) {
@@ -70,12 +72,14 @@ define(function(require) {
             }
             groups[group].show();
 
-            element.css("left", pos.x + "px");
-            if (pos.y + element.height() < jQuery(window).height()) {
-                element.css("top", pos.y + "px");
-            } else {
-                element.css("top", pos.y - element.height());
+            left = pos.x + jQuery(window).scrollLeft();
+            top = pos.y + jQuery(window).scrollTop();
+            if (pos.y + element.height() > jQuery(window).height()) {
+                top -= element.height();
             }
+
+            element.css("left", left + "px");
+            element.css("top", top + "px");
             element.show();
         };
 
