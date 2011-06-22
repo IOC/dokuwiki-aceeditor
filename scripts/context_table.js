@@ -229,6 +229,16 @@ define(function(require) {
                 update();
             };
 
+            var has_colspans = function() {
+                var i;
+                for (i = 0; i < rows.length; i += 1) {
+                    if (rows[i].length() !== rows[i].columns()) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
             var normalize = function() {
                 var columns = 0, i;
                 for (i = 0; i < rows.length; i += 1) {
@@ -256,7 +266,7 @@ define(function(require) {
             that.move_column_left = function() {
                 var i;
                 normalize();
-                if (cursor_cell > 0) {
+                if (!has_colspans() && cursor_cell > 0) {
                     for (i = 0; i < rows.length; i += 1) {
                         rows[i].move_cell_left(cursor_cell);
                     }
@@ -268,7 +278,7 @@ define(function(require) {
             that.move_column_right = function() {
                 var i;
                 normalize();
-                if (cursor_cell < rows[cursor_row].length() - 1) {
+                if (!has_colspans() && cursor_cell < rows[cursor_row].length() - 1) {
                     for (i = 0; i < rows.length; i += 1) {
                         rows[i].move_cell_right(cursor_cell);
                     }
@@ -317,7 +327,7 @@ define(function(require) {
             that.remove_column = function() {
                 var i;
                 normalize();
-                if (rows[0].length() > 1) {
+                if (!has_colspans() && rows[0].length() > 1) {
                     for (i = 0; i < rows.length; i += 1) {
                         rows[i].remove_cell(cursor_cell);
                     }
