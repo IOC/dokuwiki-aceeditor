@@ -68,13 +68,6 @@ define(function(require) {
                     });
                 }
             }
-
-            jQuery(".ace-doku").mouseup(function(event) {
-                if (event.which === 2) {
-                    show_menu();
-                    return false;
-                }
-            });
         };
 
         var menu_callback = function(context, key) {
