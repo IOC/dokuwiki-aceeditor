@@ -247,6 +247,9 @@ define(function(require) {
                 for (i = 0; i < rows.length; i += 1) {
                     rows[i].fill(columns);
                 }
+                if (cursor_cell >= rows[cursor_row].length()) {
+                    cursor_cell = rows[cursor_row].length() - 1;
+                }
             };
 
             var update = function() {
@@ -312,7 +315,7 @@ define(function(require) {
                     cursor_cell -= 1;
                 } else if (cursor_row > 0) {
                     cursor_row -= 1;
-                    cursor_cell = rows[cursor_row].length() - 1;
+                    cursor_cell = Infinity;
                 }
                 format();
             };
@@ -330,9 +333,6 @@ define(function(require) {
                 if (!has_colspans() && rows[0].length() > 1) {
                     for (i = 0; i < rows.length; i += 1) {
                         rows[i].remove_cell(cursor_cell);
-                    }
-                    if (cursor_cell === rows[0].length()) {
-                        cursor_cell -= 1;
                     }
                 }
                 format();
