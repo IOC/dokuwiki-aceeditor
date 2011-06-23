@@ -48,6 +48,12 @@
     border: 1px solid #ccc;
 }
 
+.ace-doku .ace_marker-layer .ace_menu {
+    background-color: white;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+}
+
 /* Menu */
 
 .ace-menu {

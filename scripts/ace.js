@@ -109,7 +109,8 @@ define(function(require) {
                     top: (range.start.row - config.firstRowScreen) * config.lineHeight,
                     bottom: (range.end.row - config.firstRowScreen + 1) * config.lineHeight,
                     screen_height: config.height,
-                    screen_width: config.width
+                    screen_width: config.width,
+                    container_height: config.minHeight
                 }));
             };
             return session.addMarker(range, spec.klass, renderer, true);

@@ -21,7 +21,33 @@ define(function(require) {
     return function(spec) {
         var that = {};
 
-        var contexts, menu;
+        var contexts, menu_marker;
+
+        var add_menu_marker = function(context) {
+            var pos = spec.ace.cursor_position();
+            var renderer = function(spec) {
+                var i, html, top;
+                html = ['<div class="ace_menu" style="position: absolute;' +
+                        'left:' + spec.left + 'px;' +
+                        (spec.top > spec.screen_height - spec.bottom ?
+                         'bottom:' + (spec.container_height - spec.top) + 'px;">' :
+                         'top:' + spec.bottom + 'px;">')];
+                for (i = 0; i < context.menu.length; i += 1) {
+                    html.push('<div><strong>' + context.menu[i].key
+                              + '</strong> ' + context.menu[i].label + '</div>');
+                }
+                html.push('</div>');
+                return html.join("");
+            };
+            menu_marker = spec.ace.add_marker({
+                start_row: pos.row,
+                start_column: pos.column,
+                end_row: pos.row,
+                end_column: pos.column + 1,
+                klass: "menu",
+                on_render: renderer
+            });
+        };
 
         var command_callback = function(name, fallback) {
             return function() {
@@ -32,6 +58,7 @@ define(function(require) {
                         if (exec = context.commands[name]) {
                             exec(data);
                         }
+                        that.hide_menu();
                         return;
                     }
                 }
@@ -42,58 +69,28 @@ define(function(require) {
         };
 
         var init = function() {
-            var i, j, context, item;
-
-            menu = require("menu")({
-                on_hide: function() {
-                    spec.ace.focus();
-                }
-            });
-
             contexts = [
                 require("context_table")({
                     ace: spec.ace
                 })
             ];
-
-            for (i = 0; i < contexts.length; i += 1) {
-                context = contexts[i];
-                for (j = 0; j < context.menu.length; j += 1) {
-                    item = context.menu[j];
-                    menu.append({
-                        group: context.name,
-                        key: item.key,
-                        label: item.label,
-                        exec: menu_callback(context, item.key)
-                    });
-                }
-            }
-        };
-
-        var menu_callback = function(context, key) {
-            return function() {
-                var data, exec;
-                if (data = context.parse()) {
-                    if (exec = context.commands["menu_" + key]) {
-                        exec(data);
-                    }
-                }
-            };
         };
 
         var show_menu = function() {
             var i;
+            that.hide_menu();
             for (i = 0; i < contexts.length; i += 1) {
                 if (contexts[i].parse()) {
-                    menu.show(spec.ace.cursor_coordinates(), contexts[i].name);
+                    add_menu_marker(contexts[i]);
                     return;
                 }
             }
         };
 
         that.hide_menu = function() {
-            if (menu) {
-                menu.hide();
+            if (menu_marker) {
+                spec.ace.remove_marker(menu_marker);
+                marker = null;
             }
         };
 
