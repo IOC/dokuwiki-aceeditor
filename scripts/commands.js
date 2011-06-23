@@ -120,6 +120,11 @@ define(function(require) {
         });
 
         spec.ace.add_command({
+            name: "doku-hide-menu",
+            exec: that.hide_menu
+        });
+
+        spec.ace.add_command({
             name: "doku-menu",
             exec: show_menu
         });
@@ -189,6 +194,10 @@ define(function(require) {
             "doku-menu": [{
                 key: "ctrl-space",
                 exec: "doku-menu",
+            }, {
+                key: "esc",
+                exec: "doku-hide-menu",
+                next: "start",
             }, {
                 key: "c",
                 exec: "doku-menu-c",
