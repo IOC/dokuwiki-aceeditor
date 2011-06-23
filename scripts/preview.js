@@ -106,11 +106,11 @@ define(function(require) {
             var url = DOKU_BASE + "lib/plugins/aceeditor/preview.php";
             jQuery.getJSON(url, { text: token.value }, function (data) {
                 var renderer = function(spec) {
-                    var top = (spec.top > spec.screen_height - spec.bottom ?
-                               spec.top - data.height - 12 : spec.bottom);
-                    return ('<div class="ace_preview" style="padding:5px; '
-                            + 'position:absolute; left:' + spec.left + 'px; top:' + top  + 'px; '
-                            + 'width:' + data.width  + 'px; height:' + data.height + 'px;">'
+                    return ('<div class="ace_preview" style="left:' + spec.left + 'px;'
+                            + (spec.top > spec.screen_height - spec.bottom ?
+                               'bottom:' + (spec.container_height - spec.top) + 'px;' :
+                               'top:' + spec.bottom + 'px;')
+                            + 'width:' + data.width  + 'px;height:' + data.height + 'px;">'
                             + '<img src="' + encodeURI(data.url) + '"/></div>');
                 };
                 if (data && !timer) {
