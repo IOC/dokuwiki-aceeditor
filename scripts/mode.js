@@ -93,7 +93,7 @@ define(function(require) {
                                 "internallink", "media", "externallink", "linebreak",
                                 "emaillink", "notoc", "nocache",
                                 "preformatted", "code", "file", "php", "html",
-                                "htmlblock", "phpblock", "unformatted",
+                                "htmlblock", "phpblock", "unformatted", "unformattedalt",
                                 "latex-latex", "latex-ddollar", "latex-dollar",
                                 "latex-displaymath", "latex-equation",
                                 "latex-equationstar", "latex-eqnarray",
