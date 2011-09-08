@@ -52,6 +52,7 @@ define(function(require) {
             session.setUseWrapMode(spec.wrapmode);
             session.setWrapLimitRange(null, spec.wraplimit);
             editor.setPrintMarginColumn(spec.wraplimit);
+            renderer.setHScrollBarAlwaysVisible(false);
 
             session.on("change", function() {
                 if (!spec.readonly) {
