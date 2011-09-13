@@ -30,7 +30,7 @@ define(function(require) {
         ]).join("|") + ")");
 
         var add_rule = function(state, token, regex, next) {
-            var rule = {token: token, regex: regex};
+            var rule = {token: token, regex: regex, merge: true};
             if (next) {
                 rule.next = next;
             }
