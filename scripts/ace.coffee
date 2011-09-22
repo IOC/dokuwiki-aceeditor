@@ -31,10 +31,8 @@ define (require) -> (spec) ->
     {row, column: offset}
 
   pos_to_offset = (pos) ->
-    offset = pos.column;
-    for i in [0...pos.row]
-      offset += session.getLine(i).length + 1
-    offset
+    iterator = (memo, row) -> memo + session.getLine(row).length + 1
+    _.reduce [0...pos.row], iterator, pos.column
 
   do ->
     {Editor} = require 'ace/editor'
@@ -53,8 +51,7 @@ define (require) -> (spec) ->
     session.setUndoManager new UndoManager()
     session.setTabSize 2
     mode.$tokenizer = new Tokenizer spec.tokenizer_rules
-    mode.getNextLineIndent = (state, line, tab) ->
-      spec.next_line_indent line
+    mode.getNextLineIndent = (state, line, tab) -> spec.next_line_indent line
     session.setMode mode
 
     editor.setShowPrintMargin spec.wrapmode

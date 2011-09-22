@@ -34,8 +34,7 @@ define -> (spec) ->
     tokenizer_rules[state].push rule
 
   create_rules = (prefix, names) ->
-    names.sort (a, b) ->
-      (modes[a]?.sort or 1000) - (modes[b]?.sort or 1000)
+    _.sortBy names, (name) -> modes[name]?.sort or 1000
     for name in names
       if mode = modes[name]
         state = prefix + '-' + name
@@ -236,7 +235,7 @@ define -> (spec) ->
   do ->
     if spec.latex
       modes[name] = mode for name, mode of latex_modes
-    create_rules 'start', (name for name of modes)
+    create_rules 'start', _.keys(modes)
 
   next_line_indent: (line) -> indent_regex.exec(line)?[0] or ''
 

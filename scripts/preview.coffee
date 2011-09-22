@@ -17,7 +17,6 @@
 
 define -> (spec) ->
   marker = null
-  timer = null
 
   token_at_pos = (pos) ->
 
@@ -67,31 +66,31 @@ define -> (spec) ->
     result
 
   update = ->
-    timer = null
     token = token_at_pos spec.ace.cursor_position()
-    spec.ace.remove_marker marker if marker
     update_latex token if token and /^latex-.*$/.test token.type
+
+  update = _.debounce update, 1000
 
   update_latex = (token) ->
     url = DOKU_BASE + 'lib/plugins/aceeditor/preview.php'
     jQuery.getJSON url, text: token.value, (data) ->
-      if data and not timer
-        marker = spec.ace.add_marker
-          start_row: token.start_row
-          start_column: token.start_column
-          end_row: token.end_row
-          end_column: token.end_column
-          klass: 'preview'
-          on_render: (spec) ->
-            vertical_pos = if spec.top > spec.screen_height - spec.bottom
-              "bottom: #{spec.container_height - spec.top}px;"
-            else
-              "top: #{spec.bottom}px;"
-            style = "left: #{spec.left}px; #{vertical_pos}"
-            attributes = "class=\"ace_preview\" style=\"#{style}\""
-            "<div #{attributes}><img src=\"#{encodeURI data.url}\"/></div>"
+      spec.ace.remove_marker marker
+      return unless data
+      marker = spec.ace.add_marker
+        start_row: token.start_row
+        start_column: token.start_column
+        end_row: token.end_row
+        end_column: token.end_column
+        klass: 'preview'
+        on_render: (spec) ->
+          vertical_pos = if spec.top > spec.screen_height - spec.bottom
+            "bottom: #{spec.container_height - spec.top}px;"
+          else
+            "top: #{spec.bottom}px;"
+          style = "left: #{spec.left}px; #{vertical_pos}"
+          attributes = "class=\"ace_preview\" style=\"#{style}\""
+          "<div #{attributes}><img src=\"#{encodeURI data.url}\"/></div>"
 
   trigger: ->
-    clearTimeout timer if timer
-    spec.ace.remove_marker marker if marker
-    timer = setTimeout update, 1000
+    spec.ace.remove_marker marker
+    update()

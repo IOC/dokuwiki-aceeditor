@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-define (require) -> (spec) ->
+define -> (spec) ->
 
   new_cell = (spec) ->
 
@@ -78,23 +78,21 @@ define (require) -> (spec) ->
   new_row = (cells) ->
 
     columns = ->
-      result = 0
-      result += cell.colspan() for cell in cells
-      result
+      iterator = (memo, cell) -> memo + cell.colspan()
+      _.reduce cells, iterator, 0
 
     align_cell: (index, align) -> cells[index].set_align align
 
     columns: columns
 
-    cursor_position: (cell) ->
-      position = 0
-      position += cells[i].length() for i in [0...cell]
-      position + cells[cell].cursor_position()
+    cursor_position: (index) ->
+      iterator = (memo, cell) -> memo + cell.length()
+      _.reduce cells[0...index], iterator, cells[index].cursor_position()
 
     cursor_cell: (column) ->
       length = 0
-      for i in [0...cells.length]
-        length += cells[i].length()
+      for cell, i in cells
+        length += cell.length()
         return i if column < length
       cells.length - 1
 
@@ -104,7 +102,7 @@ define (require) -> (spec) ->
           align: 'left'
           colspan: 1
           content: '  '
-          is_header: cells[cells.length - 1]?.is_header()
+          is_header: _.last(cells)?.is_header()
 
     format: (layout, pass) ->
       offset = 0
@@ -127,7 +125,7 @@ define (require) -> (spec) ->
     toggle_header: (index) -> cells[index].toggle_header()
 
     value: ->
-      last_sep = if cells[cells.length-1].is_header() then '^' else '|'
+      last_sep = if _.last(cells).is_header() then '^' else '|'
       (cell.value() for cell in cells).join('') + last_sep
 
   new_table = (rows, start_row, end_row, cursor_pos) ->
@@ -146,18 +144,13 @@ define (require) -> (spec) ->
         row.format layout, pass for row in rows
       update()
 
-    has_colspans = ->
-      for row in rows
-        return true if row.length() != row.columns()
+    has_colspans = -> _.any rows, (row) -> row.length() != row.columns()
 
     normalize = ->
-      columns = 0
-      for row in rows
-        columns = Math.max columns, row.columns()
-      for row in rows
-        row.fill columns
-      if cursor_cell >= rows[cursor_row].length()
-        cursor_cell = rows[cursor_row].length() - 1
+      iterator = (memo, row) -> Math.max memo, row.columns()
+      columns = _.reduce rows, iterator, 0
+      row.fill columns for row in rows
+      cursor_cell = Math.min cursor_cell, rows[cursor_row].length() - 1
 
     update = ->
       lines = (row.value() for row in rows)
@@ -187,14 +180,12 @@ define (require) -> (spec) ->
       if cursor_cell == rows[cursor_row].length()
         cursor_cell = 0
         cursor_row += 1
-        if cursor_row == rows.length
-          rows.push new_row []
+        rows.push new_row [] if cursor_row == rows.length
       format()
 
     next_row: ->
       cursor_row += 1
-      if cursor_row == rows.length
-        rows.push new_row []
+      rows.push new_row [] if cursor_row == rows.length
       format()
 
     previous_cell: ->
@@ -206,8 +197,7 @@ define (require) -> (spec) ->
       format()
 
     previous_row: ->
-      if cursor_row > 0
-        cursor_row -= 1
+      cursor_row -= 1 if cursor_row > 0
       format()
 
     remove_column: ->
@@ -227,28 +217,24 @@ define (require) -> (spec) ->
 
     push_cell = (colspan) ->
       if content?
-        if not /^  +[^ ]/.test content
-          align = 'left'
-        else if /[^ ] + $/.test content
-          align = 'center'
-        else
-          align = 'right'
+        align = if not /^  +[^ ]/.test content then 'left'
+        else if /[^ ] + $/.test content then 'center'
+        else 'right'
         cells.push new_cell {align, colspan, content, is_header}
 
     parse_table_token = (token) ->
-      is_separator = (i) ->
-        token[i] == '|' or token[i] == '^'
-      for i in [0...token.length]
+      is_separator = (i) -> token[i] in ['|', '^']
+      for c, i in token
         if is_separator i
           colspan = 1
           while is_separator i + 1
             colspan += 1
             i += 1
           push_cell colspan
-          is_header = token[i] is '^'
+          is_header = c is '^'
           content = ''
         else
-          content += token[i]
+          content += c
 
     tokens = spec.ace.get_tokens row
     return unless tokens[0]?.type is 'table'

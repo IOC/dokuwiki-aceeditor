@@ -44,9 +44,10 @@ define (require) ->
 
   init = ->
     return unless navigator.userAgent.indexOf('MSIE') is -1
-    return unless $ 'wiki__text' and window.jQuery and window.JSINFO
+    return unless $('wiki__text') and window.jQuery and window.JSINFO
 
     require 'pilot/fixoldbrowsers'
+    require 'underscore'
 
     doku = require('doku')
       get_selection: -> ace.get_selection()
