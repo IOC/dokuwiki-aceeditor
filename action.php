@@ -65,11 +65,11 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
             );
         }
 
-        if ($this->getConf('loadjquery')) {
+        if (!$this->has_jquery() and $this->getConf('loadjquery')) {
             $event->data['script'][] = array(
                 'type' => 'text/javascript',
                 'charset' => 'utf-8',
-                'src' => 'http://code.jquery.com/jquery-1.6.1.min.js',
+                'src' => 'http://code.jquery.com/jquery.min.js',
             );
             $event->data['script'][] = array(
                 'type' => 'text/javascript',
@@ -77,5 +77,11 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
                 '_data' => '$.noConflict();',
             );
         }
+    }
+
+    public function has_jquery() {
+        $version = getVersionData();
+        $date = str_replace('-', '', $version['date']);
+        return (int) $date > 20110525;
     }
 }
