@@ -44,7 +44,8 @@ define (require) ->
 
   init = ->
     return unless navigator.userAgent.indexOf('MSIE') is -1
-    return unless $('wiki__text') and window.jQuery and window.JSINFO
+    return unless window.jQuery and window.JSINFO
+    return unless document.getElementById 'wiki__text'
 
     require 'pilot/fixoldbrowsers'
     require 'underscore'

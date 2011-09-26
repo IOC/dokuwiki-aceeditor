@@ -18,15 +18,19 @@
 define (require) -> (spec) ->
 
   patching = false
-  textarea = $ 'wiki__text'
+  textarea = document.getElementById 'wiki__text'
 
-  doku_current_headline_level = window.currentHeadlineLevel
-  window.currentHeadlineLevel = (id) ->
+  patch = (name, func) ->
+    obj = if dw_editor?[name]? then dw_editor else window
+    orig_func = obj[name]
+    obj[name] = (args...) -> func.call this, orig_func, args...
+    orig_func
+
+  patch 'currentHeadlineLevel', (func, id) ->
     jQuery(textarea).val spec.get_value() if id is textarea.id
-    doku_current_headline_level id
+    func id
 
-  doku_get_selection = window.getSelection
-  window.getSelection = (obj) ->
+  doku_get_selection = patch 'getSelection', (func, obj) ->
     if patching and obj is textarea
       result = spec.get_selection()
       selection = new selection_class()
@@ -35,54 +39,48 @@ define (require) -> (spec) ->
       selection.end = result.end
       selection
     else
-      doku_get_selection obj
+      func obj
 
-  doku_paste_text = window.pasteText
-  window.pasteText = (selection, text, opts) ->
+  patch 'pasteText', (func, selection, text, opts={}) ->
     if patching and selection.obj is textarea
-      opts or= {}
       spec.paste_text selection.start, selection.end, text
       selection.end = selection.start + text.length - (opts.endofs or 0)
+      selection.start += opts.startofs or 0
       selection.start = selection.end if opts.nosel
-      selection.start += (opts.startofs or 0) unless opts.nosel
       spec.set_selection selection.start, selection.end
     else
-      doku_paste_text selection, text, opts
+      func selection, text, opts
 
-  doku_selection_class = window.selection_class
-  class window.selection_class extends doku_selection_class
-    getText: ->
+  doku_selection_class = patch 'selection_class', (func) ->
+    func.apply this
+    @doku_get_text = @getText
+    @getText = ->
       if patching and @obj is textarea
         spec.get_text @start, @end
       else
-        super()
+        @doku_get_text
+    null
 
-  doku_set_selection = window.setSelection
-  window.setSelection = (selection) ->
+  doku_set_selection = patch 'setSelection', (func, selection) ->
     if patching and selection.obj is textarea
       spec.set_selection selection.start, selection.end
     else
-      doku_set_selection selection
+      func selection
 
-  doku_set_wrap = window.setWrap
-  window.setWrap = (obj, value) ->
-    doku_set_wrap obj, value
+  patch 'setWrap', (func, obj, value) ->
+    func obj, value
     spec.set_wrap value isnt 'off' if obj is textarea
 
-  doku_size_ctl = window.sizeCtl
-  window.sizeCtl = (edid, val) ->
-    doku_size_ctl edid, val
-    spec.size_ctl val if patching and edid is textarea.id
+  patch 'sizeCtl', (func, obj, value) ->
+    func obj, value
+    id = obj.attr?('id') or obj
+    spec.size_ctl value if patching and id is textarea.id
 
   doku_submit_handler = textarea.form.onsubmit
-  addEvent textarea.form, 'submit', (event) ->
+  jQuery(textarea.form).submit (event) ->
     jQuery(textarea).val spec.get_value() if patching
-    if doku_submit_handler and doku_submit_handler isnt handleEvent
-      # submit handler is not set with addEvent
-      # in older versions of Dokuwiki
-      doku_submit_handler event
 
-  addEvent window, 'resize', (event) -> spec.on_resize() if patching
+  jQuery(window).resize (event) -> spec.on_resize() if patching
 
   disable: ->
     patching = true
