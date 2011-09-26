@@ -67,7 +67,7 @@ define -> (spec) ->
 
   update = ->
     token = token_at_pos spec.ace.cursor_position()
-    update_latex token if token and /^latex-.*$/.test token.type
+    update_latex token if token and /^latex_.*$/.test token.type
 
   update = _.debounce update, 1000
 

@@ -191,42 +191,42 @@ define -> (spec) ->
         '(?:[a-zA-Z]{2,4}|museum|travel)>'
 
   latex_modes =
-    'latex-latex':
-      sort: 100,
+    latex_latex:
+      sort: 100
       entry: '<latex>'
       exit: '</latex>'
       pattern: '.'
-    'latex-ddollar':
-      sort: 300,
+    latex_ddollar:
+      sort: 300
       entry: '\\$\\$'
       exit: '\\$\\$'
       pattern: '.'
-    'latex-dollar':
-      sort: 405,
+    latex_dollar:
+      sort: 405
       entry: '\\$'
       exit: '\\$'
       pattern: '.'
-    'latex-displaymath':
+    latex_displaymath:
       sort: 405
       entry: '\\\\begin\\{displaymath\\}'
       exit: '\\\\end\\{displaymath\\}'
       pattern: '.'
-    'latex-equation':
+    latex_equation:
       sort: 405
       entry: '\\\\begin\\{equation\\}'
       exit: '\\\\end\\{equation\\}'
       pattern: '.'
-    'latex-equationstar':
+    latex_equationstar:
       sort: 405
       entry: '\\\\begin\\{equation\\*\\}'
       exit: '\\\\end\\{equation\\*\\}'
       pattern: '.'
-    'latex-eqnarray':
+    latex_eqnarray:
       sort: 405
       entry: '\\\\begin\\{eqnarray\\}'
       exit: '\\\\end\\{eqnarray\\}'
       pattern: '.'
-    'latex-eqnarraystar':
+    latex_eqnarraystar:
       sort: 405
       entry: '\\\\begin\\{eqnarray\\*\\}'
       exit: '\\\\end\\{eqnarray\\*\\}'
