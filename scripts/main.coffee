@@ -28,6 +28,7 @@ define (require) ->
     doku.enable()
     doku.set_value ace.get_value()
     doku.set_selection selection.start, selection.end
+    doku.focus()
 
   enable = ->
     selection = doku.get_selection()

@@ -90,6 +90,8 @@ define (require) -> (spec) ->
     patching = false
     jQuery(textarea).show()
 
+  focus: -> jQuery(textarea).focus()
+
   get_cookie: (name) -> DokuCookie.getValue name
 
   get_readonly: -> jQuery(textarea).attr 'readonly'
