@@ -18,20 +18,18 @@
 define [
   'ace/editor'
   'ace/keyboard/state_handler'
-  'ace/mode/text'
   'ace/range'
-  'ace/tokenizer'
   'ace/undomanager'
   'ace/virtual_renderer'
+  'mode',
   'pilot/canon'
 ], (deps...) -> (spec) ->
   [{Editor}
    {StateHandler}
-   {Mode}
    {Range}
-   {Tokenizer}
    {UndoManager}
    {VirtualRenderer}
+   new_mode
    canon] = deps
 
   editor = null
@@ -51,16 +49,13 @@ define [
   do ->
     theme = {cssClass: 'ace-doku-' + spec.colortheme}
     renderer = new VirtualRenderer spec.element, theme
-    mode = new Mode()
 
     editor = new Editor renderer
     editor.setReadOnly spec.readonly
     session = editor.getSession()
     session.setUndoManager new UndoManager()
     session.setTabSize 2
-    mode.$tokenizer = new Tokenizer spec.tokenizer_rules
-    mode.getNextLineIndent = (state, line, tab) -> spec.next_line_indent line
-    session.setMode mode
+    session.setMode new_mode latex: spec.latex
 
     editor.setShowPrintMargin spec.wrapmode
     session.setUseWrapMode spec.wrapmode

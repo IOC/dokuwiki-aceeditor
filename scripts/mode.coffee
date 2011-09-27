@@ -15,7 +15,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-define -> (spec) ->
+define [
+  'ace/mode/text'
+  'ace/tokenizer'
+], (deps...) -> (spec) ->
+  [{Mode}
+   {Tokenizer}] = deps
 
   tokenizer_rules = []
   containers = ['start', 'table']
@@ -232,11 +237,11 @@ define -> (spec) ->
       exit: '\\\\end\\{eqnarray\\*\\}'
       pattern: '.'
 
-  do ->
-    if spec.latex
-      modes[name] = mode for name, mode of latex_modes
-    create_rules 'start', _.keys(modes)
-
-  next_line_indent: (line) -> indent_regex.exec(line)?[0] or ''
-
-  tokenizer_rules: -> tokenizer_rules
+  if spec.latex
+    modes[name] = mode for name, mode of latex_modes
+  create_rules 'start', _.keys(modes)
+  doku_mode = new Mode()
+  doku_mode.$tokenizer = new Tokenizer tokenizer_rules
+  doku_mode.getNextLineIndent = (state, line, tab) ->
+    indent_regex.exec(line)?[0] or ''
+  doku_mode

@@ -20,7 +20,6 @@ require [
   'commands'
   'container'
   'doku'
-  'mode'
   'preview'
   'toggle'
   'pilot/fixoldbrowsers'
@@ -30,7 +29,6 @@ require [
    new_commands
    new_container
    new_doku
-   new_mode
    new_preview
    new_toggle] = deps
 
@@ -94,13 +92,10 @@ require [
       on_enable: enable
       on_disable: disable
 
-    mode = new_mode
-      latex: JSINFO.plugin_aceeditor.latex
-
     ace = new_ace
       colortheme: JSINFO.plugin_aceeditor.colortheme
       element: container.element()
-      next_line_indent: mode.next_line_indent
+      latex: JSINFO.plugin_aceeditor.latex
       on_cursor_change: ->
         preview.trigger()
         commands.hide_menu()
@@ -110,7 +105,6 @@ require [
           preview.trigger()
           commands.hide_menu()
       readonly: doku.get_readonly()
-      tokenizer_rules: mode.tokenizer_rules()
       wraplimit: JSINFO.plugin_aceeditor.wraplimit
       wrapmode: doku.get_wrap()
 
