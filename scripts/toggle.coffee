@@ -15,9 +15,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-IMAGES_BASE = window.DOKU_BASE + 'lib/plugins/aceeditor/images/'
-
 define -> (spec) ->
+
+  IMAGES_BASE = window.DOKU_BASE + 'lib/plugins/aceeditor/images/'
 
   img_on = jQuery('<img>')
     .addClass('ace-toggle')

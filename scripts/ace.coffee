@@ -15,10 +15,24 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-define (require) -> (spec) ->
-  {Range} = require 'ace/range'
-  {StateHandler} = require 'ace/keyboard/state_handler'
-  canon = require 'pilot/canon'
+define [
+  'ace/editor'
+  'ace/keyboard/state_handler'
+  'ace/mode/text'
+  'ace/range'
+  'ace/tokenizer'
+  'ace/undomanager'
+  'ace/virtual_renderer'
+  'pilot/canon'
+], (deps...) -> (spec) ->
+  [{Editor}
+   {StateHandler}
+   {Mode}
+   {Range}
+   {Tokenizer}
+   {UndoManager}
+   {VirtualRenderer}
+   canon] = deps
 
   editor = null
   session = null
@@ -35,12 +49,6 @@ define (require) -> (spec) ->
     _.reduce [0...pos.row], iterator, pos.column
 
   do ->
-    {Editor} = require 'ace/editor'
-    {VirtualRenderer} = require 'ace/virtual_renderer'
-    {Mode} = require 'ace/mode/text'
-    {Tokenizer} = require 'ace/tokenizer'
-    {UndoManager} = require 'ace/undomanager'
-
     theme = {cssClass: 'ace-doku-' + spec.colortheme}
     renderer = new VirtualRenderer spec.element, theme
     mode = new Mode()

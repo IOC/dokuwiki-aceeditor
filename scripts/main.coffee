@@ -15,7 +15,25 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-define (require) ->
+require [
+  'ace'
+  'commands'
+  'container'
+  'doku'
+  'mode'
+  'preview'
+  'toggle'
+  'pilot/fixoldbrowsers'
+  'underscore'
+], (deps...) ->
+  [new_ace,
+   new_commands
+   new_container
+   new_doku
+   new_mode
+   new_preview
+   new_toggle] = deps
+
   ace = container = doku = toggle = null
   user_editing = false
 
@@ -48,10 +66,7 @@ define (require) ->
     return unless window.jQuery and window.JSINFO
     return unless document.getElementById 'wiki__text'
 
-    require 'pilot/fixoldbrowsers'
-    require 'underscore'
-
-    doku = require('doku')
+    doku = new_doku
       get_selection: -> ace.get_selection()
       get_text: (start, end) -> ace.get_value().substring start, end
       get_value: -> ace.get_value()
@@ -73,16 +88,16 @@ define (require) ->
         ace.resize()
         ace.focus()
 
-    container = require('container')()
+    container = new_container()
 
-    toggle = require('toggle')
+    toggle = new_toggle
       on_enable: enable
       on_disable: disable
 
-    mode = require('mode')
+    mode = new_mode
       latex: JSINFO.plugin_aceeditor.latex
 
-    ace = require('ace')
+    ace = new_ace
       colortheme: JSINFO.plugin_aceeditor.colortheme
       element: container.element()
       next_line_indent: mode.next_line_indent
@@ -99,12 +114,12 @@ define (require) ->
       wraplimit: JSINFO.plugin_aceeditor.wraplimit
       wrapmode: doku.get_wrap()
 
-    preview = require('preview') ace: ace
+    preview = new_preview ace: ace
 
-    commands = require('commands') ace: ace
+    commands = new_commands ace: ace
 
     enable() if doku.get_cookie('aceeditor') isnt 'off'
 
   require.ready ->
     # initialize editor after Dokuwiki
-    setTimeout init, 0
+    _.defer init
