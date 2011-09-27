@@ -16,13 +16,20 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 define [
+  'ace/mode/html_highlight_rules'
+  'ace/mode/latex_highlight_rules'
+  'ace/mode/php_highlight_rules'
+  'ace/mode/text_highlight_rules'
   'ace/mode/text'
   'ace/tokenizer'
 ], (deps...) -> (spec) ->
-  [{Mode}
+  [{HtmlHighlightRules}
+   {LatexHighlightRules}
+   {PhpHighlightRules}
+   {TextHighlightRules}
+   {Mode}
    {Tokenizer}] = deps
 
-  tokenizer_rules = []
   containers = ['start', 'table']
 
   indent_regex = /// ^(?:
@@ -32,11 +39,9 @@ define [
     | >{1,}[\x20\t]* # quote
   ) ///
 
-
   add_rule = (state, token, regex, next) ->
-    rule = {token, regex, next, merge: true}
-    tokenizer_rules[state] or= []
-    tokenizer_rules[state].push rule
+    highlighter.$rules[state] or= []
+    highlighter.$rules[state].push {token, regex, next, merge: true}
 
   create_rules = (prefix, names) ->
     _.sortBy names, (name) -> modes[name]?.sort or 1000
@@ -44,7 +49,11 @@ define [
       if mode = modes[name]
         state = prefix + '-' + name
         add_rule prefix, name, mode.special if mode.special
-        if mode.entry and mode.exit
+        if mode.embed
+          add_rule prefix, name, mode.entry, state + '-start'
+          highlighter.embedRules mode.embed, state + '-',
+            [token: name, regex: mode.exit, next: prefix, merge: true]
+        else if mode.entry
           add_rule prefix, name, mode.entry, state
           add_rule state, name, mode.exit, prefix
           add_rule state, name, mode.pattern if mode.pattern
@@ -144,22 +153,22 @@ define [
       sort: 180
       entry: '<php>'
       exit: '</php>'
-      pattern: '.'
+      embed: PhpHighlightRules
     phpblock:
       sort: 180
       entry: '<PHP>'
       exit: '</PHP>'
-      pattern: '.'
+      embed: PhpHighlightRules
     html:
       sort: 190
       entry: '<html>'
       exit: '</html>'
-      pattern: '.'
+      embed: HtmlHighlightRules
     htmlblock:
       sort: 190
       entry: '<HTML>'
       exit: '</HTML>'
-      pattern: '.'
+      embed: HtmlHighlightRules
     code:
       sort: 200
       entry: '<code.*?>'
@@ -200,48 +209,52 @@ define [
       sort: 100
       entry: '<latex>'
       exit: '</latex>'
-      pattern: '.'
+      embed: LatexHighlightRules
     latex_ddollar:
       sort: 300
       entry: '\\$\\$'
       exit: '\\$\\$'
-      pattern: '.'
+      embed: LatexHighlightRules
     latex_dollar:
       sort: 405
       entry: '\\$'
       exit: '\\$'
-      pattern: '.'
+      embed: LatexHighlightRules
     latex_displaymath:
       sort: 405
       entry: '\\\\begin\\{displaymath\\}'
       exit: '\\\\end\\{displaymath\\}'
-      pattern: '.'
+      embed: LatexHighlightRules
     latex_equation:
       sort: 405
       entry: '\\\\begin\\{equation\\}'
       exit: '\\\\end\\{equation\\}'
-      pattern: '.'
+      embed: LatexHighlightRules
     latex_equationstar:
       sort: 405
       entry: '\\\\begin\\{equation\\*\\}'
       exit: '\\\\end\\{equation\\*\\}'
-      pattern: '.'
+      embed: LatexHighlightRules
     latex_eqnarray:
       sort: 405
       entry: '\\\\begin\\{eqnarray\\}'
       exit: '\\\\end\\{eqnarray\\}'
-      pattern: '.'
+      embed: LatexHighlightRules
     latex_eqnarraystar:
       sort: 405
       entry: '\\\\begin\\{eqnarray\\*\\}'
       exit: '\\\\end\\{eqnarray\\*\\}'
-      pattern: '.'
+      embed: LatexHighlightRules
 
   if spec.latex
     modes[name] = mode for name, mode of latex_modes
+
+  highlighter = new TextHighlightRules()
+  highlighter.$rules = {}
   create_rules 'start', _.keys(modes)
+
   doku_mode = new Mode()
-  doku_mode.$tokenizer = new Tokenizer tokenizer_rules
+  doku_mode.$tokenizer = new Tokenizer highlighter.getRules()
   doku_mode.getNextLineIndent = (state, line, tab) ->
     indent_regex.exec(line)?[0] or ''
   doku_mode
