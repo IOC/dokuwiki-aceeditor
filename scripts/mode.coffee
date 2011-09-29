@@ -30,8 +30,6 @@ define [
    {Mode}
    {Tokenizer}] = deps
 
-  containers = ['start', 'table']
-
   indent_regex = /// ^(?:
     (?:\x20{2,}|\t{1,})[\*\-][\x20\t]* # listblock
     | (?:\x20{2}|\t)(?=.) # preformatted
@@ -39,219 +37,161 @@ define [
     | >{1,}[\x20\t]* # quote
   ) ///
 
-  add_rule = (state, token, regex, next) ->
-    highlighter.$rules[state] or= []
-    highlighter.$rules[state].push {token, regex, next, merge: true}
+  highlighter = new TextHighlightRules
+  highlighter.$rules = []
 
-  create_rules = (prefix, names) ->
-    _.sortBy names, (name) -> modes[name]?.sort or 1000
-    for name in names
-      if mode = modes[name]
-        state = prefix + '-' + name
-        add_rule prefix, name, mode.special if mode.special
-        if mode.embed
-          add_rule prefix, name, mode.entry, state + '-start'
-          highlighter.embedRules mode.embed, state + '-',
-            [token: name, regex: mode.exit, next: prefix, merge: true]
-        else if mode.entry
-          add_rule prefix, name, mode.entry, state
-          add_rule state, name, mode.exit, prefix
-          add_rule state, name, mode.pattern if mode.pattern
-          create_rules state, mode.modes if mode.modes
+  inline_rules = []
+  container_states = []
 
-  container_modes = ['listblock', 'table', 'quote', 'hr']
-  formatting_modes = [
-    'strong', 'emphasis', 'underline', 'monospace', 'subscript', 'superscript'
-    'deleted', 'footnote', 'internallink', 'media', 'externallink', 'linebreak'
-    'emaillink', 'notoc', 'nocache', 'preformatted', 'code', 'file',
-    'html', 'htmlblock',  'php', 'phpblock', 'unformatted', 'unformattedalt'
-    'latex-latex', 'latex-ddollar', 'latex-dollar', 'latex-displaymath'
-    'latex-equation', 'latex-equationstar',
-    'latex-eqnarray', 'latex-eqnarraystar'
-    ]
+  def_rule = (state, regex, token, next) ->
+    (highlighter.$rules[state] or= []).push {regex, token, next}
 
-  modes =
-    listblock:
-      sort: 10
-      special: '^(?: {2,}|\t{1,})[\-\\*]'
-      modes: formatting_modes
-    preformatted:
-      sort: 20
-      special: '^(?:  |\t).+$'
-    notoc:
-      sort: 30
-      special: '~~NOTOC~~'
-    nocache:
-      sort: 40
-      special: '~~NOCACHE~~'
-    header:
-      sort: 50
-      special: '[ \t]*={2,}.+={2,}[ \t]*$'
-    table:
-      sort: 60
-      entry : '^[\\||\\^](?=.*[\\||\\^][ \t]*$)'
-      exit: '[\\|\\^][ \t]*$'
-      pattern: '[\\|\\^]|:::(?=[ \t]*[\\|\\^])'
-      modes: formatting_modes
-    strong:
-      sort: 70
-      entry: '\\*\\*'
-      exit: '\\*\\*'
-      pattern: '.'
-    emphasis:
-      sort: 80
-      entry: '//'
-      exit: '//'
-      pattern: '.'
-    underline:
-      sort: 90
-      entry: '__'
-      exit: '__'
-      pattern: '.'
-    monospace:
-      sort: 100
-      entry: "''"
-      exit: "''"
-      pattern: '.'
-    subscript:
-      sort: 110
-      entry: '<sub>'
-      exit: '</sub>'
-      pattern: '.'
-    superscript:
-      sort: 120
-      entry: '<sup>'
-      exit: '</sup>'
-      pattern: '.'
-    deleted:
-      sort: 130
-      entry: '<del>'
-      exit: '</del>'
-      pattern: '.'
-    linebreak:
-      sort: 140
-      special: '\\\\\\\\'
-    footnote:
-      sort: 150
-      entry: '\\(\\('
-      exit: '\\)\\)'
-      pattern: '.'
-    hr:
-      sort: 160
-      special: '^[ \t]*-{4,}[ \t]*$'
-    unformatted:
-      sort: 170
-      entry: '<nowiki>'
-      exit: '</nowiki>'
-      pattern: '.'
-    unformattedalt:
-      sort: 170
-      entry: '%%'
-      exit: '%%'
-      pattern: '.'
-    php:
-      sort: 180
-      entry: '<php>'
-      exit: '</php>'
-      embed: PhpHighlightRules
-    phpblock:
-      sort: 180
-      entry: '<PHP>'
-      exit: '</PHP>'
-      embed: PhpHighlightRules
-    html:
-      sort: 190
-      entry: '<html>'
-      exit: '</html>'
-      embed: HtmlHighlightRules
-    htmlblock:
-      sort: 190
-      entry: '<HTML>'
-      exit: '</HTML>'
-      embed: HtmlHighlightRules
-    code:
-      sort: 200
-      entry: '<code.*?>'
-      exit: '</code>'
-      pattern: '.'
-    file:
-      sort: 210
-      entry: '<file.*?>'
-      exit: '</file>'
-      pattern: '.'
-    quote:
-      sort: 220
-      special: '^>{1,2}'
-      modes: formatting_modes
-    internallink:
-      sort: 300
-      special: '\\[\\[.+?\\]\\]'
-    media:
-      sort: 320
-      special: '\\{\\{.+?\\}\\}'
-    externallink:
-      sort: 330
-      special: '(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://' +
-        '[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*' +
-        '[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$)|(?:www|ftp)\\.' +
-        '[\\w.:?\\-;,]+?\\.[\\w.:?\\-;,]+?' +
-        '[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?' +
-        '(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$))'
-    emaillink:
-      sort: 340
-      special: '<[0-9a-zA-Z!#$%&\'*+\/=?^_`{|}~-]+' +
-        '(?:\\.[0-9a-zA-Z!#$%&\'*+\\/=?^_`{|}~-]+)*' +
-        '@(?:[0-9a-zA-Z][0-9a-zA-Z-]*\\.)+' +
-        '(?:[a-zA-Z]{2,4}|museum|travel)>'
+  def_base = (regex, token, next) ->
+    def_rule 'start', regex, token, next
 
-  latex_modes =
-    latex_latex:
-      sort: 100
-      entry: '<latex>'
-      exit: '</latex>'
-      embed: LatexHighlightRules
-    latex_ddollar:
-      sort: 300
-      entry: '\\$\\$'
-      exit: '\\$\\$'
-      embed: LatexHighlightRules
-    latex_dollar:
-      sort: 405
-      entry: '\\$'
-      exit: '\\$'
-      embed: LatexHighlightRules
-    latex_displaymath:
-      sort: 405
-      entry: '\\\\begin\\{displaymath\\}'
-      exit: '\\\\end\\{displaymath\\}'
-      embed: LatexHighlightRules
-    latex_equation:
-      sort: 405
-      entry: '\\\\begin\\{equation\\}'
-      exit: '\\\\end\\{equation\\}'
-      embed: LatexHighlightRules
-    latex_equationstar:
-      sort: 405
-      entry: '\\\\begin\\{equation\\*\\}'
-      exit: '\\\\end\\{equation\\*\\}'
-      embed: LatexHighlightRules
-    latex_eqnarray:
-      sort: 405
-      entry: '\\\\begin\\{eqnarray\\}'
-      exit: '\\\\end\\{eqnarray\\}'
-      embed: LatexHighlightRules
-    latex_eqnarraystar:
-      sort: 405
-      entry: '\\\\begin\\{eqnarray\\*\\}'
-      exit: '\\\\end\\{eqnarray\\*\\}'
-      embed: LatexHighlightRules
+  def_inline = (regex, token, next) ->
+    def_rule 'start', regex, token, next
+    inline_rules.push _.last highlighter.$rules['start']
 
+  def_format = (name, open_regex, close_regex, tag_token, content_token) ->
+    tag_token ?= 'keyword.operator'
+    content_token ?= 'text'
+    def_inline open_regex, tag_token, name
+    def_rule name, "(.*?)(#{close_regex})", [content_token, tag_token], 'start'
+    def_rule name, '.+$', content_token
+
+  def_block = (name, open_regex, close_regex, token, rules) ->
+    if rules
+      def_inline open_regex, token, "#{name}-start"
+      highlighter.embedRules rules, "#{name}-",
+        [{regex: close_regex, token, next: 'start'}]
+    else
+      def_inline open_regex, token, name
+      def_rule name, close_regex, token, 'start'
+
+  def_container = (name, regex, token) ->
+    def_rule 'start', regex, token, "#{name}-start"
+    container_states.push name
+
+  # 10 listblock
+  def_base '^(?: {2,}|\t{1,})[\-\\*]', 'markup.list'
+  # 20 preformatted
+  def_base '^(?:  |\t).+$', 'text'
+  # 30 notoc
+  def_inline '~~NOTOC~~', 'keyword'
+  # 40 nocache
+  def_inline '~~NOCACHE~~', 'keyword'
+  # 50 header
+  def_base '[ \t]*={2,}.+={2,}[ \t]*$', 'markup.heading'
+  # 60 table
+  def_container 'table', '^[\\||\\^](?=.*[\\||\\^][ \t]*$)', 'keyword.operator'
+  def_rule 'table-start', '[\\|\\^][ \t]*$', 'keyword.operator', 'start'
+  def_rule 'table-start', '[\\|\\^]|:::(?=[ \t]*[\\|\\^])', 'keyword.operator'
+  # 70 strong
+  def_format 'strong', '\\*\\*', '\\*\\*'
+  # 80 emphasis
+  def_format 'emphasis', '//', '//'
+  # 90 underline
+  def_format 'underline', '__', '__'
+  # 100 monospace
+  def_format 'monospace', "''", "''"
+  # 100 latex
+  def_block 'latex-latex', '<latex>', '</latex>', 'keyword', LatexHighlightRules if spec.latex
+  # 110 subscript
+  def_format 'subscript', '<sub>', '</sub>'
+  # 120 superscript
+  def_format 'superscript', '<sup>', '</sup>'
+  # 130 deleted
+  def_format 'subscript', '<del>', '</del>'
+  # 140 linebreak
+  def_inline '\\\\\\\\', 'keyword.operator'
+  # 150 footnote
+  def_format '\\(\\(', '\\)\\)'
+  # 160 hr
+  def_base '^[ \t]*-{4,}[ \t]*$', 'keyword.operator'
+  # 170 unformatted
+  def_format 'unformatted', '<nowiki>', '</nowki>', 'comment', 'comment'
+  # 170 unformattedalt
+  def_format 'unformattedalt', '%%', '%%', 'comment', 'comment'
+  # 180 php
+  def_block 'php', '<php>', '</php>', 'keyword', PhpHighlightRules
+  # 180 phpblock
+  def_block 'phpblock', '<PHP>', '</PHP>', 'keyword', PhpHighlightRules
+  # 190 html
+  def_block 'html', '<html>', '</html>', 'keyword', HtmlHighlightRules
+  # 190 htmlblock
+  def_block 'htmlblock', '<HTML>', '</HTML>', 'keyword', HtmlHighlightRules
+  # 200 code
+  def_block 'code', '<code.*?>', '</code>', 'keyword'
+  # 210 file
+  def_block 'file', '<file.*?>', '</file>', 'keyword'
+  # 220 quote
+  def_base '^>{1,2}', 'keyword.operator'
+  # 300 internallink
+  def_inline '\\[\\[(?=.*\\]\\])', 'keyword.operator', 'internallink-ref'
+  def_rule 'internallink-ref', '\\]\\]', 'keyword.operator', 'start'
+  def_rule 'internallink-ref', '\\|', 'keyword.operator', 'internallink-title'
+  def_rule 'internallink-ref', '.+?(?=\\||\\]\\])', 'markup.underline'
+  def_rule 'internallink-title', '\\]\\]', 'keyword.operator', 'start'
+  def_rule 'internallink-title', '.+?(?=\\]\\])', 'string'
+  # 300 latex
+  def_block 'latex-ddollar', '\\$\\$', '\\$\\$', 'keyword', LatexHighlightRules if spec.latex
+  # 320 media
+  def_inline '\\{\\{(?=.*\\}\\})', 'keyword.operator', 'media-ref'
+  def_rule 'media-ref', '\\}\\}', 'keyword.operator', 'start'
+  def_rule 'media-ref', '\\?', 'keyword.operator', 'media-width'
+  def_rule 'media-ref', '\\|', 'keyword.operator', 'media-title'
+  def_rule 'media-ref', '.+?(?=\\?|\\||\\}\\})', 'markup.underline'
+  def_rule 'media-width', '[0-9]+', 'constant.numeric'
+  def_rule 'media-width', 'x', 'keyword.operator', 'media-height'
+  def_rule 'media-width', '\\|', 'keyword.operator', 'media-title'
+  def_rule 'media-width', '\\}\\}', 'keyword.operator', 'start'
+  def_rule 'media-width', '.+?', 'keyword.invalid'
+  def_rule 'media-height', '[0-9]+', 'constant.numeric'
+  def_rule 'media-height', '\\|', 'keyword.operator', 'media-title'
+  def_rule 'media-height', '\\}\\}', 'keyword.operator', 'start'
+  def_rule 'media-height', '.+?', 'keyword.invalid'
+  def_rule 'media-title', '\\}\\}', 'keyword.operator', 'start'
+  def_rule 'media-title', '.+?(?=\\}\\})', 'string'
+  # 330 externallink
+  def_inline '(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://' +
+    '[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*' +
+    '[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$)|(?:www|ftp)\\' +
+    '[\\w.:?\\-;,]+?\\.[\\w.:?\\-;,]+?' +
+    '[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?' +
+    '(?=[.:?\\-;,]*[^\\w/\\#~:.?+=&%@!\\-.:?\\-;,]|$))',
+    'markup.underline'
+  # 340 emaillink
+  def_inline '(<)([0-9a-zA-Z!#$%&\'*+\/=?^_`{|}~-]+' +
+    '(?:\\.[0-9a-zA-Z!#$%&\'*+\\/=?^_`{|}~-]+)*' +
+    '@(?:[0-9a-zA-Z][0-9a-zA-Z-]*\\.)+' +
+    '(?:[a-zA-Z]{2,4}|museum|travel))(>)',
+    ['keyword.operator', 'markup.underline', 'keyword.operator']
+  # 405 latex
   if spec.latex
-    modes[name] = mode for name, mode of latex_modes
+    def_block 'latex-dollar', '\\$', '\\$', 'keyword', LatexHighlightRules
+    def_block 'latex-displaymath', '\\\\begin\\{displaymath\\}',
+      '\\\\end\\{displaymath\\}', 'keyword', LatexHighlightRules
+    def_block 'latex-equation', '\\\\begin\\{equation\\}',
+      '\\\\end\\{equation\\}', 'keyword', LatexHighlightRules
+    def_block 'latex-equationstar', '\\\\begin\\{equation\\*\\}',
+      '\\\\end\\{equation\\*\\}', 'keyword', LatexHighlightRules
+    def_block 'latex-eqnarray', '\\\\begin\\{eqnarray\\}',
+      '\\\\end\\{eqnarray\\}', 'keyword', LatexHighlightRules
+    def_block 'latex-eqnarraystar', '\\\\begin\\{eqnarray\\*\\}',
+      '\\\\end\\{eqnarray\\*\\}', 'keyword', LatexHighlightRules
 
-  highlighter = new TextHighlightRules()
-  highlighter.$rules = {}
-  create_rules 'start', _.keys(modes)
+  copy_rules = (state, prefix, rules) ->
+    console.log state, prefix
+    rules ?= highlighter.$rules[state]
+    for rule in rules
+      next = if rule.next then "#{prefix}-#{rule.next}"
+      def_rule "#{prefix}-#{state}", rule.regex, rule.token, next
+      copy_rules rule.next, prefix if rule.next and not highlighter.$rules[next]
+
+  do ->
+    for state in container_states
+      copy_rules 'start', state, inline_rules
 
   doku_mode = new Mode()
   doku_mode.$tokenizer = new Tokenizer highlighter.getRules()

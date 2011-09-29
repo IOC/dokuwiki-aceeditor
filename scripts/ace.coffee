@@ -19,6 +19,7 @@ define [
   'ace/editor'
   'ace/keyboard/state_handler'
   'ace/range'
+  'ace/theme/textmate'
   'ace/undomanager'
   'ace/virtual_renderer'
   'mode',
@@ -27,6 +28,7 @@ define [
   [{Editor}
    {StateHandler}
    {Range}
+   theme
    {UndoManager}
    {VirtualRenderer}
    new_mode
@@ -47,7 +49,6 @@ define [
     _.reduce [0...pos.row], iterator, pos.column
 
   do ->
-    theme = {cssClass: 'ace-doku-' + spec.colortheme}
     renderer = new VirtualRenderer spec.element, theme
 
     editor = new Editor renderer
@@ -163,4 +164,3 @@ define [
   set_wrap_mode: (value) ->
     editor.setShowPrintMargin value
     session.setUseWrapMode value
-
