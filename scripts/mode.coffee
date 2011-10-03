@@ -16,19 +16,43 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 define [
-  'ace/mode/html_highlight_rules'
-  'ace/mode/latex_highlight_rules'
-  'ace/mode/php_highlight_rules'
-  'ace/mode/text_highlight_rules'
   'ace/mode/text'
   'ace/tokenizer'
+  'ace/mode/c_cpp_highlight_rules'
+  'ace/mode/csharp_highlight_rules'
+  'ace/mode/css_highlight_rules'
+  'ace/mode/groovy_highlight_rules'
+  'ace/mode/html_highlight_rules'
+  'ace/mode/java_highlight_rules'
+  'ace/mode/javascript_highlight_rules'
+  'ace/mode/latex_highlight_rules'
+  'ace/mode/lua_highlight_rules'
+  'ace/mode/perl_highlight_rules'
+  'ace/mode/php_highlight_rules'
+  'ace/mode/python_highlight_rules'
+  'ace/mode/ruby_highlight_rules'
+  'ace/mode/scala_highlight_rules'
+  'ace/mode/text_highlight_rules'
+  'ace/mode/xml_highlight_rules'
 ], (deps...) -> (spec) ->
-  [{HtmlHighlightRules}
+  [{Mode}
+   {Tokenizer}
+   {c_cppHighlightRules}
+   {CSharpHighlightRules}
+   {CssHighlightRules}
+   {GroovyHighlightRules}
+   {HtmlHighlightRules}
+   {JavaHighlightRules}
+   {JavaScriptHighlightRules}
    {LatexHighlightRules}
+   {LuaHighlightRules}
+   {PerlHighlightRules}
    {PhpHighlightRules}
+   {PythonHighlightRules}
+   {RubyHighlightRules}
+   {ScalaHighlightRules}
    {TextHighlightRules}
-   {Mode}
-   {Tokenizer}] = deps
+   {XmlHighlightRules}] = deps
 
   indent_regex = /// ^(?:
     (?:\x20{2,}|\t{1,})[\*\-][\x20\t]* # listblock
@@ -37,11 +61,30 @@ define [
     | >{1,}[\x20\t]* # quote
   ) ///
 
+  lang_rules =
+    c: c_cppHighlightRules
+    cpp: c_cppHighlightRules
+    csharp: CSharpHighlightRules
+    css: CssHighlightRules
+    groovy: GroovyHighlightRules
+    html: HtmlHighlightRules
+    java: JavaHighlightRules
+    javascript: JavaScriptHighlightRules
+    latex: LatexHighlightRules
+    lua: LuaHighlightRules
+    perl: PerlHighlightRules
+    php: PhpHighlightRules
+    python: PythonHighlightRules
+    ruby: RubyHighlightRules
+    scala: ScalaHighlightRules
+    xml: XmlHighlightRules
+
   highlighter = new TextHighlightRules
   highlighter.$rules = []
 
   inline_rules = []
   container_states = []
+  lang_embeds = []
 
   def_rule = (state, regex, token, next) ->
     (highlighter.$rules[state] or= []).push {regex, token, next}
@@ -60,14 +103,14 @@ define [
     def_rule name, "(.*?)(#{close_regex})", [content_token, tag_token], 'start'
     def_rule name, '.+$', content_token
 
-  def_block = (name, open_regex, close_regex, token, rules) ->
-    if rules
-      def_inline open_regex, token, "#{name}-start"
-      highlighter.embedRules rules, "#{name}-",
-        [{regex: close_regex, token, next: 'start'}]
-    else
-      def_inline open_regex, token, name
-      def_rule name, close_regex, token, 'start'
+  def_block = (name, open_regex, close_regex, token) ->
+    def_inline open_regex, token, name
+    def_rule name, close_regex, token, 'start'
+
+  def_embed = (name, open_regex, close_regex, token, lang) ->
+    def_inline open_regex, token, "#{name}-start"
+    lang_embeds.push [lang_rules[lang], "#{name}-",
+      [{regex: close_regex, token, next: 'start'}]]
 
   def_container = (name, regex, token) ->
     def_rule 'start', regex, token, "#{name}-start"
@@ -96,7 +139,7 @@ define [
   # 100 monospace
   def_format 'monospace', "''", "''"
   # 100 latex
-  def_block 'latex-latex', '<latex>', '</latex>', 'keyword', LatexHighlightRules if spec.latex
+  def_embed 'latex-latex', '<latex>', '</latex>', 'keyword', 'latex' if spec.latex
   # 110 subscript
   def_format 'subscript', '<sub>', '</sub>'
   # 120 superscript
@@ -114,16 +157,20 @@ define [
   # 170 unformattedalt
   def_format 'unformattedalt', '%%', '%%', 'comment', 'comment'
   # 180 php
-  def_block 'php', '<php>', '</php>', 'keyword', PhpHighlightRules
+  def_embed 'php', '<php>', '</php>', 'keyword', 'php'
   # 180 phpblock
-  def_block 'phpblock', '<PHP>', '</PHP>', 'keyword', PhpHighlightRules
+  def_embed 'phpblock', '<PHP>', '</PHP>', 'keyword', 'php'
   # 190 html
-  def_block 'html', '<html>', '</html>', 'keyword', HtmlHighlightRules
+  def_embed 'html', '<html>', '</html>', 'keyword', 'html'
   # 190 htmlblock
-  def_block 'htmlblock', '<HTML>', '</HTML>', 'keyword', HtmlHighlightRules
+  def_embed 'htmlblock', '<HTML>', '</HTML>', 'keyword', 'html'
   # 200 code
+  for lang  in _.keys(lang_rules)
+    def_embed "code-#{lang}", "<code #{lang}>", '</code>', 'keyword', lang
   def_block 'code', '<code.*?>', '</code>', 'keyword'
   # 210 file
+  for lang  in _.keys(lang_rules)
+    def_embed "file-#{lang}", "<file #{lang}(?: .*?)?>", '</file>', 'keyword', lang
   def_block 'file', '<file.*?>', '</file>', 'keyword'
   # 220 quote
   def_base '^>{1,2}', 'keyword.operator'
@@ -135,7 +182,7 @@ define [
   def_rule 'internallink-title', '\\]\\]', 'keyword.operator', 'start'
   def_rule 'internallink-title', '.+?(?=\\]\\])', 'string'
   # 300 latex
-  def_block 'latex-ddollar', '\\$\\$', '\\$\\$', 'keyword', LatexHighlightRules if spec.latex
+  def_embed 'latex-ddollar', '\\$\\$', '\\$\\$', 'keyword', 'latex' if spec.latex
   # 320 media
   def_inline '\\{\\{(?=.*\\}\\})', 'keyword.operator', 'media-ref'
   def_rule 'media-ref', '\\}\\}', 'keyword.operator', 'start'
@@ -169,27 +216,28 @@ define [
     ['keyword.operator', 'markup.underline', 'keyword.operator']
   # 405 latex
   if spec.latex
-    def_block 'latex-dollar', '\\$', '\\$', 'keyword', LatexHighlightRules
-    def_block 'latex-displaymath', '\\\\begin\\{displaymath\\}',
-      '\\\\end\\{displaymath\\}', 'keyword', LatexHighlightRules
-    def_block 'latex-equation', '\\\\begin\\{equation\\}',
-      '\\\\end\\{equation\\}', 'keyword', LatexHighlightRules
-    def_block 'latex-equationstar', '\\\\begin\\{equation\\*\\}',
-      '\\\\end\\{equation\\*\\}', 'keyword', LatexHighlightRules
-    def_block 'latex-eqnarray', '\\\\begin\\{eqnarray\\}',
-      '\\\\end\\{eqnarray\\}', 'keyword', LatexHighlightRules
-    def_block 'latex-eqnarraystar', '\\\\begin\\{eqnarray\\*\\}',
-      '\\\\end\\{eqnarray\\*\\}', 'keyword', LatexHighlightRules
+    def_embed 'latex-dollar', '\\$', '\\$', 'keyword', 'latex'
+    def_embed 'latex-displaymath', '\\\\begin\\{displaymath\\}',
+      '\\\\end\\{displaymath\\}', 'keyword', 'latex'
+    def_embed 'latex-equation', '\\\\begin\\{equation\\}',
+      '\\\\end\\{equation\\}', 'keyword', 'latex'
+    def_embed 'latex-equationstar', '\\\\begin\\{equation\\*\\}',
+      '\\\\end\\{equation\\*\\}', 'keyword', 'latex'
+    def_embed 'latex-eqnarray', '\\\\begin\\{eqnarray\\}',
+      '\\\\end\\{eqnarray\\}', 'keyword', 'latex'
+    def_embed 'latex-eqnarraystar', '\\\\begin\\{eqnarray\\*\\}',
+      '\\\\end\\{eqnarray\\*\\}', 'keyword', 'latex'
 
   copy_rules = (state, prefix, rules) ->
-    console.log state, prefix
     rules ?= highlighter.$rules[state]
-    for rule in rules
+    for rule in highlighter.$rules
       next = if rule.next then "#{prefix}-#{rule.next}"
       def_rule "#{prefix}-#{state}", rule.regex, rule.token, next
       copy_rules rule.next, prefix if rule.next and not highlighter.$rules[next]
 
   do ->
+    for args in lang_embeds
+      highlighter.embedRules args...
     for state in container_states
       copy_rules 'start', state, inline_rules
 
