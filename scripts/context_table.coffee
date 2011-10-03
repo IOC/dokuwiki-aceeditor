@@ -212,38 +212,19 @@ define -> (spec) ->
 
   parse_row = (row) ->
     cells = []
-    content = null
-    is_header = false
+    line = spec.ace.get_line row
 
-    push_cell = (colspan) ->
-      if content?
-        align = if not /^  +[^ ]/.test content then 'left'
-        else if /[^ ] + $/.test content then 'center'
-        else 'right'
-        cells.push new_cell {align, colspan, content, is_header}
+    return unless /^[\||\^].*[\||\^][ \t]*$/.test line
 
-    parse_table_token = (token) ->
-      is_separator = (i) -> token[i] in ['|', '^']
-      for c, i in token
-        if is_separator i
-          colspan = 1
-          while is_separator i + 1
-            colspan += 1
-            i += 1
-          push_cell colspan
-          is_header = c is '^'
-          content = ''
-        else
-          content += c
-
-    tokens = spec.ace.get_tokens row
-    return unless tokens[0]?.type is 'table'
-
-    for token in tokens
-      if token.type is 'table'
-        parse_table_token token.value
-      else
-        content += token.value
+    words = line.split /([\^\|]+)/
+    for index in [1...words.length - 2] by 2
+      is_header = _.last(words[index]) == '^'
+      content = words[index+1]
+      colspan = words[index+2].length
+      align = if not /^  +[^ ]/.test content then 'left'
+      else if /[^ ]  +$/.test content then 'center'
+      else 'right'
+      cells.push new_cell {align, colspan, content, is_header}
 
     new_row cells
 
