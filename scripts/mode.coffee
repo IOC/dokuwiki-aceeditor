@@ -108,7 +108,8 @@ define [
     def_rule name, close_regex, token, 'start'
 
   def_embed = (name, open_regex, close_regex, token, lang) ->
-    def_inline open_regex, token, "#{name}-start"
+    def_rule "start", "(?=#{open_regex})", token, name
+    def_rule name, open_regex, token, "#{name}-start"
     lang_embeds.push [lang_rules[lang], "#{name}-",
       [{regex: close_regex, token, next: 'start'}]]
 

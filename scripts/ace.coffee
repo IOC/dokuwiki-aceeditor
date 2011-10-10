@@ -48,6 +48,37 @@ define [
     iterator = (memo, row) -> memo + session.getLine(row).length + 1
     _.reduce [0...pos.row], iterator, pos.column
 
+  getLineStates = (line, startState) ->
+    currentState = startState
+    state = @rules[currentState]
+    mapping = @matchMappings[currentState]
+    re = @regExps[currentState]
+
+    re.lastIndex = lastIndex = 0
+    states = [start: 0, name: startState]
+
+    while match = re.exec line
+
+      for i in [0...match.length - 2] by 1
+        if match[i + 1]?
+          rule = state[mapping[i].rule]
+          if rule.next and rule.next isnt currentState
+            currentState = rule.next
+            state = @rules[currentState]
+            mapping = @matchMappings[currentState]
+            lastIndex = re.lastIndex
+            re = @regExps[currentState]
+            re.lastIndex = lastIndex
+            _.last(states).end = lastIndex
+            states.push start: lastIndex, name: currentState
+          break
+
+      break if lastIndex == line.length
+      lastIndex = re.lastIndex
+
+    _.last(states).end = lastIndex
+    states
+
   do ->
     renderer = new VirtualRenderer spec.element, theme
 
@@ -102,18 +133,21 @@ define [
 
   get_length: -> session.getLength()
 
-  get_line: (row) -> session.getLine(row)
+  get_line: (row) -> session.getLine row
+
+  get_line_states: (row) ->
+    state = if row > 0 then session.getState row - 1 else 'start'
+    line = session.getLine row
+    getLineStates.call session.getMode().getTokenizer(), line, state
 
   get_selection: ->
     range = editor.getSelection().getRange()
     start: pos_to_offset range.start
     end: pos_to_offset range.end
 
-  get_tokens: (row) ->
-    tokens = session.getTokens(row, row)[0]
-    result = tokens.tokens
-    result.state = tokens.state;
-    result
+  get_text_range: (start, end) ->
+    range = new Range start.row, start.column, end.row, end.column
+    session.getTextRange range
 
   get_value: -> session.getValue()
 
