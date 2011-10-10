@@ -61,8 +61,7 @@ require [
 
   init = ->
     return unless navigator.userAgent.indexOf('MSIE') is -1
-    return unless window.jQuery and window.JSINFO
-    return unless document.getElementById 'wiki__text'
+    return unless window.JSINFO and document.getElementById 'wiki__text'
 
     doku = new_doku
       get_selection: -> ace.get_selection()
@@ -114,6 +113,5 @@ require [
 
     enable() if doku.get_cookie('aceeditor') isnt 'off'
 
-  require.ready ->
-    # initialize editor after Dokuwiki
-    _.defer init
+  # initialize editor after Dokuwiki
+  jQuery?(document).ready -> _.defer init
