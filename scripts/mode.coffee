@@ -32,6 +32,7 @@ define [
   'ace/mode/python_highlight_rules'
   'ace/mode/ruby_highlight_rules'
   'ace/mode/scala_highlight_rules'
+  'ace/mode/sql_highlight_rules'
   'ace/mode/text_highlight_rules'
   'ace/mode/xml_highlight_rules'
 ], (deps...) -> (spec) ->
@@ -51,6 +52,7 @@ define [
    {PythonHighlightRules}
    {RubyHighlightRules}
    {ScalaHighlightRules}
+   {SqlHighlightRules}
    {TextHighlightRules}
    {XmlHighlightRules}] = deps
 
@@ -77,6 +79,7 @@ define [
     python: PythonHighlightRules
     ruby: RubyHighlightRules
     scala: ScalaHighlightRules
+    sql: SqlHighlightRules
     xml: XmlHighlightRules
 
   highlighter = new TextHighlightRules
