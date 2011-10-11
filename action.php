@@ -43,6 +43,12 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
 
     public function handle_tpl_metaheader_output(Doku_Event &$event, $param) {
         global $ACT;
+
+        if (!in_array($ACT, array('edit', 'create', 'source', 'preview',
+                                  'locked', 'draft', 'recover'))) {
+            return;
+        }
+
         if (file_exists(DOKU_INC.'lib/plugins/aceeditor/build')) {
             $config = array('baseUrl' => 'lib/plugins/aceeditor/build');
             $path = 'build/main.js';
