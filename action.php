@@ -43,39 +43,23 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
 
     public function handle_tpl_metaheader_output(Doku_Event &$event, $param) {
         global $ACT;
-
-        if (file_exists(DOKU_INC.'lib/plugins/aceeditor/build.js')) {
-            $event->data['script'][] = array(
-                'type' => 'text/javascript',
-                'charset' => 'utf-8',
-                'src' => DOKU_BASE.'lib/plugins/aceeditor/build.js',
-            );
-            // Workaround for conflict with syntaxhighlighter3 plugin
-            $event->data['script'][] = array(
-                'type' => 'text/javascript',
-                'charset' => 'utf-8',
-                '_data' => 'window.require = undefined;',
-            );
+        if (file_exists(DOKU_INC.'lib/plugins/aceeditor/build')) {
+            $config = array('baseUrl' => 'lib/plugins/aceeditor/build');
+            $path = 'build/main.js';
         } else {
-            $event->data['script'][] = array(
-                'type' => 'text/javascript',
-                'charset' => 'utf-8',
-                'src' => DOKU_BASE.'lib/plugins/aceeditor/scripts/require.js',
-                'data-main' => DOKU_BASE.'lib/plugins/aceeditor/scripts/main.js',
-            );
+            $config = array('baseUrl' => 'lib/plugins/aceeditor/scripts',
+                            'deps' => array('main'));
+            $path = 'scripts/require.js';
         }
+        $this->include_script($event, 'require = '.json_encode($config));
+        $this->link_script($event, DOKU_BASE.'lib/plugins/aceeditor/'.$path);
+
+        // Workaround for conflict with syntaxhighlighter3 plugin
+        $this->include_script($event, 'window.require = undefined;');
 
         if (!$this->has_jquery() and $this->getConf('loadjquery')) {
-            $event->data['script'][] = array(
-                'type' => 'text/javascript',
-                'charset' => 'utf-8',
-                'src' => 'http://code.jquery.com/jquery.min.js',
-            );
-            $event->data['script'][] = array(
-                'type' => 'text/javascript',
-                'charset' => 'utf-8',
-                '_data' => '$.noConflict();',
-            );
+            $this->link_script($event, 'http://code.jquery.com/jquery.min.js');
+            $this->include_script($event, '$.noConflict();');
         }
     }
 
@@ -83,5 +67,21 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
         $version = getVersionData();
         $date = str_replace('-', '', $version['date']);
         return (int) $date > 20110525;
+    }
+
+    private function include_script($event, $code) {
+        $event->data['script'][] = array(
+            'type' => 'text/javascript',
+            'charset' => 'utf-8',
+            '_data' => $code,
+        );
+    }
+
+    private function link_script($event, $url) {
+        $event->data['script'][] = array(
+            'type' => 'text/javascript',
+            'charset' => 'utf-8',
+            'src' => $url,
+        );
     }
 }
