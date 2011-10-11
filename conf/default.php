@@ -2,6 +2,6 @@
 
 $conf['highlight'] = true;
 $conf['wraplimit'] = 80;
-$conf['colortheme'] = 'light';
+$conf['colortheme'] = 'textmate';
 $conf['loadjquery'] = true;
 $conf['latex'] = true;

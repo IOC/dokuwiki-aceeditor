@@ -22,8 +22,9 @@ define [
   'ace/theme/textmate'
   'ace/undomanager'
   'ace/virtual_renderer'
-  'mode',
+  'mode'
   'pilot/canon'
+  'require'
 ], (deps...) -> (spec) ->
   [{Editor}
    {StateHandler}
@@ -32,7 +33,8 @@ define [
    {UndoManager}
    {VirtualRenderer}
    new_mode
-   canon] = deps
+   canon,
+   require] = deps
 
   editor = null
   session = null
@@ -81,6 +83,8 @@ define [
 
   do ->
     renderer = new VirtualRenderer spec.element, theme
+    require ["ace/theme/#{spec.colortheme}"], (theme) ->
+      renderer.setTheme theme
 
     editor = new Editor renderer
     editor.setReadOnly spec.readonly
