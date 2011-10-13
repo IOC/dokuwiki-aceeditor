@@ -10,6 +10,10 @@
     border: 1px solid #ccc;
 }
 
+.ace-doku .ace_editor {
+    font-size: 1.2em;
+}
+
 .ace-toggle {
     float: right;
     cursor: pointer;
