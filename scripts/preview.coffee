@@ -46,9 +46,9 @@ define -> (spec) ->
 
   update = ->
     pos = spec.ace.cursor_position()
-    it = states_iterator pos, false, (state) -> /^latex/.test state.name
+    it = states_iterator pos, false, (state) -> /\blatex\b/.test state.name
     end_state = state while state = it()
-    it = states_iterator pos, true, (state) -> /^latex/.test state.name
+    it = states_iterator pos, true, (state) -> /\blatex\b/.test state.name
     start_state = state while state = it()
     return unless start_state and end_state
 
