@@ -90,21 +90,20 @@ define [
   lang_embeds = []
 
   def_rule = (state, regex, token, next) ->
-    (highlighter.$rules[state] or= []).push {regex, token, next}
+    (highlighter.$rules[state] or= []).push {regex, token, next, merge: on}
 
   def_base = (regex, token, next) ->
     def_rule 'start', regex, token, next
 
   def_inline = (regex, token, next) ->
-    def_rule 'start', regex, token, next
+    def_base regex, token, next
     inline_rules.push _.last highlighter.$rules['start']
 
   def_format = (name, open_regex, close_regex, tag_token, content_token) ->
     tag_token ?= 'keyword.operator'
-    content_token ?= 'text'
     def_inline open_regex, tag_token, name
-    def_rule name, "(.*?)(#{close_regex})", [content_token, tag_token], 'start'
-    def_rule name, '.+$', content_token
+    def_rule name, close_regex, tag_token, 'start'
+    def_rule name, ".", content_token if content_token
 
   def_block = (name, open_regex, close_regex, token) ->
     def_inline open_regex, token, name
@@ -117,7 +116,7 @@ define [
       [{regex: close_regex, token, next: 'start'}]]
 
   def_container = (name, regex, token) ->
-    def_rule 'start', regex, token, "#{name}-start"
+    def_base regex, token, "#{name}-start"
     container_states.push name
 
   # 10 listblock
@@ -153,7 +152,7 @@ define [
   # 140 linebreak
   def_inline '\\\\\\\\', 'keyword.operator'
   # 150 footnote
-  def_format '\\(\\(', '\\)\\)'
+  def_format 'footnote', '\\(\\(', '\\)\\)'
   # 160 hr
   def_base '^[ \t]*-{4,}[ \t]*$', 'keyword.operator'
   # 170 unformatted
@@ -234,7 +233,7 @@ define [
 
   copy_rules = (state, prefix, rules) ->
     rules ?= highlighter.$rules[state]
-    for rule in highlighter.$rules
+    for rule in rules
       next = if rule.next then "#{prefix}-#{rule.next}"
       def_rule "#{prefix}-#{state}", rule.regex, rule.token, next
       copy_rules rule.next, prefix if rule.next and not highlighter.$rules[next]
