@@ -223,6 +223,24 @@ define [
     def_base regex, token, "#{name}-start"
     container_states.push name
 
+  def_directive = (name, params=[]) ->
+    state_id = "drective-#{name}-id"
+    state_offset = "drective-#{name}-offset"
+    state_params = "drective-#{name}-params"
+    token_valid = ['keyword.operator', 'keyword', 'keyword.operator']
+    token_invalid = ['keyword.operator', 'keyword.invalid', 'keyword.operator']
+    def_base "^(::)(#{name})(:)", token_valid, state_id
+    def_rule state_id, '\\s*$|^', 'text', state_params
+    def_rule state_id, '.+', 'keyword.invalid' if 'id' not in params
+    if 'offset' in params
+      def_rule state_params, '^(  :)(offset)(:)', token_valid, state_offset
+      def_rule state_offset, '\\s*-?\\d+\\s*$', 'constant.numeric', state_params
+      def_rule state_offset, '.+$', 'keyword.invalid', state_params
+    for param in _(params).without 'id', 'offset'
+      def_rule state_params, "^(  :)(#{param})(:)", token_valid
+    def_rule state_params, '^(  :)(.+?)(:)', token_invalid
+    def_rule state_params, '^', 'text', 'start'
+
   embed_rules = (rules, prefix, escape_rules) ->
     for name, state of rules
       state = (_.clone rule for rule in state)
@@ -234,6 +252,10 @@ define [
       escape_rules = (_.clone rule for rule in escape_rules)
       tokenizer_rules[prefix + name] = escape_rules.concat state
 
+  # 5 quiz
+  def_container 'quiz', '<quiz>', 'keyword'
+  def_rule 'quiz-start', '^(?: {2,}|\t{1,})[\-\\*]', 'markup.list'
+  def_rule 'quiz-start', '</quiz>', 'keyword', 'start'
   # 10 listblock
   def_base '^(?: {2,}|\t{1,})[\-\\*]', 'markup.list'
   # 20 preformatted
@@ -286,6 +308,9 @@ define [
   def_embed 'html', '<html>', '</html>', 'keyword', 'html'
   # 190 htmlblock
   def_embed 'htmlblock', '<HTML>', '</HTML>', 'keyword', 'html'
+  # 195 note
+  def_container 'note', '<note>', 'keyword'
+  def_rule 'note-start', '</note>', 'keyword', 'start'
   # 200 code
   for lang  in _.keys(lang_rules)
     def_embed "code-#{lang}", "<code #{lang}(?:\\s.*?)?>", '</code>', 'keyword', lang
@@ -320,7 +345,11 @@ define [
   def_rule 'media-param', '(?:direct|nolink|linkonly|nocache|recache)(?=&|\\||\\}\\})', 'consant'
   def_rule 'media-param', '.+?(?=&|\\||\\}\\})', 'keyword.invalid'
   def_rule 'media-title', '\\}\\}', 'keyword.operator', 'start'
-  def_rule 'media-title', '.+?(?=\\}\\})', 'string'
+  def_rule 'media-title', '/(?=[^/]*?\\}\\})', 'keyword.operator', 'media-offset'
+  def_rule 'media-title', '.+?(?=/|\\}\\})', 'string'
+  def_rule 'media-offset', '\\}\\}', 'keyword.operator', 'start'
+  def_rule 'media-offset', '-?\\d+(?=\\}\\})', 'constant.numeric'
+  def_rule 'media-offset', '.+?(?=\\}\\})', 'keyword.invalid'
   # 330 externallink
   def_inline '(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://' +
     '[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*' +
@@ -348,6 +377,25 @@ define [
       '\\\\end\\{eqnarray\\}', 'keyword', 'latex'
     def_embed 'latex-eqnarraystar', '\\\\begin\\{eqnarray\\*\\}',
       '\\\\end\\{eqnarray\\*\\}', 'keyword', 'latex'
+  # 500 directives
+  def_directive 'table', ['id', 'title', 'footer', 'large', 'small', 'vertical']
+  def_directive 'accounting', ['id', 'title', 'footer', 'widths']
+  def_directive 'figure', ['id', 'title', 'copyright', 'license', 'footer', 'large']
+  def_directive 'text', ['offset', 'title', 'large']
+  def_directive 'note', ['offset']
+  def_directive 'reference', ['offset']
+  def_directive 'quote'
+  def_directive 'important'
+  def_directive 'example', ['title']
+  def_base '^(::)(.+?)(:)',
+    ['keyword.operator', 'keyword.invalid', 'keyword.operator']
+  def_base '^:::\s*$', 'keyword.operator'
+  def_inline '(:)(table|figure)(:)(.+?)(:)',
+    ['keyword.operator', 'keyword', 'keyword.operator', 'text', 'keyword.operator']
+  # 513 newcontent
+  def_inline '<newcontent>', 'keyword'
+  def_inline '</newcontent>', 'keyword'
+
   # Additional XML-like tags
   for name in spec.xmltags
     def_block name, "<#{name}(?:\\s.*?)?>", "<\\/#{name}>", 'keyword'
