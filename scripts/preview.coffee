@@ -35,7 +35,7 @@ define -> (spec) ->
         row -= 1
         states = spec.ace.get_line_states row
         index = states.length - 1
-      else if not backwards and row < spec.ace.get_length()
+      else if not backwards and row + 1 < spec.ace.get_length()
         row += 1
         states = spec.ace.get_line_states row
         index = 0
@@ -51,7 +51,6 @@ define -> (spec) ->
     it = states_iterator pos, true, (state) -> /\blatex\b/.test state.name
     start_state = state while state = it()
     return unless start_state and end_state
-
     start = row: start_state.row, column: start_state.start
     end = row: end_state.row, column: end_state.end
     text = spec.ace.get_text_range start, end
