@@ -14,4 +14,5 @@ r.js -o baseUrl=. appDir=$dir/scripts/ace/theme dir=$dir/build/ace/theme
 rm -f $dir/build/ace/theme/build.txt
 
 tar -c -z -f $dir/aceeditor-$version.tar.gz -C $dir/.. \
-    aceeditor/{action.php,build,conf,images,lang,NEWS,plugin.info.txt,preview.php}
+    aceeditor/{build,conf,images,lang} \
+    aceeditor/{action.php,NEWS,plugin.info.txt,preview.php,README,style.css}
