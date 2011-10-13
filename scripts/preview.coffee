@@ -26,7 +26,7 @@ define -> (spec) ->
         states = spec.ace.get_line_states row
         for state, i in states
           index = i
-          break if pos.column < state.end
+          break if pos.column <= state.end
       else if backwards and index > 0
         index -= 1
       else if not backwards and index + 1 < states.length
