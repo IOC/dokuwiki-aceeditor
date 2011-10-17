@@ -1,3 +1,14 @@
+2011-10-17
+ * Table shortcuts now use prefix Ctrl-Space instead of Alt
+ * Table commands now support column span
+ * Use of color themes included in Ace
+ * Syntax hihglighting of content inside code, file, html, php and latex tags
+ * Russian translation (thanks to Aleksandr Selivanov)
+ * Support for next Dokuwiki release "Angua"
+ * Some minor improvements and bug fixes
+ * Code ported to CoffeScript and refactored
+ * Updated ace version
+
 2011-06-14
  * Tab now inserts 2 spaces instead of 4
  * New command to remove a column of a table
