@@ -182,27 +182,24 @@ define [
   def_rule 'internallink-ref', '\\]\\]', 'keyword.operator', 'start'
   def_rule 'internallink-ref', '\\|', 'keyword.operator', 'internallink-title'
   def_rule 'internallink-ref', '.+?(?=\\||\\]\\])', 'markup.underline'
-  def_rule 'internallink-title', '\\]\\]', 'keyword.operator', 'start'
-  def_rule 'internallink-title', '.+?(?=\\]\\])', 'string'
+  def_rule 'internallink-title', '(.*)(\\]\\])', ['string', 'keyword.operator'], 'start'
   # 300 latex
   def_embed 'latex-ddollar', '\\$\\$', '\\$\\$', 'keyword', 'latex' if spec.latex
   # 320 media
-  def_inline '\\{\\{(?=.*\\}\\})', 'keyword.operator', 'media-ref'
+  def_inline '\\{\\{ ?(?=.*\\}\\})', 'keyword.operator', 'media-ref'
   def_rule 'media-ref', '\\}\\}', 'keyword.operator', 'start'
-  def_rule 'media-ref', '\\?', 'keyword.operator', 'media-width'
+  def_rule 'media-ref', '\\?', 'keyword.operator', 'media-param'
   def_rule 'media-ref', '\\|', 'keyword.operator', 'media-title'
   def_rule 'media-ref', '.+?(?=\\?|\\||\\}\\})', 'markup.underline'
-  def_rule 'media-width', '[0-9]+', 'constant.numeric'
-  def_rule 'media-width', 'x', 'keyword.operator', 'media-height'
-  def_rule 'media-width', '\\|', 'keyword.operator', 'media-title'
-  def_rule 'media-width', '\\}\\}', 'keyword.operator', 'start'
-  def_rule 'media-width', '.+?', 'keyword.invalid'
-  def_rule 'media-height', '[0-9]+', 'constant.numeric'
-  def_rule 'media-height', '\\|', 'keyword.operator', 'media-title'
-  def_rule 'media-height', '\\}\\}', 'keyword.operator', 'start'
-  def_rule 'media-height', '.+?', 'keyword.invalid'
-  def_rule 'media-title', '\\}\\}', 'keyword.operator', 'start'
-  def_rule 'media-title', '.+?(?=\\}\\})', 'string'
+  def_rule 'media-param', '&', 'keyword.operator'
+  def_rule 'media-param', '\\|', 'keyword.operator', 'media-title'
+  def_rule 'media-param', '\\}\\}', 'keyword.operator', 'start'
+  def_rule 'media-param', '[0-9]+(?=&|\\||\\}\\})', 'constant.numeric'
+  def_rule 'media-param', '([0-9]+)(x)([0-9]+)(?=&|\\||\\}\\})',
+    ['constant.numeric', 'keyword.operator', 'constant.numeric']
+  def_rule 'media-param', '(?:direct|nolink|linkonly|nocache|recache)(?=&|\\||\\}\\})', 'consant'
+  def_rule 'media-param', '.+?(?=&|\\||\\}\\})', 'keyword.invalid'
+  def_rule 'media-title', '(.*)(\\}\\})', ['string', 'keyword.operator'], 'start'
   # 330 externallink
   def_inline '(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://' +
     '[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*' +
