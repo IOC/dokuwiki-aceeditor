@@ -182,7 +182,8 @@ define [
   def_rule 'internallink-ref', '\\]\\]', 'keyword.operator', 'start'
   def_rule 'internallink-ref', '\\|', 'keyword.operator', 'internallink-title'
   def_rule 'internallink-ref', '.+?(?=\\||\\]\\])', 'markup.underline'
-  def_rule 'internallink-title', '(.*)(\\]\\])', ['string', 'keyword.operator'], 'start'
+  def_rule 'internallink-title', '\\]\\]', 'keyword.operator', 'start'
+  def_rule 'internallink-title', '.+?(?=\\]\\])', 'string'
   # 300 latex
   def_embed 'latex-ddollar', '\\$\\$', '\\$\\$', 'keyword', 'latex' if spec.latex
   # 320 media
@@ -199,7 +200,8 @@ define [
     ['constant.numeric', 'keyword.operator', 'constant.numeric']
   def_rule 'media-param', '(?:direct|nolink|linkonly|nocache|recache)(?=&|\\||\\}\\})', 'consant'
   def_rule 'media-param', '.+?(?=&|\\||\\}\\})', 'keyword.invalid'
-  def_rule 'media-title', '(.*)(\\}\\})', ['string', 'keyword.operator'], 'start'
+  def_rule 'media-title', '\\}\\}', 'keyword.operator', 'start'
+  def_rule 'media-title', '.+?(?=\\}\\})', 'string'
   # 330 externallink
   def_inline '(?:(?:https?|telnet|gopher|wais|ftp|ed2k|irc)://' +
     '[\\w/\\#~:.?+=&%@!\\-.:?\\-;,]+?(?=[.:?\\-;,]*' +
