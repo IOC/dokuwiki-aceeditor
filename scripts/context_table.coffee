@@ -211,16 +211,27 @@ define -> (spec) ->
       format()
 
   parse_row = (row) ->
-    cells = []
     line = spec.ace.get_line row
-
     return unless /^[\||\^].*[\||\^][ \t]*$/.test line
 
-    words = line.split /([\^\|]+)/
-    for index in [1...words.length - 2] by 2
-      is_header = _.last(words[index]) == '^'
-      content = words[index+1]
-      colspan = words[index+2].length
+    cells = []
+    contents = []
+    separators = []
+
+    for state in spec.ace.get_line_states row
+      text = line[state.start...state.end]
+      if state.name in ['start', 'table-start']
+        words = text.split /([\^\|]+)/
+        contents.push contents.pop() + words[0] if words[0]
+        contents.push word for word in words[2..] by 2
+        separators.push word for word in words[1..] by 2
+      else
+        contents.push contents.pop() + text
+
+    for index in [0...contents.length-1]
+      content = contents[index]
+      is_header = _.last(separators[index]) == '^'
+      colspan = separators[index+1].length
       align = if not /^  +[^ ]/.test content then 'left'
       else if /[^ ]  +$/.test content then 'center'
       else 'right'
