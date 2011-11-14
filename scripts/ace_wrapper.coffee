@@ -18,6 +18,7 @@
 define [
   'ace/editor'
   'ace/keyboard/state_handler'
+  'ace/lib/fixoldbrowsers'
   'ace/range'
   'ace/theme/textmate'
   'ace/undomanager'
@@ -27,6 +28,7 @@ define [
 ], (deps...) -> (spec) ->
   [{Editor}
    {StateHandler}
+   fixoldbrowsers
    {Range}
    theme
    {UndoManager}

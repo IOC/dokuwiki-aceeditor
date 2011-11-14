@@ -22,7 +22,6 @@ define [
   'doku_wrapper'
   'preview'
   'toggle'
-  'ace/lib/fixoldbrowsers'
   'underscore'
 ], (deps...) ->
   [new_ace,
@@ -60,7 +59,7 @@ define [
     doku.set_cookie 'aceeditor', 'on'
 
   init = ->
-    return unless navigator.userAgent.indexOf('MSIE') is -1
+    return if /MSIE [0-8]\./.test navigator.userAgent
     return unless window.JSINFO and document.getElementById 'wiki__text'
 
     doku = new_doku
