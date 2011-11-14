@@ -23,7 +23,6 @@ define [
   'ace/undomanager'
   'ace/virtual_renderer'
   'mode'
-  'pilot/canon'
   'require'
 ], (deps...) -> (spec) ->
   [{Editor}
@@ -33,7 +32,6 @@ define [
    {UndoManager}
    {VirtualRenderer}
    new_mode
-   canon,
    require] = deps
 
   editor = null
@@ -103,7 +101,7 @@ define [
     editor.getSelection().on 'changeCursor', -> spec.on_cursor_change()
 
   add_command: (spec) ->
-    canon.addCommand
+    editor.commands.addCommand
       name: spec.name
       exec: (env, args, request) -> spec.exec()
       bindKey:

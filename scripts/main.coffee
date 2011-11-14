@@ -22,7 +22,7 @@ define [
   'doku'
   'preview'
   'toggle'
-  'pilot/fixoldbrowsers'
+  'ace/lib/fixoldbrowsers'
   'underscore'
 ], (deps...) ->
   [new_ace,
