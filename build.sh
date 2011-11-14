@@ -9,7 +9,9 @@ coffee -c $dir/scripts/*.coffee
 
 r.js -o name=main out=$dir/build/main.js baseUrl=$dir/scripts \
     paths.requirejs=require include=requirejs \
-    paths.ace/requirejs/text=text name=main
+    paths.ace=../ace/lib/ace \
+    paths.ace/requirejs/text=text \
+    name=main
 r.js -o baseUrl=. appDir=$dir/scripts/ace/theme dir=$dir/build/ace/theme
 rm -f $dir/build/ace/theme/build.txt
 

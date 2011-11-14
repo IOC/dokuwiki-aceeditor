@@ -16,10 +16,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 define [
-  'ace'
+  'ace_wrapper'
   'commands'
   'container'
-  'doku'
+  'doku_wrapper'
   'preview'
   'toggle'
   'ace/lib/fixoldbrowsers'
