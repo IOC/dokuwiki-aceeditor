@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-define ['context_table'], (new_context_table) -> (spec) ->
+define ['cs!context_table'], (new_context_table) -> (spec) ->
 
   contexts = [new_context_table ace: spec.ace]
   menu_marker = null

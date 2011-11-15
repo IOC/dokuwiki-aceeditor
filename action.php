@@ -55,7 +55,7 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
         } else {
             $config = array('baseUrl' => 'lib/plugins/aceeditor/scripts',
                             'paths' => array('ace' => '../ace/lib/ace'),
-                            'deps' => array('main'));
+                            'deps' => array('cs!main'));
             $path = 'scripts/require.js';
         }
         $this->include_script($event, 'require = '.json_encode($config));

@@ -23,7 +23,7 @@ define [
   'ace/theme/textmate'
   'ace/undomanager'
   'ace/virtual_renderer'
-  'mode'
+  'cs!mode'
   'require'
 ], (deps...) -> (spec) ->
   [{Editor}
