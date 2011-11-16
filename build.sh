@@ -11,7 +11,7 @@ r.js -o name=main out=$dir/build/main.js baseUrl=$dir/scripts \
     paths.ace=../ace/lib/ace \
     paths.ace/requirejs/text=text \
     name=cs!main
-r.js -o baseUrl=. appDir=$dir/scripts/ace/theme dir=$dir/build/ace/theme
+r.js -o baseUrl=. appDir=$dir/ace/lib/ace/theme dir=$dir/build/ace/theme
 rm -f $dir/build/ace/theme/build.txt
 
 tar -c -z -f $dir/aceeditor-$version.tar.gz -C $dir/.. \
