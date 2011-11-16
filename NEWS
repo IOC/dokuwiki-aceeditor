@@ -1,3 +1,9 @@
+2011-11-16
+  * Fixed syntax highlighting of media and internal links
+  * Fixed syntax highlighting of content inside tables
+  * Internet Explorer 9 is not blacklisted anymore
+  * Updated Ace version
+
 2011-10-17
  * Table shortcuts now use prefix Ctrl-Space instead of Alt
  * Table commands now support column span
