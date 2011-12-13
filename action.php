@@ -49,6 +49,11 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
             return;
         }
 
+        if (!$this->has_jquery() and $this->getConf('loadjquery')) {
+            $this->link_script($event, 'http://code.jquery.com/jquery.min.js');
+            $this->include_script($event, '$.noConflict();');
+        }
+
         if (file_exists(DOKU_INC.'lib/plugins/aceeditor/build')) {
             $config = array('baseUrl' => 'lib/plugins/aceeditor/build');
             $path = 'build/main.js';
@@ -63,11 +68,6 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
 
         // Workaround for conflict with syntaxhighlighter3 plugin
         $this->include_script($event, 'window.require = undefined;');
-
-        if (!$this->has_jquery() and $this->getConf('loadjquery')) {
-            $this->link_script($event, 'http://code.jquery.com/jquery.min.js');
-            $this->include_script($event, '$.noConflict();');
-        }
     }
 
     public function has_jquery() {
