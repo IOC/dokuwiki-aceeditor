@@ -8,6 +8,7 @@
 
 .ace-doku {
     border: 1px solid #ccc;
+    overflow: hidden;
 }
 
 .ace-doku .ace_editor {
