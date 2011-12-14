@@ -17,12 +17,21 @@
 
 define -> ->
 
-  wrapper = jQuery('<div>')
-    .addClass('ace-doku')
-    .insertBefore(jQuery '#wiki__text')
-    .hide()
+  textarea = jQuery '#wiki__text'
+  wrapper = jQuery '<div>', class: 'ace-doku'
+  element = jQuery '<div>'
 
-  element = jQuery('<div>').appendTo(wrapper)
+  do ->
+    properties = [
+      'border', 'border-color', 'border-style', 'border-width'
+      'border-top', 'border-top-color', 'border-top-style', 'border-top-width'
+      'border-right', 'border-right-color', 'border-right-style', 'border-right-width'
+      'border-bottom', 'border-bottom-color', 'border-bottom-style', 'border-bottom-width'
+      'border-left', 'border-left-color', 'border-left-style', 'border-left-width'
+      'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left'
+    ]
+    wrapper.css prop, textarea.css prop for prop in properties
+    wrapper.append(element).insertAfter(textarea).hide()
 
   element: -> element.get 0
 

@@ -4,10 +4,13 @@
     z-index: 99;
 }
 
+textarea.edit {
+    display: block;
+}
+
 /* Editor */
 
 .ace-doku {
-    border: 1px solid #ccc;
     overflow: hidden;
 }
 
