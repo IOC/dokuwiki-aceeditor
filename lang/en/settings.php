@@ -1,6 +1,7 @@
 <?php
 
 $lang['colortheme'] = "Color theme";
+$lang['colortheme_o_chrome'] = "Chrome";
 $lang['colortheme_o_clouds'] = "Clouds";
 $lang['colortheme_o_clouds_midnight'] = "Clouds Midnight";
 $lang['colortheme_o_cobalt'] = "Cobalt";

@@ -3,6 +3,7 @@
 $meta['highlight'] = array('onoff');
 $meta['wraplimit'] = array('string', '_pattern' => '/^\s*[0-9]*\s*$/');
 $meta['colortheme'] = array('multichoice', '_choices' => array(
+    'chrome',
     'clouds',
     'clouds_midnight',
     'cobalt',
@@ -16,6 +17,8 @@ $meta['colortheme'] = array('multichoice', '_choices' => array(
     'mono_industrial',
     'monokai',
     'pastel_on_dark',
+    'solarized_dark',
+    'solarized_light',
     'textmate',
     'tomorrow',
     'tomorrow_night',
