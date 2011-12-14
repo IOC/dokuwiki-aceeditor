@@ -1,3 +1,10 @@
+2011-12-14
+  * Fixed loading of editor randomly failed
+  * Fixed scrolling glitch when loading editor
+  * Preserve border and margin styles of textarea
+  * Polish translation by Aleksander Setlak
+  * Updated Ace version
+
 2011-11-16
   * Fixed syntax highlighting of media and internal links
   * Fixed syntax highlighting of content inside tables
