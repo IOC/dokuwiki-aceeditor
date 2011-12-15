@@ -63,7 +63,8 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
                             'deps' => array('cs!main'));
             $path = 'scripts/require.js';
         }
-        $this->include_script($event, 'require = '.json_encode($config));
+        $json = new JSON();
+        $this->include_script($event, 'require = '.$json->encode($config));
         $this->link_script($event, DOKU_BASE.'lib/plugins/aceeditor/'.$path);
 
         // Workaround for conflict with syntaxhighlighter3 plugin
