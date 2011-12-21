@@ -156,7 +156,7 @@ define [
   # 160 hr
   def_base '^[ \t]*-{4,}[ \t]*$', 'keyword.operator'
   # 170 unformatted
-  def_format 'unformatted', '<nowiki>', '</nowki>', 'comment', 'comment'
+  def_format 'unformatted', '<nowiki>', '</nowiki>', 'comment', 'comment'
   # 170 unformattedalt
   def_format 'unformattedalt', '%%', '%%', 'comment', 'comment'
   # 180 php
