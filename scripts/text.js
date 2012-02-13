@@ -1,5 +1,5 @@
 /**
- * @license RequireJS text 1.0.0 Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
+ * @license RequireJS text 1.0.2 Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
  * see: http://github.com/jrburke/requirejs for details
  */
@@ -84,7 +84,7 @@
         }
 
         text = {
-            version: '1.0.0',
+            version: '1.0.2',
 
             strip: function (content) {
                 //Strips <?xml ...?> declarations so that external SVG and XML
@@ -197,7 +197,7 @@
 
             finishLoad: function (name, strip, content, onLoad, config) {
                 content = strip ? text.strip(content) : content;
-                if (config.isBuild && config.inlineText) {
+                if (config.isBuild) {
                     buildMap[name] = content;
                 }
                 onLoad(content);
@@ -210,6 +210,13 @@
                 //inside a body tag in an HTML string. For XML/SVG content it means
                 //removing the <?xml ...?> declarations so the content can be inserted
                 //into the current doc without problems.
+
+                // Do not bother with the work if a build and text will
+                // not be inlined.
+                if (config.isBuild && !config.inlineText) {
+                    onLoad();
+                    return;
+                }
 
                 var parsed = text.parseName(name),
                     nonStripName = parsed.moduleName + '.' + parsed.ext,
