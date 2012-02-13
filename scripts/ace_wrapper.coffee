@@ -91,7 +91,9 @@ define [
     session = editor.getSession()
     session.setUndoManager new UndoManager()
     session.setTabSize 2
-    session.setMode new_mode latex: spec.latex
+    session.setMode new_mode
+      latex: spec.latex
+      xmltags: spec.xmltags
 
     editor.setShowPrintMargin spec.wrapmode
     session.setUseWrapMode spec.wrapmode

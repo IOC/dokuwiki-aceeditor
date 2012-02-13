@@ -229,6 +229,9 @@ define [
       '\\\\end\\{eqnarray\\}', 'keyword', 'latex'
     def_embed 'latex-eqnarraystar', '\\\\begin\\{eqnarray\\*\\}',
       '\\\\end\\{eqnarray\\*\\}', 'keyword', 'latex'
+  # Additional XML-like tags
+  for name in spec.xmltags
+    def_block name, "<#{name}(?:\\s.*?)?>", "<\\/#{name}>", 'keyword'
 
   copy_rules = (state, prefix, rules) ->
     rules ?= highlighter.$rules[state]

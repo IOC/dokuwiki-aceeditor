@@ -105,6 +105,7 @@ define [
       readonly: doku.get_readonly()
       wraplimit: JSINFO.plugin_aceeditor.wraplimit
       wrapmode: doku.get_wrap()
+      xmltags: JSINFO.plugin_aceeditor.xmltags
 
     preview = new_preview ace: ace
 

@@ -30,3 +30,4 @@ $lang['highlight'] = 'Enable syntax highligting';
 $lang['latex'] = 'Enable support for LaTeX plugin';
 $lang['wraplimit'] = 'Text wrapping limit';
 $lang['loadjquery'] = 'Load jQuery library';
+$lang['xmlatgs'] = 'Additional XML-like tags';

@@ -33,11 +33,14 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
     public function handle_dokuwiki_started(Doku_Event &$event, $param) {
         global $JSINFO;
         $wraplimit = trim($this->getConf('wraplimit'));
+        $xmltags = $this->getConf('xmltags');
+        $xmltags = ($xmltags ? explode(',', $xmltags) : array());
         $JSINFO['plugin_aceeditor'] = array(
             'highlight' => $this->getConf('highlight'),
             'wraplimit' => $wraplimit ? (int) $wraplimit : null,
             'colortheme' => $this->getConf('colortheme'),
             'latex' => $this->getConf('latex'),
+            'xmltags' => $xmltags,
         );
     }
 
