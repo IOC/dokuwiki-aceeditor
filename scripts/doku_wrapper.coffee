@@ -58,7 +58,7 @@ define -> (spec) ->
       if patching and @obj is textarea
         spec.get_text @start, @end
       else
-        @doku_get_text
+        @doku_get_text()
     null
 
   doku_set_selection = patch 'setSelection', (func, selection) ->
