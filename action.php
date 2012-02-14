@@ -1,6 +1,6 @@
 <?php
 /* Ace editor plugin for Dokuwiki
- * Copyright © 2011 Institut Obert de Catalunya
+ * Copyright © 2011, 2012 Institut Obert de Catalunya
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

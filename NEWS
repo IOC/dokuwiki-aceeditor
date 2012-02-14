@@ -1,3 +1,10 @@
+2012-02-14
+  * Fixed syntax of nowiki tags
+  * Fixed toolbar bug when Ace is disabled
+  * Setting for additional XML-like tags
+  * PHP-JSON extension not required
+  * Updated Ace version
+
 2011-12-14
   * Fixed loading of editor randomly failed
   * Fixed scrolling glitch when loading editor
