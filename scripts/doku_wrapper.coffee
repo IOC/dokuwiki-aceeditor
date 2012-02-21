@@ -32,6 +32,7 @@ define -> (spec) ->
 
   doku_get_selection = patch 'getSelection', (func, obj) ->
     if patching and obj is textarea
+      jQuery(textarea).val spec.get_value() # workaround for edittable
       result = spec.get_selection()
       selection = new selection_class()
       selection.obj = textarea
