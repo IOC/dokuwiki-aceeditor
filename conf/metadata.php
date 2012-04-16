@@ -9,6 +9,7 @@ $meta['colortheme'] = array('multichoice', '_choices' => array(
     'cobalt',
     'crimson_editor',
     'dawn',
+    'dreamweaver',
     'eclipse',
     'idle_fingers',
     'kr_theme',

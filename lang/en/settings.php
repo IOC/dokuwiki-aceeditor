@@ -7,6 +7,7 @@ $lang['colortheme_o_clouds_midnight'] = "Clouds Midnight";
 $lang['colortheme_o_cobalt'] = "Cobalt";
 $lang['colortheme_o_crimson_editor'] = "Crimson Editor";
 $lang['colortheme_o_dawn'] = "Dawn";
+$lang['colortheme_o_dreamweaver'] = "Dreamweaver";
 $lang['colortheme_o_eclipse'] = "Eclipse";
 $lang['colortheme_o_idle_fingers'] = "idleFingers";
 $lang['colortheme_o_kr_theme'] = "krTheme";
