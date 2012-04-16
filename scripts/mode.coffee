@@ -33,7 +33,6 @@ define [
   'ace/mode/ruby_highlight_rules'
   'ace/mode/scala_highlight_rules'
   'ace/mode/sql_highlight_rules'
-  'ace/mode/text_highlight_rules'
   'ace/mode/xml_highlight_rules'
 ], (deps...) -> (spec) ->
   [{Mode}
@@ -53,7 +52,6 @@ define [
    {RubyHighlightRules}
    {ScalaHighlightRules}
    {SqlHighlightRules}
-   {TextHighlightRules}
    {XmlHighlightRules}] = deps
 
   indent_regex = /// ^(?:
@@ -82,22 +80,19 @@ define [
     sql: SqlHighlightRules
     xml: XmlHighlightRules
 
-  highlighter = new TextHighlightRules
-  highlighter.$rules = []
-
+  tokenizer_rules = {}
   inline_rules = []
   container_states = []
-  lang_embeds = []
 
   def_rule = (state, regex, token, next) ->
-    (highlighter.$rules[state] or= []).push {regex, token, next, merge: on}
+    (tokenizer_rules[state] or= []).push {regex, token, next, merge: on}
 
   def_base = (regex, token, next) ->
     def_rule 'start', regex, token, next
 
   def_inline = (regex, token, next) ->
     def_base regex, token, next
-    inline_rules.push _.last highlighter.$rules['start']
+    inline_rules.push _.last tokenizer_rules['start']
 
   def_format = (name, open_regex, close_regex, tag_token, content_token) ->
     tag_token ?= 'keyword.operator'
@@ -112,12 +107,19 @@ define [
   def_embed = (name, open_regex, close_regex, token, lang) ->
     def_inline "(?=#{open_regex})", token, name
     def_rule name, open_regex, token, "#{name}-start"
-    lang_embeds.push [lang_rules[lang], "#{name}-",
-      [{regex: close_regex, token, next: 'start'}]]
+    rules = new lang_rules[lang]().getRules()
+    embed_rules rules, "#{name}-", [{regex: close_regex, token, next: 'start'}]
 
   def_container = (name, regex, token) ->
     def_base regex, token, "#{name}-start"
     container_states.push name
+
+  embed_rules = (rules, prefix, escape_rules) ->
+    for name, state of rules
+      state = (_.clone rule for rule in state)
+      rule.next = prefix + rule.next for rule in state when rule.next
+      escape_rules = (_.clone rule for rule in escape_rules)
+      tokenizer_rules[prefix + name] = escape_rules.concat state
 
   # 10 listblock
   def_base '^(?: {2,}|\t{1,})[\-\\*]', 'markup.list'
@@ -234,20 +236,18 @@ define [
     def_block name, "<#{name}(?:\\s.*?)?>", "<\\/#{name}>", 'keyword'
 
   copy_rules = (state, prefix, rules) ->
-    rules ?= highlighter.$rules[state]
+    rules ?= tokenizer_rules[state]
     for rule in rules
       next = if rule.next then "#{prefix}-#{rule.next}"
       def_rule "#{prefix}-#{state}", rule.regex, rule.token, next
-      copy_rules rule.next, prefix if rule.next and not highlighter.$rules[next]
+      copy_rules rule.next, prefix if rule.next and not tokenizer_rules[next]
 
   do ->
-    for args in lang_embeds
-      highlighter.embedRules args...
     for state in container_states
       copy_rules 'start', state, inline_rules
 
   doku_mode = new Mode()
-  doku_mode.$tokenizer = new Tokenizer highlighter.getRules()
+  doku_mode.$tokenizer = new Tokenizer tokenizer_rules
   doku_mode.getNextLineIndent = (state, line, tab) ->
     indent_regex.exec(line)?[0] or ''
   doku_mode
