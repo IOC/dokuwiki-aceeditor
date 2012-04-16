@@ -1,5 +1,6 @@
 <?php
 
+$conf['default'] = true;
 $conf['highlight'] = true;
 $conf['wraplimit'] = 80;
 $conf['colortheme'] = 'textmate';

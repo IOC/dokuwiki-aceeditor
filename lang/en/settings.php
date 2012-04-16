@@ -26,7 +26,7 @@ $lang['colortheme_o_tomorrow_night_bright'] = "Tomorrow Night Bright";
 $lang['colortheme_o_tomorrow_night_eighties'] = "Tomorrow Night 80s";
 $lang['colortheme_o_twilight'] = "Twilight";
 $lang['colortheme_o_vibrant_ink'] = "Vibrant Ink";
-
+$lang['default'] = 'Default editor';
 $lang['highlight'] = 'Enable syntax highligting';
 $lang['latex'] = 'Enable support for LaTeX plugin';
 $lang['markdown'] = 'Enable support for Markdown plugin';

@@ -36,6 +36,7 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
         $xmltags = $this->getConf('xmltags');
         $xmltags = ($xmltags ? explode(',', $xmltags) : array());
         $JSINFO['plugin_aceeditor'] = array(
+            'default' => $this->getConf('default'),
             'highlight' => $this->getConf('highlight'),
             'wraplimit' => $wraplimit ? (int) $wraplimit : null,
             'colortheme' => $this->getConf('colortheme'),

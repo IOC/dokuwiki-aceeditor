@@ -113,7 +113,10 @@ define [
 
     commands = new_commands ace: ace
 
-    enable() if doku.get_cookie('aceeditor') isnt 'off'
+    if doku.get_cookie('aceeditor')?
+      enable() if doku.get_cookie('aceeditor') isnt 'off'
+    else
+      enable() if JSINFO.plugin_aceeditor.default
 
   # initialize editor after Dokuwiki
   jQuery?(document).ready -> _.defer init

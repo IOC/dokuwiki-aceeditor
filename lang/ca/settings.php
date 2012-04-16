@@ -1,6 +1,7 @@
 <?php
 
 $lang['colortheme'] = "Tema de colors";
+$lang['default'] = 'Editor predeterminat';
 $lang['highlight'] = 'Habilita el ressaltat de sintaxi';
 $lang['latex'] = 'Habilita la compatibilitat amb el connector de LaTeX';
 $lang['markdown'] = 'Habilita la compatibilitat amb el connector de Markdown';
