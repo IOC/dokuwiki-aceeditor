@@ -31,7 +31,7 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
     }
 
     public function handle_dokuwiki_started(Doku_Event &$event, $param) {
-        global $JSINFO;
+        global $INFO, $JSINFO;
         $wraplimit = trim($this->getConf('wraplimit'));
         $xmltags = $this->getConf('xmltags');
         $xmltags = ($xmltags ? explode(',', $xmltags) : array());
@@ -40,6 +40,8 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
             'wraplimit' => $wraplimit ? (int) $wraplimit : null,
             'colortheme' => $this->getConf('colortheme'),
             'latex' => $this->getConf('latex'),
+            'markdown' => $this->getConf('markdown'),
+            'mdpage' => substr($INFO['id'], -3) == '.md',
             'xmltags' => $xmltags,
         );
     }

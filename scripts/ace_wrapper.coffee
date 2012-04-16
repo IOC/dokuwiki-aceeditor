@@ -19,6 +19,7 @@ define [
   'ace/editor'
   'ace/keyboard/state_handler'
   'ace/lib/fixoldbrowsers'
+  'ace/mode/markdown'
   'ace/range'
   'ace/theme/textmate'
   'ace/undomanager'
@@ -29,6 +30,7 @@ define [
   [{Editor}
    {StateHandler}
    fixoldbrowsers
+   markdown
    {Range}
    theme
    {UndoManager}
@@ -91,9 +93,14 @@ define [
     session = editor.getSession()
     session.setUndoManager new UndoManager()
     session.setTabSize 2
-    session.setMode new_mode
-      latex: spec.latex
-      xmltags: spec.xmltags
+
+    if spec.markdown and spec.mdpage
+      session.setMode new markdown.Mode
+    else
+      session.setMode new_mode
+        latex: spec.latex
+        markdown: spec.markdown
+        xmltags: spec.xmltags
 
     editor.setShowPrintMargin spec.wrapmode
     session.setUseWrapMode spec.wrapmode

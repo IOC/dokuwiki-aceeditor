@@ -94,6 +94,8 @@ define [
       colortheme: JSINFO.plugin_aceeditor.colortheme
       element: container.element()
       latex: JSINFO.plugin_aceeditor.latex
+      markdown: JSINFO.plugin_aceeditor.markdown
+      mdpage: JSINFO.plugin_aceeditor.mdpage
       on_cursor_change: ->
         preview.trigger()
         commands.hide_menu()

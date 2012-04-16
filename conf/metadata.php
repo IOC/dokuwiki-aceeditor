@@ -33,4 +33,5 @@ if (!action_plugin_aceeditor::has_jquery()) {
     $meta['loadjquery'] = array('onoff');
 }
 $meta['latex'] = array('onoff');
+$meta['markdown'] = array('onoff');
 $meta['xmltags'] = array('string', '_pattern' => '/^(([a-z][\w.-]*)(,[a-z][\w.-]*)*|)$/i');

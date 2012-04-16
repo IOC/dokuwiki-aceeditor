@@ -187,6 +187,8 @@ define [
   def_container 'table', '^[\\||\\^](?=.*[\\||\\^][ \t]*$)', 'keyword.operator'
   def_rule 'table-start', '[\\|\\^][ \t]*$', 'keyword.operator', 'start'
   def_rule 'table-start', '[\\|\\^]|:::(?=[ \t]*[\\|\\^])', 'keyword.operator'
+  # 69 markdown
+  def_embed 'markdown', '<markdown>', '</markdown>', 'keyword', 'markdown' if spec.markdown
   # 70 strong
   def_format 'strong', '\\*\\*', '\\*\\*'
   # 80 emphasis
