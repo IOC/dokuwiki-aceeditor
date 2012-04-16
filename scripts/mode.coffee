@@ -19,40 +19,74 @@ define [
   'ace/mode/text'
   'ace/tokenizer'
   'ace/mode/c_cpp_highlight_rules'
+  'ace/mode/clojure_highlight_rules'
+  'ace/mode/coffee_highlight_rules'
+  'ace/mode/coldfusion_highlight_rules'
   'ace/mode/csharp_highlight_rules'
   'ace/mode/css_highlight_rules'
   'ace/mode/groovy_highlight_rules'
+  'ace/mode/haxe_highlight_rules'
   'ace/mode/html_highlight_rules'
   'ace/mode/java_highlight_rules'
   'ace/mode/javascript_highlight_rules'
+  'ace/mode/json_highlight_rules'
   'ace/mode/latex_highlight_rules'
+  'ace/mode/less_highlight_rules'
+  'ace/mode/liquid_highlight_rules'
   'ace/mode/lua_highlight_rules'
+  'ace/mode/markdown_highlight_rules'
+  'ace/mode/ocaml_highlight_rules'
   'ace/mode/perl_highlight_rules'
+  'ace/mode/pgsql_highlight_rules'
   'ace/mode/php_highlight_rules'
+  'ace/mode/powershell_highlight_rules'
   'ace/mode/python_highlight_rules'
   'ace/mode/ruby_highlight_rules'
+  'ace/mode/scad_highlight_rules'
   'ace/mode/scala_highlight_rules'
+  'ace/mode/scss_highlight_rules'
+  'ace/mode/sh_highlight_rules'
   'ace/mode/sql_highlight_rules'
+  'ace/mode/svg_highlight_rules'
+  'ace/mode/textile_highlight_rules'
   'ace/mode/xml_highlight_rules'
+  'ace/mode/xquery_highlight_rules'
 ], (deps...) -> (spec) ->
   [{Mode}
    {Tokenizer}
    {c_cppHighlightRules}
+   {ClojureHighlightRules}
+   {CoffeeHighlightRules}
+   {ColdfusionHighlightRules}
    {CSharpHighlightRules}
    {CssHighlightRules}
    {GroovyHighlightRules}
+   {HaxeHighlightRules}
    {HtmlHighlightRules}
    {JavaHighlightRules}
    {JavaScriptHighlightRules}
+   {JsonHighlightRules}
    {LatexHighlightRules}
+   {LessHighlightRules}
+   {LiquidHighlightRules}
    {LuaHighlightRules}
+   {MarkdownHighlightRules}
+   {OcamlHighlightRules}
    {PerlHighlightRules}
+   {PgsqlHighlightRules}
    {PhpHighlightRules}
+   {PowershellHighlightRules}
    {PythonHighlightRules}
    {RubyHighlightRules}
+   {scadHighlightRules}
    {ScalaHighlightRules}
+   {ScssHighlightRules}
+   {ShHighlightRules}
    {SqlHighlightRules}
-   {XmlHighlightRules}] = deps
+   {SvgHighlightRules}
+   {TextileHighlightRules}
+   {XmlHighlightRules}
+   {XQueryHighlightRules}] = deps
 
   indent_regex = /// ^(?:
     (?:\x20{2,}|\t{1,})[\*\-][\x20\t]* # listblock
@@ -62,23 +96,41 @@ define [
   ) ///
 
   lang_rules =
+    bash: ShHighlightRules
     c: c_cppHighlightRules
+    clojure: ClojureHighlightRules
+    coffee: CoffeeHighlightRules
+    coldfusion: ColdfusionHighlightRules
     cpp: c_cppHighlightRules
     csharp: CSharpHighlightRules
     css: CssHighlightRules
     groovy: GroovyHighlightRules
+    haxe: HaxeHighlightRules
     html: HtmlHighlightRules
     java: JavaHighlightRules
     javascript: JavaScriptHighlightRules
+    json: JsonHighlightRules
     latex: LatexHighlightRules
+    less: LessHighlightRules
+    liquid: LiquidHighlightRules
     lua: LuaHighlightRules
+    markdown: MarkdownHighlightRules
+    ocaml: OcamlHighlightRules
     perl: PerlHighlightRules
+    pgsql: PgsqlHighlightRules
     php: PhpHighlightRules
+    powershell: PowershellHighlightRules
     python: PythonHighlightRules
     ruby: RubyHighlightRules
+    scad: scadHighlightRules
     scala: ScalaHighlightRules
+    scss: ScssHighlightRules
+    sh: ShHighlightRules
     sql: SqlHighlightRules
+    svg: SvgHighlightRules
+    textile: TextileHighlightRules
     xml: XmlHighlightRules
+    xquery: XQueryHighlightRules
 
   tokenizer_rules = {}
   inline_rules = []
