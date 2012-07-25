@@ -1,5 +1,7 @@
 <?php
 
+require_once(DOKU_INC.'lib/plugins/aceeditor/action.php');
+
 $meta['default'] = array('onoff');
 $meta['highlight'] = array('onoff');
 $meta['wraplimit'] = array('string', '_pattern' => '/^\s*[0-9]*\s*$/');
