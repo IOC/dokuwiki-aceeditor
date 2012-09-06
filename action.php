@@ -61,17 +61,17 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
             $this->include_script($event, '$.noConflict();');
         }
 
-        if (file_exists(DOKU_INC.'lib/plugins/aceeditor/build')) {
-            $config = array('baseUrl' => 'lib/plugins/aceeditor/build');
-            $path = 'build/main.js';
+        if (file_exists(DOKU_INC.'lib/plugins/aceeditor/build.js')) {
+            $path = 'build.js';
         } else {
             $config = array('baseUrl' => 'lib/plugins/aceeditor/scripts',
                             'paths' => array('ace' => '../ace/lib/ace'),
                             'deps' => array('cs!main'));
+            $json = new JSON();
+            $this->include_script($event, 'require = '.$json->encode($config));
             $path = 'scripts/require.js';
         }
-        $json = new JSON();
-        $this->include_script($event, 'require = '.$json->encode($config));
+
         $this->link_script($event, DOKU_BASE.'lib/plugins/aceeditor/'.$path);
 
         // Workaround for conflict with syntaxhighlighter3 plugin
