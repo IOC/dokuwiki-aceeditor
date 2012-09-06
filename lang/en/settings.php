@@ -9,6 +9,7 @@ $lang['colortheme_o_crimson_editor'] = "Crimson Editor";
 $lang['colortheme_o_dawn'] = "Dawn";
 $lang['colortheme_o_dreamweaver'] = "Dreamweaver";
 $lang['colortheme_o_eclipse'] = "Eclipse";
+$lang['colortheme_o_github'] = "GitHub";
 $lang['colortheme_o_idle_fingers'] = "idleFingers";
 $lang['colortheme_o_kr_theme'] = "krTheme";
 $lang['colortheme_o_merbivore'] = "Merbivore";

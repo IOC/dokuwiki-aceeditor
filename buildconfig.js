@@ -18,6 +18,7 @@
         "ace/theme/dawn",
         "ace/theme/dreamweaver",
         "ace/theme/eclipse",
+        "ace/theme/github",
         "ace/theme/idle_fingers",
         "ace/theme/kr_theme",
         "ace/theme/merbivore",

@@ -14,6 +14,7 @@ $meta['colortheme'] = array('multichoice', '_choices' => array(
     'dawn',
     'dreamweaver',
     'eclipse',
+    'github',
     'idle_fingers',
     'kr_theme',
     'merbivore',
