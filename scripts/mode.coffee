@@ -91,7 +91,6 @@ define [
   indent_regex = /// ^(?:
     (?:\x20{2,}|\t{1,})[\*\-][\x20\t]* # listblock
     | (?:\x20{2}|\t)(?=.) # preformatted
-    | [\||\^][\x20\t]*(?=.*[\||\^][\x20\t]*$) # table
     | >{1,}[\x20\t]* # quote
   ) ///
 

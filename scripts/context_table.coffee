@@ -226,7 +226,9 @@ define -> (spec) ->
         contents.push word for word in words[2..] by 2
         separators.push word for word in words[1..] by 2
       else
-        contents.push contents.pop() + text
+        contents.push (contents.pop() or '') + text
+
+    return if separators.length is 0
 
     for index in [0...contents.length-1]
       content = contents[index]
