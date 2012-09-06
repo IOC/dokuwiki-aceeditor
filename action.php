@@ -56,7 +56,7 @@ class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
         }
 
         if (!$this->has_jquery() and $this->getConf('loadjquery')) {
-            $jqueryurl = 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js';
+            $jqueryurl = '//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js';
             $this->link_script($event, $jqueryurl);
             $this->include_script($event, '$.noConflict();');
         }
