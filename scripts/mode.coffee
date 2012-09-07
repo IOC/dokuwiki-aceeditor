@@ -24,16 +24,20 @@ define [
   'ace/mode/coldfusion_highlight_rules'
   'ace/mode/csharp_highlight_rules'
   'ace/mode/css_highlight_rules'
+  'ace/mode/diff_highlight_rules'
+  'ace/mode/golang_highlight_rules'
   'ace/mode/groovy_highlight_rules'
   'ace/mode/haxe_highlight_rules'
   'ace/mode/html_highlight_rules'
   'ace/mode/java_highlight_rules'
   'ace/mode/javascript_highlight_rules'
   'ace/mode/json_highlight_rules'
+  'ace/mode/jsx_highlight_rules'
   'ace/mode/latex_highlight_rules'
   'ace/mode/less_highlight_rules'
   'ace/mode/liquid_highlight_rules'
   'ace/mode/lua_highlight_rules'
+  'ace/mode/luapage_highlight_rules'
   'ace/mode/markdown_highlight_rules'
   'ace/mode/ocaml_highlight_rules'
   'ace/mode/perl_highlight_rules'
@@ -48,9 +52,11 @@ define [
   'ace/mode/sh_highlight_rules'
   'ace/mode/sql_highlight_rules'
   'ace/mode/svg_highlight_rules'
+  'ace/mode/tcl_highlight_rules'
   'ace/mode/textile_highlight_rules'
   'ace/mode/xml_highlight_rules'
   'ace/mode/xquery_highlight_rules'
+  'ace/mode/yaml_highlight_rules'
 ], (deps...) -> (spec) ->
   [{Mode}
    {Tokenizer}
@@ -60,16 +66,20 @@ define [
    {ColdfusionHighlightRules}
    {CSharpHighlightRules}
    {CssHighlightRules}
+   {DiffHighlightRules}
+   {GolangHighlightRules}
    {GroovyHighlightRules}
    {HaxeHighlightRules}
    {HtmlHighlightRules}
    {JavaHighlightRules}
    {JavaScriptHighlightRules}
    {JsonHighlightRules}
+   {JsxHighlightRules}
    {LatexHighlightRules}
    {LessHighlightRules}
    {LiquidHighlightRules}
    {LuaHighlightRules}
+   {LuaPageHighlightRules}
    {MarkdownHighlightRules}
    {OcamlHighlightRules}
    {PerlHighlightRules}
@@ -84,9 +94,11 @@ define [
    {ShHighlightRules}
    {SqlHighlightRules}
    {SvgHighlightRules}
+   {TclHighlightRules}
    {TextileHighlightRules}
    {XmlHighlightRules}
-   {XQueryHighlightRules}] = deps
+   {XQueryHighlightRules}
+   {YamlHighlightRules}] = deps
 
   indent_regex = /// ^(?:
     (?:\x20{2,}|\t{1,})[\*\-][\x20\t]* # listblock
@@ -103,16 +115,20 @@ define [
     cpp: c_cppHighlightRules
     csharp: CSharpHighlightRules
     css: CssHighlightRules
+    diff: DiffHighlightRules
+    golang: GolangHighlightRules
     groovy: GroovyHighlightRules
     haxe: HaxeHighlightRules
     html: HtmlHighlightRules
     java: JavaHighlightRules
     javascript: JavaScriptHighlightRules
     json: JsonHighlightRules
+    jsx: JsxHighlightRules
     latex: LatexHighlightRules
     less: LessHighlightRules
     liquid: LiquidHighlightRules
     lua: LuaHighlightRules
+    luapage: LuaPageHighlightRules
     markdown: MarkdownHighlightRules
     ocaml: OcamlHighlightRules
     perl: PerlHighlightRules
@@ -127,9 +143,11 @@ define [
     sh: ShHighlightRules
     sql: SqlHighlightRules
     svg: SvgHighlightRules
+    tcl: TclHighlightRules
     textile: TextileHighlightRules
     xml: XmlHighlightRules
     xquery: XQueryHighlightRules
+    yaml: YamlHighlightRules
 
   tokenizer_rules = {}
   inline_rules = []
