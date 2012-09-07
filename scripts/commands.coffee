@@ -45,7 +45,10 @@ define ['cs!context_table'], (new_context_table) -> (spec) ->
         context.commands[name]? data
         hide_menu()
         return
-    fallback?()
+    if fallback
+      platform = spec.ace.platform()
+      exec = fallback[platform] or fallback
+      return exec?()
 
   hide_menu = ->
     spec.ace.remove_marker menu_marker if menu_marker
@@ -62,19 +65,25 @@ define ['cs!context_table'], (new_context_table) -> (spec) ->
     name: 'doku-alt-left'
     key_win: 'Alt-Left'
     key_mac: 'Option-Left'
-    exec: callback('alt_left', spec.ace.navigate_line_start)
+    exec: callback('alt_left', {
+      win: spec.ace.navigate_line_start
+      mac: spec.ace.navigate_word_left
+    })
 
   spec.ace.add_command
     name: 'doku-alt-right'
     key_win: 'Alt-Right'
     key_mac: 'Option-Right'
-    exec: callback('alt_right', spec.ace.navigate_line_end)
+    exec: callback('alt_right', {
+      win: spec.ace.navigate_line_end
+      mac: spec.ace.navigate_word_right
+    })
 
   spec.ace.add_command
     name: 'doku-ctrl-shift-d'
     key_win: 'Ctrl-Shift-D'
     key_mac: 'Command-Shift-D'
-    exec: callback 'ctrl_shift_d'
+    exec: callback('ctrl_shift_d', spec.ace.duplicate_selection)
 
   spec.ace.add_command
     name: 'doku-hide-menu'

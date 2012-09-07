@@ -142,6 +142,8 @@ define [
 
   cursor_position: -> editor.getCursorPosition()
 
+  duplicate_selection: -> editor.duplicateSelection()
+
   focus: -> editor.focus()
 
   get_length: -> session.getLength()
@@ -168,13 +170,19 @@ define [
 
   insert: (text) -> editor.insert text
 
+  navigate: (position) -> editor.navigateTo position.row, position.column
+
   navigate_line_end: -> editor.navigateLineEnd()
 
   navigate_line_start: -> editor.navigateLineStart()
 
-  navigate: (position) -> editor.navigateTo position.row, position.column
+  navigate_word_left: -> editor.navigateWordLeft()
+
+  navigate_word_right: -> editor.navigateWordRight()
 
   outdent: -> editor.blockOutdent()
+
+  platform: -> editor.commands.platform
 
   remove_marker: (marker_id) -> session.removeMarker marker_id
 
