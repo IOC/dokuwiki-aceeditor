@@ -1,3 +1,9 @@
+2012-10-01
+  * Syntax highlighting for diff, Go, JSX, Lua Page, TCL and YAML
+  * Fixed headline buttons when Ace is disabled
+  * Fixed navigation shortcuts issues on Mac
+  * Updated Ace version
+
 2012-09-06
   * Fixed settings when plugin is disabled
   * Fixed SSL alert when loading jQuery (pre-Angua)
