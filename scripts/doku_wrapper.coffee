@@ -27,7 +27,7 @@ define -> (spec) ->
     orig_func
 
   patch 'currentHeadlineLevel', (func, id) ->
-    jQuery(textarea).val spec.get_value() if id is textarea.id
+    jQuery(textarea).val spec.get_value() if patching and id is textarea.id
     func id
 
   doku_get_selection = patch 'getSelection', (func, obj) ->
