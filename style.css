@@ -15,7 +15,7 @@ textarea.edit {
 }
 
 .ace-doku .ace_editor {
-    font-size: 1.2em;
+    font-size: inherit;
 }
 
 .ace-toggle {
