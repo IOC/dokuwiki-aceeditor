@@ -242,11 +242,11 @@ define [
   def_embed 'htmlblock', '<HTML>', '</HTML>', 'keyword', 'html'
   # 200 code
   for lang  in _.keys(lang_rules)
-    def_embed "code-#{lang}", "<code #{lang}>", '</code>', 'keyword', lang
+    def_embed "code-#{lang}", "<code #{lang}(?:\\s.*?)?>", '</code>', 'keyword', lang
   def_block 'code', '<code.*?>', '</code>', 'keyword'
   # 210 file
   for lang  in _.keys(lang_rules)
-    def_embed "file-#{lang}", "<file #{lang}(?: .*?)?>", '</file>', 'keyword', lang
+    def_embed "file-#{lang}", "<file #{lang}(?:\\s.*?)?>", '</file>', 'keyword', lang
   def_block 'file', '<file.*?>', '</file>', 'keyword'
   # 220 quote
   def_base '^>{1,2}', 'keyword.operator'
