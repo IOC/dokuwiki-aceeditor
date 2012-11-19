@@ -94,13 +94,14 @@ define [
     session.setUndoManager new UndoManager()
     session.setTabSize 2
 
-    if spec.markdown and spec.mdpage
-      session.setMode new markdown.Mode
-    else
-      session.setMode new_mode
-        latex: spec.latex
-        markdown: spec.markdown
-        xmltags: spec.xmltags
+    if spec.highlight
+      if spec.markdown and spec.mdpage
+        session.setMode new markdown.Mode
+      else
+        session.setMode new_mode
+          latex: spec.latex
+          markdown: spec.markdown
+          xmltags: spec.xmltags
 
     editor.setShowPrintMargin spec.wrapmode
     session.setUseWrapMode spec.wrapmode

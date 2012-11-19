@@ -93,6 +93,7 @@ define [
     ace = new_ace
       colortheme: JSINFO.plugin_aceeditor.colortheme
       element: container.element()
+      highlight: JSINFO.plugin_aceeditor.highlight
       latex: JSINFO.plugin_aceeditor.latex
       markdown: JSINFO.plugin_aceeditor.markdown
       mdpage: JSINFO.plugin_aceeditor.mdpage
