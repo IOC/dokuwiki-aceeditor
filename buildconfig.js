@@ -1,15 +1,11 @@
 ({
+    mainConfigFile: "scripts/init.js",
     baseUrl: "scripts",
-    paths: {
-        "requirejs": "require",
-        "ace": "../ace/lib/ace",
-        "ace/requirejs/text": "text",
-    },
     name: "almond",
     out: "build.js",
     stubModules: ["cs"],
     include: [
-        "boot",
+        "init",
         "ace/theme/chrome",
         "ace/theme/clouds",
         "ace/theme/clouds_midnight",
