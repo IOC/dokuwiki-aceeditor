@@ -54,7 +54,8 @@ define [
 
   getLineStates = (line, startState) ->
     currentState = startState
-    state = @rules[currentState]
+    stack = []
+    state = @states[currentState]
     mapping = @matchMappings[currentState]
     re = @regExps[currentState]
 
@@ -65,10 +66,10 @@ define [
 
       for i in [0...match.length - 2] by 1
         if match[i + 1]?
-          rule = state[mapping[i].rule]
-          if rule.next and rule.next isnt currentState
-            currentState = rule.next
-            state = @rules[currentState]
+          rule = state[mapping[i]]
+          if rule.next
+            currentState = rule.next?(currentState, stack) or rule.next
+            state = @states[currentState]
             mapping = @matchMappings[currentState]
             lastIndex = re.lastIndex
             re = @regExps[currentState]

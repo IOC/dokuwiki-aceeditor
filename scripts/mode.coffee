@@ -55,7 +55,6 @@ define [
   'ace/mode/tcl_highlight_rules'
   'ace/mode/textile_highlight_rules'
   'ace/mode/xml_highlight_rules'
-  'ace/mode/xquery_highlight_rules'
   'ace/mode/yaml_highlight_rules'
 ], (deps...) -> (spec) ->
   [{Mode}
@@ -84,7 +83,7 @@ define [
    {OcamlHighlightRules}
    {PerlHighlightRules}
    {PgsqlHighlightRules}
-   {PhpHighlightRules}
+   {PhpLangHighlightRules}
    {PowershellHighlightRules}
    {PythonHighlightRules}
    {RubyHighlightRules}
@@ -97,7 +96,6 @@ define [
    {TclHighlightRules}
    {TextileHighlightRules}
    {XmlHighlightRules}
-   {XQueryHighlightRules}
    {YamlHighlightRules}] = deps
 
   indent_regex = /// ^(?:
@@ -133,7 +131,7 @@ define [
     ocaml: OcamlHighlightRules
     perl: PerlHighlightRules
     pgsql: PgsqlHighlightRules
-    php: PhpHighlightRules
+    php: PhpLangHighlightRules
     powershell: PowershellHighlightRules
     python: PythonHighlightRules
     ruby: RubyHighlightRules
@@ -146,15 +144,14 @@ define [
     tcl: TclHighlightRules
     textile: TextileHighlightRules
     xml: XmlHighlightRules
-    xquery: XQueryHighlightRules
     yaml: YamlHighlightRules
 
   tokenizer_rules = {}
   inline_rules = []
   container_states = []
 
-  def_rule = (state, regex, token, next) ->
-    (tokenizer_rules[state] or= []).push {regex, token, next, merge: on}
+  def_rule = (state, regex, token, next, nextState) ->
+    (tokenizer_rules[state] or= []).push {regex, token, next, nextState, merge: on}
 
   def_base = (regex, token, next) ->
     def_rule 'start', regex, token, next
@@ -186,7 +183,11 @@ define [
   embed_rules = (rules, prefix, escape_rules) ->
     for name, state of rules
       state = (_.clone rule for rule in state)
-      rule.next = prefix + rule.next for rule in state when rule.next
+      for rule in state
+        if rule.nextState
+          rule.nextState = prefix + rule.nextState
+        else if typeof rule.next is 'string'
+          rule.next = prefix + rule.next
       escape_rules = (_.clone rule for rule in escape_rules)
       tokenizer_rules[prefix + name] = escape_rules.concat state
 
@@ -309,13 +310,19 @@ define [
   copy_rules = (state, prefix, rules) ->
     rules ?= tokenizer_rules[state]
     for rule in rules
-      next = if rule.next then "#{prefix}-#{rule.next}"
-      def_rule "#{prefix}-#{state}", rule.regex, rule.token, next
-      copy_rules rule.next, prefix if rule.next and not tokenizer_rules[next]
+      next = nextState = copyState = null
+      if rule.nextState
+        next = rule.next
+        nextState = prefix + rule.nextState
+        copyState = rule.nextState
+      else if typeof rule.next is 'string'
+        next = prefix + rule.next
+        copyState = rule.next
+      def_rule prefix + state, rule.regex, rule.token, next, nextState
+      copy_rules copyState, prefix if copyState and not tokenizer_rules[prefix + copyState]
 
-  do ->
-    for state in container_states
-      copy_rules 'start', state, inline_rules
+  for state in container_states
+    copy_rules 'start', state + "-", inline_rules
 
   doku_mode = new Mode()
   doku_mode.$tokenizer = new Tokenizer tokenizer_rules
