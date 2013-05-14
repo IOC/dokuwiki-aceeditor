@@ -18,83 +18,95 @@
 define [
   'ace/mode/text'
   'ace/tokenizer'
+  'ace/mode/abap_highlight_rules'
+  'ace/mode/actionscript_highlight_rules'
+  'ace/mode/autohotkey_highlight_rules'
   'ace/mode/c_cpp_highlight_rules'
   'ace/mode/clojure_highlight_rules'
   'ace/mode/coffee_highlight_rules'
-  'ace/mode/coldfusion_highlight_rules'
   'ace/mode/csharp_highlight_rules'
   'ace/mode/css_highlight_rules'
   'ace/mode/diff_highlight_rules'
+  'ace/mode/dot_highlight_rules'
+  'ace/mode/erlang_highlight_rules'
+  'ace/mode/glsl_highlight_rules'
   'ace/mode/golang_highlight_rules'
   'ace/mode/groovy_highlight_rules'
+  'ace/mode/haskell_highlight_rules'
   'ace/mode/haxe_highlight_rules'
   'ace/mode/html_highlight_rules'
+  'ace/mode/ini_highlight_rules'
   'ace/mode/java_highlight_rules'
   'ace/mode/javascript_highlight_rules'
-  'ace/mode/json_highlight_rules'
-  'ace/mode/jsx_highlight_rules'
   'ace/mode/latex_highlight_rules'
-  'ace/mode/less_highlight_rules'
-  'ace/mode/liquid_highlight_rules'
+  'ace/mode/lisp_highlight_rules'
+  'ace/mode/lsl_highlight_rules'
   'ace/mode/lua_highlight_rules'
-  'ace/mode/luapage_highlight_rules'
+  'ace/mode/makefile_highlight_rules'
   'ace/mode/markdown_highlight_rules'
+  'ace/mode/objectivec_highlight_rules'
   'ace/mode/ocaml_highlight_rules'
+  'ace/mode/pascal_highlight_rules'
   'ace/mode/perl_highlight_rules'
   'ace/mode/pgsql_highlight_rules'
   'ace/mode/php_highlight_rules'
   'ace/mode/powershell_highlight_rules'
+  'ace/mode/prolog_highlight_rules'
+  'ace/mode/properties_highlight_rules'
   'ace/mode/python_highlight_rules'
   'ace/mode/ruby_highlight_rules'
-  'ace/mode/scad_highlight_rules'
   'ace/mode/scala_highlight_rules'
-  'ace/mode/scss_highlight_rules'
+  'ace/mode/scheme_highlight_rules'
   'ace/mode/sh_highlight_rules'
   'ace/mode/sql_highlight_rules'
-  'ace/mode/svg_highlight_rules'
   'ace/mode/tcl_highlight_rules'
-  'ace/mode/textile_highlight_rules'
   'ace/mode/xml_highlight_rules'
   'ace/mode/yaml_highlight_rules'
 ], (deps...) -> (spec) ->
   [{Mode}
    {Tokenizer}
+   {AbapHighlightRules}
+   {ActionScriptHighlightRules}
+   {AutoHotKeyHighlightRules}
    {c_cppHighlightRules}
    {ClojureHighlightRules}
    {CoffeeHighlightRules}
-   {ColdfusionHighlightRules}
    {CSharpHighlightRules}
    {CssHighlightRules}
    {DiffHighlightRules}
+   {DotHighlightRules}
+   {ErlangHighlightRules}
+   {glslHighlightRules}
    {GolangHighlightRules}
    {GroovyHighlightRules}
+   {HaskellHighlightRules}
    {HaxeHighlightRules}
    {HtmlHighlightRules}
+   {IniHighlightRules}
    {JavaHighlightRules}
    {JavaScriptHighlightRules}
-   {JsonHighlightRules}
-   {JsxHighlightRules}
    {LatexHighlightRules}
-   {LessHighlightRules}
-   {LiquidHighlightRules}
+   {LispHighlightRules}
+   {LSLHighlightRules}
    {LuaHighlightRules}
-   {LuaPageHighlightRules}
+   {MakefileHighlightRules}
    {MarkdownHighlightRules}
+   {ObjectiveCHighlightRules}
    {OcamlHighlightRules}
+   {PascalHighlightRules}
    {PerlHighlightRules}
    {PgsqlHighlightRules}
    {PhpLangHighlightRules}
    {PowershellHighlightRules}
+   {PrologHighlightRules}
+   {PropertiesHighlightRules}
    {PythonHighlightRules}
    {RubyHighlightRules}
-   {scadHighlightRules}
    {ScalaHighlightRules}
-   {ScssHighlightRules}
+   {SchemeHighlightRules}
    {ShHighlightRules}
    {SqlHighlightRules}
-   {SvgHighlightRules}
    {TclHighlightRules}
-   {TextileHighlightRules}
    {XmlHighlightRules}
    {YamlHighlightRules}] = deps
 
@@ -105,44 +117,55 @@ define [
   ) ///
 
   lang_rules =
+    abap: AbapHighlightRules
+    actionscript: ActionScriptHighlightRules
+    actionscript3: ActionScriptHighlightRules
+    autohotkey: AutoHotKeyHighlightRules
     bash: ShHighlightRules
     c: c_cppHighlightRules
     clojure: ClojureHighlightRules
-    coffee: CoffeeHighlightRules
-    coldfusion: ColdfusionHighlightRules
+    coffeescript: CoffeeHighlightRules
     cpp: c_cppHighlightRules
     csharp: CSharpHighlightRules
     css: CssHighlightRules
     diff: DiffHighlightRules
-    golang: GolangHighlightRules
+    dot: DotHighlightRules
+    ecmascript: JavaScriptHighlightRules
+    erlang: ErlangHighlightRules
+    glsl: glslHighlightRules
+    go: GolangHighlightRules
     groovy: GroovyHighlightRules
+    haskell: HaskellHighlightRules
     haxe: HaxeHighlightRules
     html: HtmlHighlightRules
+    html4strict: HtmlHighlightRules
+    html5: HtmlHighlightRules
+    ini: IniHighlightRules
     java: JavaHighlightRules
+    java5: JavaHighlightRules
     javascript: JavaScriptHighlightRules
-    json: JsonHighlightRules
-    jsx: JsxHighlightRules
     latex: LatexHighlightRules
-    less: LessHighlightRules
-    liquid: LiquidHighlightRules
+    lisp: LispHighlightRules
+    lsl2: LSLHighlightRules
     lua: LuaHighlightRules
-    luapage: LuaPageHighlightRules
+    make: MakefileHighlightRules
     markdown: MarkdownHighlightRules
+    mysql: SqlHighlightRules
+    objc: ObjectiveCHighlightRules
     ocaml: OcamlHighlightRules
+    pascal: PascalHighlightRules
     perl: PerlHighlightRules
     pgsql: PgsqlHighlightRules
     php: PhpLangHighlightRules
     powershell: PowershellHighlightRules
+    prolog: PrologHighlightRules
+    properties: PropertiesHighlightRules
     python: PythonHighlightRules
     ruby: RubyHighlightRules
-    scad: scadHighlightRules
     scala: ScalaHighlightRules
-    scss: ScssHighlightRules
-    sh: ShHighlightRules
+    scheme: SchemeHighlightRules
     sql: SqlHighlightRules
-    svg: SvgHighlightRules
     tcl: TclHighlightRules
-    textile: TextileHighlightRules
     xml: XmlHighlightRules
     yaml: YamlHighlightRules
 
