@@ -71,6 +71,12 @@ define ['cs!context_table'], (new_context_table) -> (spec) ->
     })
 
   spec.ace.add_command
+    name: 'doku-alt-return'
+    key_win: 'Alt-Return'
+    key_mac: 'Option-Return'
+    exec: callback 'alt_return'
+
+  spec.ace.add_command
     name: 'doku-alt-right'
     key_win: 'Alt-Right'
     key_mac: 'Option-Right'
@@ -78,6 +84,12 @@ define ['cs!context_table'], (new_context_table) -> (spec) ->
       win: spec.ace.navigate_line_end
       mac: spec.ace.navigate_word_right
     })
+
+  spec.ace.add_command
+    name: 'doku-alt-shift-return'
+    key_win: 'Alt-Shift-Return'
+    key_mac: 'Option-Shift-Return'
+    exec: callback 'alt_shift_return'
 
   spec.ace.add_command
     name: 'doku-ctrl-shift-d'

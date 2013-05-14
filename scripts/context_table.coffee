@@ -161,6 +161,12 @@ define -> (spec) ->
       rows[cursor_row].align_cell cursor_cell, align
       format()
 
+    insert_row: (before) ->
+      cursor_row += 1 unless before
+      rows.splice cursor_row, 0, new_row []
+      cursor_cell = 0
+      format()
+
     move_column_left: ->
       normalize()
       if not has_colspans() and cursor_cell > 0
@@ -269,7 +275,9 @@ define -> (spec) ->
 
   commands:
     alt_left: (table) -> table.move_column_left()
+    alt_return: (table) -> table.insert_row()
     alt_right: (table) -> table.move_column_right()
+    alt_shift_return: (table) -> table.insert_row true
     ctrl_shift_d: (table) -> table.remove_column()
     menu_c: (table) -> table.align_cell 'center'
     menu_l: (table) -> table.align_cell 'left'
