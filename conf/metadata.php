@@ -6,6 +6,8 @@ $meta['default'] = array('onoff');
 $meta['highlight'] = array('onoff');
 $meta['wraplimit'] = array('string', '_pattern' => '/^\s*[0-9]*\s*$/');
 $meta['colortheme'] = array('multichoice', '_choices' => array(
+    'ambiance',
+    'chaos',
     'chrome',
     'clouds',
     'clouds_midnight',
@@ -24,6 +26,7 @@ $meta['colortheme'] = array('multichoice', '_choices' => array(
     'pastel_on_dark',
     'solarized_dark',
     'solarized_light',
+    'terminal',
     'textmate',
     'tomorrow',
     'tomorrow_night',
@@ -32,6 +35,7 @@ $meta['colortheme'] = array('multichoice', '_choices' => array(
     'tomorrow_night_eighties',
     'twilight',
     'vibrant_ink',
+    'xcode',
 ));
 if (!action_plugin_aceeditor::has_jquery()) {
     $meta['loadjquery'] = array('onoff');

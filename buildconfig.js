@@ -6,6 +6,8 @@
     stubModules: ["cs"],
     include: [
         "init",
+        "ace/theme/ambiance",
+        "ace/theme/chaos",
         "ace/theme/chrome",
         "ace/theme/clouds",
         "ace/theme/clouds_midnight",
@@ -24,6 +26,7 @@
         "ace/theme/pastel_on_dark",
         "ace/theme/solarized_dark",
         "ace/theme/solarized_light",
+        "ace/theme/terminal",
         "ace/theme/textmate",
         "ace/theme/tomorrow",
         "ace/theme/tomorrow_night_blue",
@@ -32,6 +35,7 @@
         "ace/theme/tomorrow_night",
         "ace/theme/twilight",
         "ace/theme/vibrant_ink",
+        "ace/theme/xcode",
     ],
     exclude: [
         "coffee-script",
