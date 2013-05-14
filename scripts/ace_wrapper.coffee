@@ -17,6 +17,7 @@
 
 define [
   'ace/editor'
+  'ace/ext/searchbox'
   'ace/keyboard/state_handler'
   'ace/lib/fixoldbrowsers'
   'ace/mode/markdown'
@@ -28,6 +29,7 @@ define [
   'require'
 ], (deps...) -> (spec) ->
   [{Editor}
+   searchbox
    {StateHandler}
    fixoldbrowsers
    markdown
