@@ -1,3 +1,12 @@
+2013-05-15
+  * Fixed lock expiring while editing
+  * Fixed setting to enabled/disable syntax highlighting
+  * Fixed highlighting of code blocks with filenames
+  * Fixed highñighting of tables with multiline cells
+  * Use same font size and line height as textarea
+  * Same languages as GeSHI allowed in code/file blocks
+  * Updated Ace version (freaturing a search box and new themes)
+
 2012-10-01
   * Syntax highlighting for diff, Go, JSX, Lua Page, TCL and YAML
   * Fixed headline buttons when Ace is disabled
