@@ -225,9 +225,11 @@ define [
   # 50 header
   def_base '[ \t]*={2,}.+={2,}[ \t]*$', 'markup.heading'
   # 60 table
-  def_container 'table', '^[\\||\\^](?=.*[\\||\\^][ \t]*$)', 'keyword.operator'
-  def_rule 'table-start', '[\\|\\^][ \t]*$', 'keyword.operator', 'start'
-  def_rule 'table-start', '[\\|\\^]|:::(?=[ \t]*[\\|\\^])', 'keyword.operator'
+  def_container 'table', '^[\\|\\^]', 'keyword.operator'
+  def_rule 'table-start', '[\\|\\^]', 'keyword.operator'
+  def_rule 'table-start', '[\t ]*:::[\t ]*(?=[\\|\\^])', 'keyword.operator'
+  def_rule 'table-start', '[\t ]+', 'text'
+  def_rule 'table-start', '$', 'text', 'start'
   # 69 markdown
   def_embed 'markdown', '<markdown>', '</markdown>', 'keyword', 'markdown' if spec.markdown
   # 70 strong
