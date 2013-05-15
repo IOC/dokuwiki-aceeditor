@@ -121,4 +121,5 @@ define -> (spec) ->
 
   text_changed: ->
     window.textChanged = true
+    dw_locktimer.refresh()
     summaryCheck()
