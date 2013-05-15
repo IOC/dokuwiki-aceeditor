@@ -86,15 +86,17 @@ define -> (spec) ->
     columns: columns
 
     cursor_position: (index) ->
-      iterator = (memo, cell) -> memo + cell.length()
-      _.reduce cells[0...index], iterator, cells[index].cursor_position()
+      pos = 0
+      pos += cells[i].length() for i in [0...index]
+      pos += if index < cells.length then cells[index].cursor_position() else 1
+      pos
 
     cursor_cell: (column) ->
       length = 0
       for cell, i in cells
         length += cell.length()
-        return i if column < length
-      cells.length - 1
+        return i if column <= length
+      cells.length
 
     fill: (n_columns) ->
       for i in [columns()...n_columns]
@@ -150,7 +152,8 @@ define -> (spec) ->
       iterator = (memo, row) -> Math.max memo, row.columns()
       columns = _.reduce rows, iterator, 0
       row.fill columns for row in rows
-      cursor_cell = Math.min cursor_cell, rows[cursor_row].length() - 1
+
+    cursor_row_length = -> rows[cursor_row].length()
 
     update = ->
       lines = (row.value() for row in rows)
@@ -158,6 +161,8 @@ define -> (spec) ->
       spec.ace.navigate cursor_position()
 
     align_cell: (align) ->
+      normalize()
+      cursor_cell = Math.min cursor_cell, cursor_row_length() - 1
       rows[cursor_row].align_cell cursor_cell, align
       format()
 
@@ -169,51 +174,61 @@ define -> (spec) ->
 
     move_column_left: ->
       normalize()
-      if not has_colspans() and cursor_cell > 0
+      if not has_colspans() and 0 < cursor_cell < cursor_row_length()
+        console.log cursor_cell, cursor_row_length()
         row.move_cell_left cursor_cell for row in rows
         cursor_cell -= 1
       format()
 
     move_column_right: ->
       normalize()
-      if not has_colspans() and cursor_cell < rows[cursor_row].length() - 1
+      if not has_colspans() and cursor_cell < cursor_row_length() - 1
         row.move_cell_right cursor_cell for row in rows
         cursor_cell += 1
       format()
 
     next_cell: ->
+      normalize()
       cursor_cell += 1
-      if cursor_cell == rows[cursor_row].length()
+      if cursor_cell >= cursor_row_length()
         cursor_cell = 0
         cursor_row += 1
         rows.push new_row [] if cursor_row == rows.length
       format()
 
     next_row: ->
-      cursor_row += 1
-      rows.push new_row [] if cursor_row == rows.length
-      format()
+      if cursor_cell < cursor_row_length()
+        cursor_row += 1
+        rows.push new_row [] if cursor_row == rows.length
+        format()
+      else
+        spec.ace.insert '\n'
 
     previous_cell: ->
+      normalize()
       if cursor_cell > 0
         cursor_cell -= 1
       else if cursor_row > 0
         cursor_row -= 1
-        cursor_cell = Infinity
+        cursor_cell = cursor_row_length() - 1
       format()
 
     previous_row: ->
-      cursor_row -= 1 if cursor_row > 0
+      normalize()
+      if cursor_cell < cursor_row_length()
+        cursor_row -= 1 if cursor_row > 0
       format()
 
     remove_column: ->
       normalize()
-      if not has_colspans() and rows[0].length() > 1
+      if not has_colspans() and cursor_row_length() > 1
         row.remove_cell cursor_cell for row in rows
       format()
 
     toggle_header: ->
-      rows[cursor_row].toggle_header cursor_cell
+      normalize()
+      if cursor_cell < cursor_row_length()
+        rows[cursor_row].toggle_header cursor_cell
       format()
 
   parse_row = (row) ->
