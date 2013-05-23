@@ -15,6 +15,7 @@ textarea.edit {
 }
 
 .ace-doku .ace_editor {
+    font-family: inherit;
     font-size: inherit;
 }
 

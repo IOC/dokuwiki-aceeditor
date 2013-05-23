@@ -23,7 +23,7 @@ define -> ->
 
   do ->
     properties = [
-      'font-size', 'line-height',
+      'font-family', 'font-size', 'line-height',
       'border', 'border-color', 'border-style', 'border-width'
       'border-top', 'border-top-color', 'border-top-style', 'border-top-width'
       'border-right', 'border-right-color', 'border-right-style', 'border-right-width'
