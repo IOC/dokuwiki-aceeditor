@@ -1,3 +1,8 @@
+2013-07-02
+  * Fixed cursor position in IE
+  * Use same font family as textarea
+  * Updated Ace version
+
 2013-05-15
   * Fixed lock expiring while editing
   * Fixed setting to enabled/disable syntax highlighting
