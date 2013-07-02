@@ -31,7 +31,7 @@ define -> ->
       'border-left', 'border-left-color', 'border-left-style', 'border-left-width'
       'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left'
     ]
-    wrapper.css prop, textarea.css prop for prop in properties
+    element.css prop, textarea.css prop for prop in properties
     wrapper.append(element).insertAfter(textarea).hide()
 
   element: -> element.get 0

@@ -14,11 +14,6 @@ textarea.edit {
     overflow: hidden;
 }
 
-.ace-doku .ace_editor {
-    font-family: inherit;
-    font-size: inherit;
-}
-
 .ace-toggle {
     float: right;
     cursor: pointer;
