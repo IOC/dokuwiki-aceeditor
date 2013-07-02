@@ -20,12 +20,16 @@ define [
   'ace/tokenizer'
   'ace/mode/abap_highlight_rules'
   'ace/mode/actionscript_highlight_rules'
+  'ace/mode/ada_highlight_rules'
+  'ace/mode/assembly_x86_highlight_rules'
   'ace/mode/autohotkey_highlight_rules'
   'ace/mode/c_cpp_highlight_rules'
   'ace/mode/clojure_highlight_rules'
+  'ace/mode/cobol_highlight_rules'
   'ace/mode/coffee_highlight_rules'
   'ace/mode/csharp_highlight_rules'
   'ace/mode/css_highlight_rules'
+  'ace/mode/d_highlight_rules'
   'ace/mode/diff_highlight_rules'
   'ace/mode/dot_highlight_rules'
   'ace/mode/erlang_highlight_rules'
@@ -44,6 +48,8 @@ define [
   'ace/mode/lua_highlight_rules'
   'ace/mode/makefile_highlight_rules'
   'ace/mode/markdown_highlight_rules'
+  'ace/mode/matlab_highlight_rules'
+  'ace/mode/mysql_highlight_rules'
   'ace/mode/objectivec_highlight_rules'
   'ace/mode/ocaml_highlight_rules'
   'ace/mode/pascal_highlight_rules'
@@ -60,6 +66,7 @@ define [
   'ace/mode/sh_highlight_rules'
   'ace/mode/sql_highlight_rules'
   'ace/mode/tcl_highlight_rules'
+  'ace/mode/verilog_highlight_rules'
   'ace/mode/xml_highlight_rules'
   'ace/mode/yaml_highlight_rules'
 ], (deps...) -> (spec) ->
@@ -67,12 +74,16 @@ define [
    {Tokenizer}
    {AbapHighlightRules}
    {ActionScriptHighlightRules}
+   {AdaHighlightRules}
+   {AssemblyX86HighlightRules}
    {AutoHotKeyHighlightRules}
    {c_cppHighlightRules}
    {ClojureHighlightRules}
+   {CobolHighlightRules}
    {CoffeeHighlightRules}
    {CSharpHighlightRules}
    {CssHighlightRules}
+   {DHighlightRules}
    {DiffHighlightRules}
    {DotHighlightRules}
    {ErlangHighlightRules}
@@ -91,6 +102,8 @@ define [
    {LuaHighlightRules}
    {MakefileHighlightRules}
    {MarkdownHighlightRules}
+   {MatlabHighlightRules}
+   {MysqlHighlightRules}
    {ObjectiveCHighlightRules}
    {OcamlHighlightRules}
    {PascalHighlightRules}
@@ -107,6 +120,7 @@ define [
    {ShHighlightRules}
    {SqlHighlightRules}
    {TclHighlightRules}
+   {VerilogHighlightRules}
    {XmlHighlightRules}
    {YamlHighlightRules}] = deps
 
@@ -120,14 +134,18 @@ define [
     abap: AbapHighlightRules
     actionscript: ActionScriptHighlightRules
     actionscript3: ActionScriptHighlightRules
+    ada: AdaHighlightRules
+    asm: AssemblyX86HighlightRules
     autohotkey: AutoHotKeyHighlightRules
     bash: ShHighlightRules
     c: c_cppHighlightRules
     clojure: ClojureHighlightRules
+    cobol: CobolHighlightRules
     coffeescript: CoffeeHighlightRules
     cpp: c_cppHighlightRules
     csharp: CSharpHighlightRules
     css: CssHighlightRules
+    d: DHighlightRules
     diff: DiffHighlightRules
     dot: DotHighlightRules
     ecmascript: JavaScriptHighlightRules
@@ -150,7 +168,8 @@ define [
     lua: LuaHighlightRules
     make: MakefileHighlightRules
     markdown: MarkdownHighlightRules
-    mysql: SqlHighlightRules
+    matlab: MatlabHighlightRules
+    mysql: MysqlHighlightRules
     objc: ObjectiveCHighlightRules
     ocaml: OcamlHighlightRules
     pascal: PascalHighlightRules
@@ -166,6 +185,7 @@ define [
     scheme: SchemeHighlightRules
     sql: SqlHighlightRules
     tcl: TclHighlightRules
+    verilog: VerilogHighlightRules
     xml: XmlHighlightRules
     yaml: YamlHighlightRules
 
