@@ -1,3 +1,8 @@
+2013-07-19
+  * Fixed formatting of tables with fullwidth characters
+  * Fixed border and margin of editor
+  * Updated Russian translation (thanks to Aleksandr Selivanov)
+
 2013-07-02
   * Fixed cursor position in IE
   * Use same font family as textarea
