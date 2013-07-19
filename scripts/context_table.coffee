@@ -17,6 +17,8 @@
 
 define -> (spec) ->
 
+  wide_chars_re = /[\u1100-\u115F\u11A3-\u11A7\u11FA-\u11FF\u2329-\u232A\u2E80-\u2E99\u2E9B-\u2EF3\u2F00-\u2FD5\u2FF0-\u2FFB\u3000-\u303E\u3041-\u3096\u3099-\u30FF\u3105-\u312D\u3131-\u318E\u3190-\u31BA\u31C0-\u31E3\u31F0-\u321E\u3220-\u3247\u3250-\u32FE\u3300-\u4DBF\u4E00-\uA48C\uA490-\uA4C6\uA960-\uA97C\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFAFF\uFE10-\uFE19\uFE30-\uFE52\uFE54-\uFE66\uFE68-\uFE6B\uFF01-\uFF60\uFFE0-\uFFE6]/g
+
   new_cell = (spec) ->
 
     text = -> spec.content.replace(/^\ +/, '').replace(/\ +$/, '')
@@ -26,7 +28,8 @@ define -> (spec) ->
         when 'left' then left: 1, right: 1
         when 'center' then left: 2, right: 2
         when 'right' then left: 2, right: 1
-      min_length = text().length + spec.colspan + padding.left + padding.right
+      visual_length = text().replace(wide_chars_re, 'XX').length
+      min_length = visual_length + spec.colspan + padding.left + padding.right
       target_length = 0
 
       for i in [0...spec.colspan]
