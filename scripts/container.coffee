@@ -22,8 +22,8 @@ define -> ->
   element = jQuery '<div>'
 
   do ->
-    properties = [
-      'font-family', 'font-size', 'line-height',
+    text_properties = ['font-family', 'font-size', 'line-height']
+    box_properties = [
       'border', 'border-color', 'border-style', 'border-width'
       'border-top', 'border-top-color', 'border-top-style', 'border-top-width'
       'border-right', 'border-right-color', 'border-right-style', 'border-right-width'
@@ -31,7 +31,8 @@ define -> ->
       'border-left', 'border-left-color', 'border-left-style', 'border-left-width'
       'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left'
     ]
-    element.css prop, textarea.css prop for prop in properties
+    element.css prop, textarea.css prop for prop in text_properties
+    wrapper.css prop, textarea.css prop for prop in box_properties
     wrapper.append(element).insertAfter(textarea).hide()
 
   element: -> element.get 0
