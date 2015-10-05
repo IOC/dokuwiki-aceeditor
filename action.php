@@ -19,7 +19,7 @@
 
 if (!defined('DOKU_INC')) die();
 
-require_once DOKU_PLUGIN.action.php';
+require_once DOKU_PLUGIN.'action.php';
 
 class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
 
