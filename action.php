@@ -23,7 +23,7 @@ require_once DOKU_INC.'lib/plugins/action.php';
 
 class action_plugin_aceeditor extends DokuWiki_Action_Plugin {
 
-    public function register(Doku_Event_Handler &$controller){
+    public function register(Doku_Event_Handler $controller){
         $controller->register_hook('DOKUWIKI_STARTED', 'AFTER',
                                    $this, 'handle_dokuwiki_started');
         $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE',
